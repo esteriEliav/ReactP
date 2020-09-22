@@ -9,8 +9,8 @@ import Axios from "../Axios";
 
 export class Main extends Component {
 
-    submit = (type, object) => {
-        if (type === 'הוסף')
+    submit = (name, object) => {
+        if (name === 'הוסף')
             this.addObject(object)
         else
             this.updateObject(object)
@@ -70,8 +70,9 @@ export class Main extends Component {
                 <Table name={this.state.name} fieldsArray={this.state.fieldsOwnersArray} objectsArray={this.state.OwnersArray}
                     LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
                     erors={this.state.erors} submit={this.submit}
-                    delObject={this.deleteObject}
-                    set={this.set} validate={this.validate} />
+                    delObject={this.deleteObject} set={this.set} validate={this.validate}
+                    fieldsToSearch={this.state.fieldsOwnersArray.filter((field, index) => index !== 0)}
+                />
 
 
             </div>

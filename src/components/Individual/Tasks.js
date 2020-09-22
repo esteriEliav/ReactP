@@ -21,10 +21,15 @@ HandlingWay nvarchar(max),--אופן טיפול
  */
 export class Tasks extends Component {
     submit = (type, object) => {
-        if (type === 'הוסף')
+        if (type === 'Add')
             this.addObject(object)
-        else
-            this.updateObject(object)
+        else if (type === 'Update')
+            this.updateObject(object);
+        else {
+            Axios.post('Task/Search', ...object).then(data => alert(data))
+
+            alert(type);
+        }
     }
     updateObject = (object) => {
         Axios.post('Task/UpdateTask', object).then(x => { alert('המטלה עודכנה בהצלחה') });
@@ -98,7 +103,8 @@ export class Tasks extends Component {
                     LinksForTable={this.state.LinksForTable}
                     ButtonsForTable={this.state.ButtonsForTable} fieldsToAdd={this.state.fieldsToAdd}
                     set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit} />
+                    validate={this.validate} erors={this.state.erors} submit={this.submit}
+                    fieldsToSearch={this.state.fieldsTasksArray.filter((f, index) => index !== 0)} />
 
             </div>
         )

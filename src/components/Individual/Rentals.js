@@ -15,8 +15,8 @@ EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
 export class Rentals extends Component {
-    submit = (type, object) => {
-        if (type === 'הוסף')
+    submit = (name, object) => {
+        if (name === 'הוסף')
             this.addObject(object)
         else
             this.updateObject(object)
@@ -36,6 +36,9 @@ export class Rentals extends Component {
         fieldsPropertyArray: [{ field: 'RentalID', name: 'קוד שכירות', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שוכר', type: 'text' },
         { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
+
+        fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
+        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
         PropertiesArray: [{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: true }],//
         LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
@@ -84,7 +87,8 @@ export class Rentals extends Component {
                     LinksForTable={this.state.LinksForTable}
                     ButtonsForTable={this.state.ButtonsForTable} fieldsToAdd={this.state.fieldsToAdd}
                     set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit} />
+                    validate={this.validate} erors={this.state.erors} submit={this.submit}
+                    fieldsToSearch={this.state.fieldsToSearch} />
             </div>
         )
 

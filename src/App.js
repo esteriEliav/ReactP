@@ -15,7 +15,7 @@ import PropertyForRenter from "./components/Individual/PropertyForRenter";
 import Rentals from "./components/Individual/Rentals";
 import Tasks from "./components/Individual/Tasks";
 import SubProperties from "./components/Individual/SubProperties";
-
+import ReportForm from "./components/Individual/ReportForm";
 
 function App() {
   return (
@@ -35,6 +35,7 @@ function App() {
         <Route path='/Form' component={Form} />
         <Route path='/Details' component={Details}></Route>
       </Switch>
+
     </div>
   );
 }

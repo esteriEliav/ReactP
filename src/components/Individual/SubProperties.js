@@ -16,11 +16,11 @@ IsRented bit not null constraint DF_SubProperties_IsRented default 0
 
 
 export class SubProperties extends Component {
-    submit = (type) => {
-        if (type === 'הוסף')
-            this.addObject()
+    submit = (name, object) => {
+        if (name === 'הוסף')
+            this.addObject(object)
         else
-            this.updateObject()
+            this.updateObject(object)
     }
     updateObject = (object) => {
         Axios.post('SubProperty/UpdateSubProperty', object).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
@@ -81,7 +81,8 @@ export class SubProperties extends Component {
                     LinksForTable={this.state.LinksForTable}
                     ButtonsForTable={this.state.ButtonsForTable}
                     set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit} />
+                    validate={this.validate} erors={this.state.erors} submit={this.submit}
+                    fieldsToSearch={this.state.fieldsPropertyArray.filter((f, index) => index !== 0)} />
             </div>
         )
     }

@@ -27,7 +27,7 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 export class Main extends Component {
 
     submit = (type, object) => {
-        if (type === 'הוסף')
+        if (type === 'Add')
             this.addObject(object)
         else
             this.updateObject(object)
@@ -48,9 +48,12 @@ export class Main extends Component {
         fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד דירה', type: 'text' }, { field: 'OwnerID', name: 'בעלים', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' },
         { field: 'StreetName', name: 'רחוב', type: 'text' }, { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' },
         { field: 'ApartmentNum', name: 'מספר דירה', type: 'number' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
-        { field: 'IsDivided', name: 'מחולק?', type: 'checkbox' },
-        { field: 'ManagmentPayment', name: 'דמי ניהול', type: 'text' }, { field: 'IsPaid', name: 'שולם?', type: 'checkbox' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' },
-        { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' }],
+        { field: 'IsDivided', name: 'מחולק?', type: 'checkbox' }, { field: 'ManagmentPayment', name: 'דמי ניהול', type: 'text' }, { field: 'IsPaid', name: 'שולם?', type: 'checkbox' },
+        { field: 'IsRented', name: 'מושכר', type: 'checkbox' }, { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' }],
+
+
+        fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
+        { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
         PropertiesArray: [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
         { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }],//
         LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
@@ -101,10 +104,10 @@ export class Main extends Component {
         return (
             <div>
                 <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                    LinksForTable={this.state.LinksForTable}
-                    ButtonsForTable={this.state.ButtonsForTable}
+                    LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
                     set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit} />
+                    validate={this.validate} erors={this.state.erors} submit={this.submit}
+                    fieldsToSearch={this.state.fieldsToSearch} />
             </div>
         )
     }

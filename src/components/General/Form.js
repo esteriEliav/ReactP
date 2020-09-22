@@ -10,7 +10,7 @@ export class Form extends Component {
     }
     componentDidMount = () => {
         let tempObject = { ...this.state.Object }
-        if (this.props.tempObject === null) {
+        if (tempObject === null) {
             this.props.fieldArray.map(field => { tempObject[field] = "" });
             tempObject[this.props.fieldArray[0]] = this.props.length + 1;
             this.setState({ Object: tempObject });
@@ -28,7 +28,7 @@ export class Form extends Component {
 
         let i = 0, j = 0;
         const puterors = (index) => {
-            if (i < this.props.erors.length && this.props.erors[i].index == index) {
+            if (i < this.props.erors.length && this.props.erors[i].index === index) {
                 i += 1
                 return <label>{this.props.erors[i].name}</label>
             }
@@ -48,26 +48,26 @@ export class Form extends Component {
         }
         return (
             <React.Fragment>
-                <button>aaa</button>
 
-                <form>
+                <form onSubmit={() => this.props.submit(this.props.type, this.state.Object)}>
                     {this.props.fieldsArray.map((field, index) =>
-                        <div>
-                            <label>{field}</label>
-                            <input type={field.field} name={field} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
+                        <span key={index}>
+                            <label>{field.name}</label>
+                            <input type={field.type} id={field.field} placeholder={field.name} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
                             {puterors(index)}
-                        </div>
+                            {this.props.type !== 'Search' && <br />}
+                        </span>
 
                     )}
                     {this.props.fieldsToAdd.map((field, index) =>
-                        <div>
+                        <div key={index}>
                             <label>{field.name}</label>
-                            <input type={this.props.fieldsInputTypes[index]} name={field} value={this.state.Object[field]} onChange={(e) => { this.change(e, field) }} />
+                            <input type={field.type} id={field.field} name={field} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field) }} />
                             {puterors(index)}
                             {func(index)}
                         </div>
                     )}
-                    <button type="Submit" name={this.props.type}>{this.props.type}</button>
+                    <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
                 </form>
 
             </React.Fragment>

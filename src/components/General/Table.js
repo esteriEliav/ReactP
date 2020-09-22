@@ -14,6 +14,14 @@ export class Table extends Component {
             <div>
 
                 <h1>{this.props.name}</h1>
+
+                {this.props.fieldsToSearch && <Form name='חיפוש' type='Search' fieldsArray={this.props.fieldsToSearch} Object={null}
+                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
+                    fieldsToAdd={[]} erors={[]} submit={this.props.submit}></Form>}
+
+
+
+
                 { this.props.LinksForTable.map((lin, index) => <div key={index}> <Link to={lin.link}
                     fieldsArray={this.props.fieldsArray} Object={null}
                     LinksForEveryRow={this.props.LinksForEveryRow} ButtonsForEveryRow={this.props.ButtonsForEveryRow}

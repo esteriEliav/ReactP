@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
 
+
 //import Main1 from "../Individual/PropertyOwner";
 //import PropertyForRenter from "../Individual/PropertyForRenter";
 //import Properties from "../Individual/Properties";
@@ -9,6 +10,7 @@ import Tasks from "../Individual/Tasks";
 import SubProperties from "../Individual/SubProperties";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+
 
 export class AddCommonLinks extends Component {
 

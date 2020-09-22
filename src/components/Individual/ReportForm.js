@@ -41,7 +41,7 @@ export class ReportForm extends Component {
 
         return (
             <div>
-                <form class="ui form" >
+                <form class="ui form" onSubmit={() => { console.log(this.state.malfunctions) }}>
                     <div class="field">
                         <label>תיאור הבעיה</label>
                         <textarea id="description" placeholder="עד 50 מילים" onChange={(e) => this.change(e)}></textarea>
