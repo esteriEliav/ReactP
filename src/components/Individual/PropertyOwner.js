@@ -3,24 +3,39 @@ import Table from '../General/Table'
 import Details from '../General/Details'
 import AddCommonLinks from '../General/AddCommonLinks'
 import MPropertyForRenterain1 from './PropertyForRenter';
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
 
-export class Main extends Component {
+export class PropertyOwner extends Component {
 
-    submit = (name, object) => {
-        if (name === 'הוסף')
-            this.addObject(object)
+    submit = (type, object) => {
+        let x = false;
+        if (type === 'Add')
+            x = this.addObject(object)
+        else if (type === 'Update')
+            x = this.updateObject(object)
         else
-            this.updateObject(object)
+            x = this.Search(object)
+        if (x)
+            return <Redirect to='/PropertyOwner' />
+        return null;
+    }
+    Search = (object) => {
+        Axios.post('PropertyOwner/AddPropertyOwner', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     updateObject = (object) => {
-        Axios.post('Property/UpdateSubProperty', object).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
+        Axios.post('PropertyOwner/UpdatePropertyOwner', object).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     addObject = (object) => {
         object.PropertyID = 1;
-        Axios.post('Property/AddSubProperty', object).then(x => { alert('הדירה עודכנה בהצלחה') });
+        Axios.post('PropertyOwner/AddPropertyOwner', object).then(x => { alert('הדירה עודכנה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     deleteObject = (object) => {
         window.confirm("האוביקט ימחק מיד");
@@ -33,8 +48,8 @@ export class Main extends Component {
         OwnersArray: [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
         { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
         { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }],
-        LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ name: 'הוספת משכיר', link: '/Form' }],
+        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
+        LinksForTable: [{ type: 'Add', name: 'הוספת משכיר', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
         ButtonsForTable: [],
         fieldsToAdd: [],
@@ -81,4 +96,4 @@ export class Main extends Component {
     }
 }
 
-export default Main
+export default PropertyOwner

@@ -1,18 +1,22 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
-
+/*
+except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject,submit,name,type
+*/
 export class Form extends Component {
-    state = {
-        Object: { ...this.props.Object },
 
+    state = {
+        Object: { ...this.props.location.Object },
+        isRedirect: false
 
     }
     componentDidMount = () => {
-        let tempObject = { ...this.state.Object }
-        if (tempObject === null) {
-            this.props.fieldArray.map(field => { tempObject[field] = "" });
-            tempObject[this.props.fieldArray[0]] = this.props.length + 1;
+        let tempObject = { ...this.state.Object };
+        if (Object.keys(tempObject).length === 0) {
+            this.props.location.fieldsArray.map(field => { tempObject[field.field] = "" });
+            tempObject[this.props.location.fieldsArray[0].field] = 1;
+            this.props.location.fieldsToAdd.map(field => { tempObject[field.field] = "" });
             this.setState({ Object: tempObject });
             console.log('object', this.state.Object)
         }
@@ -28,48 +32,61 @@ export class Form extends Component {
 
         let i = 0, j = 0;
         const puterors = (index) => {
-            if (i < this.props.erors.length && this.props.erors[i].index === index) {
+            if (i < this.props.location.erors.length && this.props.location.erors[i].index === index) {
                 i += 1
-                return <label>{this.props.erors[i].name}</label>
+                return <label>{this.props.location.erors[i].name}</label>
             }
             return null
         }
 
         const func = (index) => {
-            while (j < this.props.fieldsToAdd.length && this.props.fieldsToAdd[j].index === index) {
+            while (j < this.props.location.fieldsToAdd.length && this.props.location.fieldsToAdd[j].index === index) {
                 j += 1
                 return <div>
-                    <label >{this.props.fieldsToAdd[j].name}</label>
-                    <input type={this.props.fieldsToAdd[j].type} name={this.props.fieldsToAdd[j].field} value={this.state.Object[this.props.fieldsToAdd[j].field]} onChange={(e) => { this.change(e, this.props.fieldsToAdd[j].field) }} />
+                    <label >{this.props.location.fieldsToAdd[j].name}</label>
+                    <input type={this.props.location.fieldsToAdd[j].type} name={this.props.location.fieldsToAdd[j].field} value={this.state.Object[this.props.location.fieldsToAdd[j].field]} onChange={(e) => { this.change(e, this.props.location.fieldsToAdd[j].field) }} />
                 </div>
 
 
             }
         }
+
+        const submitHandler = (e) => {
+            let re = null;
+            e.preventDefault();
+
+            this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
+        }
         return (
             <React.Fragment>
 
-                <form onSubmit={() => this.props.submit(this.props.type, this.state.Object)}>
-                    {this.props.fieldsArray.map((field, index) =>
+                <form onSubmit={submitHandler}>
+                    {this.props.location.fieldsArray.map((field, index) =>
                         <span key={index}>
                             <label>{field.name}</label>
                             <input type={field.type} id={field.field} placeholder={field.name} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
                             {puterors(index)}
-                            {this.props.type !== 'Search' && <br />}
+                            {console.log('type', this.props.location.type)}
+                            {this.props.location.type !== 'Search' && <br />}
                         </span>
 
                     )}
-                    {this.props.fieldsToAdd.map((field, index) =>
+                    {this.props.location.fieldsToAdd.map((field, index) =>
                         <div key={index}>
                             <label>{field.name}</label>
                             <input type={field.type} id={field.field} name={field} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field) }} />
                             {puterors(index)}
                             {func(index)}
+
+                            {this.props.location.type !== 'Search' && <br />}
                         </div>
                     )}
-                    <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
+                    <button type={this.props.location.type} name={this.props.location.name} >{this.props.location.name}</button>
+
                 </form>
 
+                {console.log('isRedirect', this.state.isRedirect)}
+                {this.state.isRedirect}
             </React.Fragment>
 
         )

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Axios from '../Axios'
+
 
 
 /*PropertyID int  not null identity,
@@ -27,18 +28,32 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 export class Main extends Component {
 
     submit = (type, object) => {
+        let x = false;
         if (type === 'Add')
-            this.addObject(object)
+            x = this.addObject(object)
+        else if (type === 'Update')
+            x = this.updateObject(object)
         else
-            this.updateObject(object)
+            x = this.Search(object)
+        if (x)
+            return <Redirect to='/Properties' />
+        return null;
+    }
+    Search = (object) => {
+        Axios.post('Property/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     updateObject = (object) => {
-        Axios.post('Property/UpdateProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
+        Axios.post('Property/UpdateProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     addObject = (object) => {
         object.PropertyID = 1;
         Axios.post('Property/AddProperty', object).then(x => { alert('הנכס עודכן בהצלחה') });
-
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     deleteObject = (object) => {
         Axios.post('Property/DeleteProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
@@ -56,8 +71,8 @@ export class Main extends Component {
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
         PropertiesArray: [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
         { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }],//
-        LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ name: ' הוספת דירה', link: '/Form' }],
+        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
+        LinksForTable: [{ type: 'Add', name: ' הוספת דירה', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
         ButtonsForTable: [],
         fieldsToAdd: [],

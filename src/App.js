@@ -4,7 +4,7 @@ import './App.css';
 import Login from './components/Login'
 import Calendar from './components/Calendar'
 import EventDetails from './components/EventDetails'
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
 
 import Form from './components/General/Form'
 import Details from './components/General/Details'
@@ -18,6 +18,7 @@ import SubProperties from "./components/Individual/SubProperties";
 import ReportForm from "./components/Individual/ReportForm";
 
 function App() {
+
   return (
 
     <div className="App">
@@ -28,16 +29,22 @@ function App() {
         <Route exact path='/' component={() => <AddCommonLinks name='Leah' age={20}></AddCommonLinks>} />
         <Route path='/Properties' component={Properties} />
         <Route path='/PropertyOwner' component={PropertyOwner} />
-        <Route path='/PropertyForRenter' component={PropertyForRenter} />
+        <Route name="propertyForRenter" path='/PropertyForRenter' component={PropertyForRenter} />
         <Route path='/Rentals' component={Rentals} />
         <Route path='/Tasks' component={Tasks} />
         <Route path='/SubProperties' component={SubProperties} />
+
+        {/*:type/:name/:submit/:fieldsArray/:Object/:fieldsToAdd/:LinksForEveryRow
+        /:ButtonsForEveryRow/:LinksPerObject/:erors' */}
         <Route path='/Form' component={Form} />
+
+
         <Route path='/Details' component={Details}></Route>
       </Switch>
 
     </div>
+
   );
 }
 
-export default App;
+export default withRouter(App);

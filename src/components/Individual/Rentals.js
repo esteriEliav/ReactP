@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 
 /*
@@ -15,21 +15,38 @@ EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
 export class Rentals extends Component {
-    submit = (name, object) => {
-        if (name === 'הוסף')
-            this.addObject(object)
+    submit = (type, object) => {
+        let x = false;
+        if (type === 'Add')
+            x = this.addObject(object)
+        else if (type === 'Update')
+            x = this.updateObject(object)
         else
-            this.updateObject(object)
+            x = this.Search(object)
+        if (x)
+            return <Redirect to='/Rentals' />
+        return null;
+    }
+    Search = (object) => {
+        Axios.post('Rental/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     updateObject = (object) => {
         Axios.post('Rental/UpdateRental', object).then(x => { alert('השכירות נוספה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     addObject = (object) => {
         object.RentalID = 1;
         Axios.post('Rental/AddRental', object).then(x => { alert('השכירות נוספה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     deleteObject = (object) => {
         Axios.post('Rental/DeleteRental', object).then(x => { alert('השכירות נמחקה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     state = {
         name: 'השכרות',
@@ -41,8 +58,8 @@ export class Rentals extends Component {
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
         PropertiesArray: [{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: true }],//
-        LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ name: ' הוספת שכירות', link: '/Form' }],
+        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
+        LinksForTable: [{ type: 'Add', name: ' הוספת שכירות', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
         ButtonsForTable: [],
         fieldsToAdd: [],

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
+
 /*
 create table Tasks--משימות
 (
@@ -21,25 +22,37 @@ HandlingWay nvarchar(max),--אופן טיפול
  */
 export class Tasks extends Component {
     submit = (type, object) => {
+        let x = false;
         if (type === 'Add')
-            this.addObject(object)
+            x = this.addObject(object)
         else if (type === 'Update')
-            this.updateObject(object);
-        else {
-            Axios.post('Task/Search', ...object).then(data => alert(data))
-
-            alert(type);
-        }
+            x = this.updateObject(object)
+        else
+            x = this.Search(object)
+        if (x)
+            return <Redirect to='/Tasks' />
+        return null;
+    }
+    Search = (object) => {
+        Axios.post('Task/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     updateObject = (object) => {
         Axios.post('Task/UpdateTask', object).then(x => { alert('המטלה עודכנה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     addObject = (object) => {
         object.TaskID = 1;
         Axios.post('Task/AddTask', object).then(x => { alert('המטלה נוספה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     deleteObject = (object) => {
         Axios.post('Task/DeleteTask', object).then(x => { alert('המטלה נמחקה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
     }
     state = {
         name: 'משימות',
@@ -49,8 +62,8 @@ export class Tasks extends Component {
         //  fieldsInputTypes: [, , , , , ],
         TasksArray: [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
-        LinksForEveryRow: [{ name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ name: ' הוספת משימה', link: '/Form' }],
+        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
+        LinksForTable: [{ type: 'Add', name: ' הוספת משימה', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
         ButtonsForTable: [],
         fieldsToAdd: [],

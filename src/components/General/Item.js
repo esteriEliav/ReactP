@@ -39,11 +39,20 @@ export class Item extends Component {
             <React.Fragment>
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.props.Object[item.field]}</td> })}
 
-                    {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={lin.link + '/:Object=' + this.state.Object + '/:fieldsArray=' + this.props.fieldsArray + '/:submit?' + this.props.submit} >{lin.name} </Link></td>)}
+                    {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={{
+                        pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: this.state.Object,
+                        LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
+                        fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
+                        erors: [], submit: this.props.submit, type: lin.type, name: lin.name
+
+                    }} >{lin.name} </Link></td>)}
                     {this.state.LinksPerObject.map((lin, index) => <span key={index}>{lin}  </span>)}
-                    {this.state.isToomatch && <td><Link to={'/Details'} fieldsArray={this.props.fieldsArray} Object={this.state.Object}
-                        LinksForEveryRow={this.state.LinksForEveryRow} ButtonsForEveryRow={this.state.ButtonsForEveryRow}
-                        fieldsToAdd={this.state.fieldsToAdd} LinksPerObject={this.state.LinksPerObject}>
+                    {this.state.isToomatch && <td><Link to={{
+                        pathname: '/Details', fieldsArray: this.props.fieldsArray, Object: this.state.Object,
+                        LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
+                        fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
+                        submit: this.props.submit, erors: [],
+                    }}>
                         לפרטים נוספים</Link> </td>}
 
                     {this.state.ButtonsForEveryRow.map((but, index) => <td><button key={index} onClick={() => but.onclick()}>{but.name}</button></td>)}
