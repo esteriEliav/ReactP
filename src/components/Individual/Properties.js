@@ -25,7 +25,7 @@ IsExclusivity bit not null constraint DF_Properties_IsExclusivity default 0,
 ExclusivityID int,
 IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם באחריות 
 */
-export class Main extends Component {
+export class Properties extends Component {
 
     submit = (type, object) => {
         let x = false;
@@ -39,22 +39,37 @@ export class Main extends Component {
             return <Redirect to='/Properties' />
         return null;
     }
+    addObject = (object) => {
+        object.PropertyID = 1;
+        //object.CityID=
+        //object.StreetID=
+
+        Axios.post('Property/AddProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(
+                x => console.log('הנכס עודכן בהצלחה') + x
+            );
+
+
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
+    }
     Search = (object) => {
-        Axios.post('Property/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //{ ...object }
+        Axios.post('Property/Search', [object.CityName, object.StreetName, object.Number, object.Floor, object.IsRented],
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(x => { alert("הנכס נשמר בהצלחה" + x) });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     updateObject = (object) => {
-        Axios.post('Property/UpdateProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        //object.CityID=
+        //object.StreetID=
+        Axios.post('Property/UpdateProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(x => { alert("הנכס נשמר בהצלחה" + x) });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
-    addObject = (object) => {
-        object.PropertyID = 1;
-        Axios.post('Property/AddProperty', object).then(x => { alert('הנכס עודכן בהצלחה') });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
+
     deleteObject = (object) => {
         Axios.post('Property/DeleteProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
     }
@@ -69,8 +84,10 @@ export class Main extends Component {
 
         fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
-        PropertiesArray: [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-        { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }],//
+
+        PropertiesArray: /*Axios.post('Property/GetAllProperties').then(res => res.data)*/[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+        { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }]//
+        ,
         LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
         LinksForTable: [{ type: 'Add', name: ' הוספת דירה', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
@@ -89,21 +106,39 @@ export class Main extends Component {
         }
         return false
     }
-    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
-    // setForAddCommonLinks = (LinksForEveryRow, LinksForTable, ButtonsForEveryRow) =>
-    //  this.setState({ LinksForEveryRow: LinksForEveryRow, LinksForTable: LinksForTable, ButtonsForEveryRow: ButtonsForEveryRow })
-    set = (object) => {
-        const { } = this.state;
-        let LinksForEveryRow = [...this.state.LinksForEveryRow];
-        let fieldsToAdd = [];
-        let tempobject = object;
-        //let ButtonsForEveryRow=[this.state.ButtonsForEveryRow];
+    set = (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
+
+        let tempobject = { ...object };
+        let fieldsToAdd = []
+        let LinksForEveryRow = [...this.state.LinksForEveryRow]
+        //   const ownerobject = Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        //     .then(res => res.data)
+        /* 
+                 const someProps = this.set(object)
+         
+                 tempobject.OwerID = <Link to={{
+                     pathname: '/Details', Object: ownerobject, LinksForEveryRow: someProps.LinksForEveryRow,
+                     fieldsArray: this.state.fieldsPropertyArray,
+                     fieldsToAdd: someProps.fieldsToAdd, ButtonsForEveryRow: someProps.ButtonsForEveryRow, LinksPerObject: someProps.LinksPerObject
+                 }}>
+                     {ownerobject.firstName + ' ' + ownerobject.lastName}</Link>
+         */
         if (object.IsDivided)
-            tempobject.IsDivided = <Link to='/Details'  >V</Link>//ששולח פרטי נכסי בן של הדירה
-        // LinksForEveryRow.push({ name: 'לדירות המחולקות', link: '', index: 6 })
-        if (object.IsRented)
-            tempobject.IsRented = <Link to='/Details'>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
-        //LinksForEveryRow.push({ name: 'לפרטי השכרה', link: '', index: 9 })
+            tempobject.IsDivided = <Link to={{ pathname: '/SubProperties', }} >V</Link>//ששולח פרטי נכסי בן של הדירה
+        else
+            tempobject.IsDivided = 'X'
+
+        //const rentalObject = Axios.post('Property/GetRentalByPropertyID', object.propertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        //   .then(res => res.data)
+        /*   if (object.IsRented)
+               tempobject.IsRented = <Link to={{
+                   pathname: '/Details', Object: rentalObject, LinksForEveryRow: someProps.LinksForEveryRow,
+                   fieldsArray: this.state.fieldsPropertyArray,
+                   fieldsToAdd: someProps.fieldsToAdd, ButtonsForEveryRow: someProps.ButtonsForEveryRow, LinksPerObject: someProps.LinksPerObject
+               }}>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
+           else
+               tempobject.IsDivided = 'X'
+   */
         if (object.IsExclusivity)
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'text', index: 10 })
         return {
@@ -113,6 +148,12 @@ export class Main extends Component {
         };
 
     }
+
+
+
+    // setForAddCommonLinks = (LinksForEveryRow, LinksForTable, ButtonsForEveryRow) =>
+    //  this.setState({ LinksForEveryRow: LinksForEveryRow, LinksForTable: LinksForTable, ButtonsForEveryRow: ButtonsForEveryRow })
+
     render() {
 
 
@@ -128,4 +169,4 @@ export class Main extends Component {
     }
 }
 
-export default Main
+export default Properties

@@ -61,30 +61,27 @@ export class AddCommonLinks extends Component {
 
         //                <button onClick={() => this.props.set(this.state.name, this.state.fieldsArray, this.state.objectsArray, this.state.LinksForEveryRow, this.state.LinksForTable)}>a</button>
 
-        // const n = { name: 'Leah', age: 20, city: 'Haifa' }
-        const a = [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }];
-        //const a = [1, 2, 3, 4];
-        const y = '2000'
+        /*GetState = (myState) => {
+            return myState;
+        }*/
         return (
 
             <div>
                 <h1>{this.props.name}</h1>
                 <h1>{this.props.age}</h1>
-                <Link to={'/PropertyOwner/:' + 5}>PropertyOwner</Link>
+                <Link to={{ pathname: '/PropertyOwner' }}>PropertyOwner</Link>
+
                 <hr />
-                <Link to={{
-                    pathname: '/propertyForRenter',
-                    vari: [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }],
-                    aaa: 'leah'
-                }} >PropertyForRenter</Link>
+                <Link to={{ pathname: '/propertyForRenter' }} >PropertyForRenter</Link>
+
                 <hr />
-                <Link to='/Properties'>Properties</Link>
+                <Link to={{ pathname: '/Properties' }}>Properties</Link>
                 <hr />
-                <Link to='/Rentals'>Rentals</Link>
+                <Link to={{ pathname: '/Rentals' }}>Rentals</Link>
                 <hr />
-                <Link to='/Tasks'>Tasks</Link>
+                <Link to={{ pathname: '/Tasks' }}>Tasks</Link>
                 <hr />
-                <Link to='/SubProperties'>SubProperties</Link>
+                <Link to={{ pathname: '/SubProperties' }}>SubProperties</Link>
                 <hr />
             </div>
         )

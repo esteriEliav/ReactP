@@ -19,9 +19,13 @@ import ReportForm from "./components/Individual/ReportForm";
 
 function App() {
 
+
   return (
 
+
     <div className="App">
+
+
       <Switch>
         <Route path="/Calendar" component={Calendar} />
         <Route path='/EventDetails/:id' exact strict component={EventDetails} />

@@ -15,9 +15,11 @@ export class Table extends Component {
 
                 <h1>{this.props.name}</h1>
 
-                { /*{this.props.fieldsToSearch && <Form name='חיפוש' type='Search' fieldsArray={this.props.fieldsToSearch} Object={null}
-                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
-        fieldsToAdd={[]} erors={[]} submit={this.props.submit}></Form>}*/}
+                {this.props.fieldsToSearch && <Form location={{
+                    name: 'חיפוש', type: 'Search', fieldsArray: this.props.fieldsToSearch, Object: null,
+                    LinksForEveryRow: [], ButtonsForEveryRow: [],
+                    fieldsToAdd: [], erors: [], submit: this.props.submit
+                }}></Form>}
 
 
 

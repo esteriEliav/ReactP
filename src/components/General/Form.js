@@ -18,7 +18,7 @@ export class Form extends Component {
             tempObject[this.props.location.fieldsArray[0].field] = 1;
             this.props.location.fieldsToAdd.map(field => { tempObject[field.field] = "" });
             this.setState({ Object: tempObject });
-            console.log('object', this.state.Object)
+
         }
     }
     change = (e, field) => {
@@ -66,7 +66,6 @@ export class Form extends Component {
                             <label>{field.name}</label>
                             <input type={field.type} id={field.field} placeholder={field.name} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
                             {puterors(index)}
-                            {console.log('type', this.props.location.type)}
                             {this.props.location.type !== 'Search' && <br />}
                         </span>
 
@@ -85,7 +84,7 @@ export class Form extends Component {
 
                 </form>
 
-                {console.log('isRedirect', this.state.isRedirect)}
+
                 {this.state.isRedirect}
             </React.Fragment>
 

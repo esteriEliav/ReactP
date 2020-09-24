@@ -39,13 +39,31 @@ export class Tasks extends Component {
         return true;
     }
     updateObject = (object) => {
+        debugger
         Axios.post('Task/UpdateTask', object).then(x => { alert('המטלה עודכנה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     addObject = (object) => {
+        //debugger
         object.TaskID = 1;
-        Axios.post('Task/AddTask', object).then(x => { alert('המטלה נוספה בהצלחה') });
+        /* fetch('https://localhost:44368/api/Task/AddTask', {
+ 
+             headers: {
+                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+             },
+             method: "Post",
+             body: JSON.stringify({ dt: object })
+         })
+ 
+             .catch(err => console.log('err', err))
+             // .then(res => res.json())
+             .then(x => { console.log('המטלה נוספה בהצלחה', x) });
+             */
+        Axios.post('Task/GetAllTasks', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        })
+            .then(x => { alert('המטלה נוספה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
@@ -58,8 +76,6 @@ export class Tasks extends Component {
         name: 'משימות',
         fieldsTasksArray: [{ field: 'TaskID', name: 'קוד משימה', type: 'text' }, { field: 'TaskTypeId', name: 'סוג', type: 'text' }, { field: 'Description', name: 'תיאור', type: 'text' },
         { field: 'ClassificationID', name: 'סווג', type: 'radio' }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
-        // HebrewfieldsArray: ['טופל?', 'קוד משימה', 'סוג', 'תיאור', 'סווג', 'תאריך לטיפול'],
-        //  fieldsInputTypes: [, , , , , ],
         TasksArray: [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
         LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],

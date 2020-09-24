@@ -82,7 +82,7 @@ export class SubProperties extends Component {
         let fieldsToAdd = [];
         let tempobject = object;
         if (object.IsRented)
-            tempobject.IsRented = <Link to='/Details'>v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
+            tempobject.IsRented = <Link to='/'>v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: this.state.ButtonsForEveryRow,

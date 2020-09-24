@@ -70,7 +70,13 @@ export class PropertyOwner extends Component {
     }
 
     set = (object) => {
-        let LinksPerObject = [<Link to='/Properties'>דירות</Link>]//שולח  רשימת דירות שמתקבלים מהפונקציה
+        let LinksPerObject = [<Link to={{
+            pathname: '/Property',
+
+            objectsArray: Axios.post('PropertyOwner/getPropertiesbyOwnerID', object.OwnerID)
+                .then(res => res.data)
+        }}>
+            דירות</Link>]//שולח  רשימת דירות שמתקבלים מהפונקציה
         return {
             fieldsToAdd: this.state.fieldsToAdd, LinksForEveryRow: this.state.LinksForEveryRow,
             ButtonsForEveryRow: this.state.ButtonsForEveryRow, LinksPerObject: LinksPerObject
