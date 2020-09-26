@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
+import Details from '../General/Details';
 
 /*
 create table Tasks--משימות
@@ -34,18 +35,20 @@ export class Tasks extends Component {
         return null;
     }
     Search = (object) => {
-        Axios.post('Task/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        Axios.post('Task/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) }, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     updateObject = (object) => {
-        debugger
-        Axios.post('Task/UpdateTask', object).then(x => { alert('המטלה עודכנה בהצלחה') });
+        Axios.post('Task/UpdateTask', object).then(x => { alert('המטלה עודכנה בהצלחה') }, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     addObject = (object) => {
-        //debugger
         object.TaskID = 1;
         /* fetch('https://localhost:44368/api/Task/AddTask', {
  
@@ -68,7 +71,9 @@ export class Tasks extends Component {
         return true;
     }
     deleteObject = (object) => {
-        Axios.post('Task/DeleteTask', object).then(x => { alert('המטלה נמחקה בהצלחה') });
+        Axios.post('Task/DeleteTask', object, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        }).then(x => { alert('המטלה נמחקה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
@@ -76,7 +81,7 @@ export class Tasks extends Component {
         name: 'משימות',
         fieldsTasksArray: [{ field: 'TaskID', name: 'קוד משימה', type: 'text' }, { field: 'TaskTypeId', name: 'סוג', type: 'text' }, { field: 'Description', name: 'תיאור', type: 'text' },
         { field: 'ClassificationID', name: 'סווג', type: 'radio' }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
-        TasksArray: [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+        TasksArray:/*Axios.get('Task/GetAllTasks') */[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
         LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
         LinksForTable: [{ type: 'Add', name: ' הוספת משימה', link: '/Form' }],
@@ -96,45 +101,67 @@ export class Tasks extends Component {
         }
         return false
     }
-    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
-
 
     set = (object) => {
         let LinksForEveryRow = [...this.state.LinksForEveryRow];
         let fieldsToAdd = [];
         let tempobject = object;
         let LinksPerObject = [];
-        //let ButtonsForEveryRow=[this.state.ButtonsForEveryRow];
+
+        // object.TaskTypeId = Axios.post('Task/GetTypeName', object.TaskTypeId, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
+        // object.ClassificationID = Axios.post('Task/GetClassificationName', object.ClassificationID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
+        // object.ClientClassificationID = Axios.post('Task/GetClassificationName', object.ClientClassificationID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
+
         if (object.SubPropertyID !== null)
-            LinksPerObject.push(<Link to='/' >נכס מחולק</Link>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
-        //LinksForEveryRow.push({ name: 'נכס מחולק', link: '/Table', index: 'end' })//קישור לתת הדירה ולדירה השלמה
-        if (true)//בדיקה האם הדירה מושכרת
-            LinksPerObject.push(<Link to='/' >פרטי השכרת נכס</Link>)//קישור לקומפוננטת השכרות והאוביקט הוא מה שיתקבל מהפונקציה של פרטי השכרה לנכס מסוים
-        //LinksForEveryRow.push({ name: 'לפרטי השכרת נכס', link: '/Details', index: 'end' })
-        if (true)//בדיקה האם מדובר בדווח תקלה
+            LinksPerObject.push(<Link to={{
+                pathname: '/SubProperties',
+                object: Axios.post('SubProperty/GetSubPropertyByID', object.SubPropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                type: 'details'
+            }} >נכס מחולק</Link>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
+
+        if (object.TaskTypeId === 'תקלה')//בדיקה האם מדובר בדווח תקלה
             fieldsToAdd.push({ field: 'ClientClassificationID', name: 'סווג לקוח', type: 'text', index: 3 },//פונקציה שמחזירה שם סווג
                 { field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 3 })
+
         if (object.IsHandled)
             fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 6 },
                 { field: 'HandlingWay', name: 'אופן טיפול', type: 'text', index: 6 })
+
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: this.state.ButtonsForEveryRow, object: tempobject,
             LinksPerObject: LinksPerObject
         };
     }
+    rend = () => {
+        if (this.props.location.type === 'details') {
+            const some = this.set(this.props.object)
+            return <Details location={{
+                object: this.props.object,
+                fieldsArray: this.state.fieldsTasksArray,
+                LinksPerObject: some.LinksPerObject,
+                LinksForEveryRow: some.LinksForEveryRow,
+                ButtonsForEveryRow: some.ButtonsForEveryRow,
+                fieldsToAdd: some.fieldsToAdd
+            }}
+            />
+
+        }
+        else
+            return <Table name={this.state.name}
+                fieldsArray={this.state.fieldsTasksArray}
+                objectsArray={this.state.TasksArray}
+                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                set={this.set}
+                delObject={this.deleteObject}
+                validate={this.validate} erors={this.state.erors} submit={this.submit}
+                fieldsToSearch={this.state.fieldsToSearch} />
+    }
     render() {
 
         return (
             <div>
-
-                <Table name={this.state.name} fieldsArray={this.state.fieldsTasksArray} objectsArray={this.state.TasksArray}
-                    LinksForTable={this.state.LinksForTable}
-                    ButtonsForTable={this.state.ButtonsForTable} fieldsToAdd={this.state.fieldsToAdd}
-                    set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit}
-                    fieldsToSearch={this.state.fieldsTasksArray.filter((f, index) => index !== 0)} />
-
+                {this.rend()}
             </div>
         )
 

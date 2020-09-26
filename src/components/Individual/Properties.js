@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from '../Axios'
+import Details from '../General/Details';
 
 
 
@@ -111,34 +112,35 @@ export class Properties extends Component {
         let tempobject = { ...object };
         let fieldsToAdd = []
         let LinksForEveryRow = [...this.state.LinksForEveryRow]
-        //   const ownerobject = Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-        //     .then(res => res.data)
-        /* 
-                 const someProps = this.set(object)
-         
-                 tempobject.OwerID = <Link to={{
-                     pathname: '/Details', Object: ownerobject, LinksForEveryRow: someProps.LinksForEveryRow,
-                     fieldsArray: this.state.fieldsPropertyArray,
-                     fieldsToAdd: someProps.fieldsToAdd, ButtonsForEveryRow: someProps.ButtonsForEveryRow, LinksPerObject: someProps.LinksPerObject
-                 }}>
-                     {ownerobject.firstName + ' ' + ownerobject.lastName}</Link>
-         */
+        const ownerobject = Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(res => res.data)
+        tempobject.OwerID = <Link to={{
+            pathname: '/PropertyOwner',
+            Object: ownerobject,
+            type: 'details'
+        }}>
+            {ownerobject.firstName + ' ' + ownerobject.lastName}</Link>
+
         if (object.IsDivided)
-            tempobject.IsDivided = <Link to={{ pathname: '/SubProperties', }} >V</Link>//ששולח פרטי נכסי בן של הדירה
+            tempobject.IsDivided = <Link to={{
+                pathname: '/SubProperties',
+                objects: Axios.post('SubProperty/GetSubPropertiesOfParentProperty', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }),
+                type: 'table'
+            }} >V</Link>//ששולח פרטי נכסי בן של הדירה
         else
             tempobject.IsDivided = 'X'
 
-        //const rentalObject = Axios.post('Property/GetRentalByPropertyID', object.propertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-        //   .then(res => res.data)
-        /*   if (object.IsRented)
-               tempobject.IsRented = <Link to={{
-                   pathname: '/Details', Object: rentalObject, LinksForEveryRow: someProps.LinksForEveryRow,
-                   fieldsArray: this.state.fieldsPropertyArray,
-                   fieldsToAdd: someProps.fieldsToAdd, ButtonsForEveryRow: someProps.ButtonsForEveryRow, LinksPerObject: someProps.LinksPerObject
-               }}>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
-           else
-               tempobject.IsDivided = 'X'
-   */
+        const rentalObject = Axios.post('Property/GetRentalByPropertyID', object.propertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(res => res.data)
+        if (object.IsRented)
+            tempobject.IsRented = <Link to={{
+                pathname: '/Rentals',
+                objects: rentalObject,
+                type: 'table'
+            }}>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
+        else
+            tempobject.IsDivided = 'X'
+
         if (object.IsExclusivity)
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'text', index: 10 })
         return {
@@ -148,22 +150,35 @@ export class Properties extends Component {
         };
 
     }
+    rend = () => {
+        if (this.props.location.type === 'details') {
+            const some = this.set(this.props.object)
+            return <Details location={{
+                object: this.props.object,
+                fieldsArray: this.state.fieldsArray,
+                LinksPerObject: some.LinksPerObject,
+                LinksForEveryRow: some.LinksForEveryRow,
+                ButtonsForEveryRow: some.ButtonsForEveryRow,
+                fieldsToAdd: some.fieldsToAdd
+            }}
+            />
 
+        }
+        else
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
+                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                set={this.set} delObject={this.deleteObject}
+                validate={this.validate} erors={this.state.erors} submit={this.submit}
+                fieldsToSearch={this.state.fieldsToSearch} />
 
-
-    // setForAddCommonLinks = (LinksForEveryRow, LinksForTable, ButtonsForEveryRow) =>
-    //  this.setState({ LinksForEveryRow: LinksForEveryRow, LinksForTable: LinksForTable, ButtonsForEveryRow: ButtonsForEveryRow })
-
+    }
     render() {
 
 
         return (
+
             <div>
-                <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                    LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
-                    set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit}
-                    fieldsToSearch={this.state.fieldsToSearch} />
+                {this.rend()}
             </div>
         )
     }

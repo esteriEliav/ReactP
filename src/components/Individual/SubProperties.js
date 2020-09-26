@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import Table from "../General/Table";
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
+import Details from '../General/Details';
+
 /*
 SubPropertyID int  not null identity,--קוד נכס בן
 PropertyID int not null,--נכס אב
@@ -29,18 +31,18 @@ export class SubProperties extends Component {
         return null;
     }
     Search = (object) => {
-        Axios.post('SubProperty/Search', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        Axios.post('SubProperty/Search', { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     updateObject = (object) => {
-        Axios.post('SubProperty/UpdateSubProperty', object).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
+        Axios.post('SubProperty/UpdateSubProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     addObject = (object) => {
         object.subPropertyID = 1;
-        Axios.post('SubProperty/AddSubProperty', object).then(x => { alert('הדירה עודכנה בהצלחה') });
+        Axios.post('SubProperty/AddSubProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('הדירה עודכנה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
@@ -52,7 +54,7 @@ export class SubProperties extends Component {
         fieldsPropertyArray: [{ field: 'SubPropertyID', name: 'קוד דירה', type: 'text' }, { field: 'PropertyID', name: 'בעלים', type: 'text' },
         { field: 'num', name: 'עיר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'רחוב', type: 'text' }],
-        PropertiesArray: [{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+        PropertiesArray:/* Axios.get('SubProperty/GetAllSubProperties')*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
         LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
         LinksForTable: [{ type: 'Add', name: ' הוספת דירה', link: '/Form' }],
         ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
@@ -81,23 +83,54 @@ export class SubProperties extends Component {
         let LinksForEveryRow = [...this.state.LinksForEveryRow];
         let fieldsToAdd = [];
         let tempobject = object;
+        object.PropertyID = <Link
+            to={{
+                pathname: '/Properties',
+                object: Axios.post('Propety/GetPropertyByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                type: 'details'
+            }}
+        ></Link>
+
         if (object.IsRented)
-            tempobject.IsRented = <Link to='/'>v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
+            tempobject.IsRented = <Link
+                to={{
+                    pathname: '/Rentals',
+                    object: Axios.post('Property/GetRentalBySubPropertyID', object.SubPropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                    type: 'details'
+                }}
+            >v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: this.state.ButtonsForEveryRow,
             object: tempobject, LinksPerObject: []
         };
     }
+    rend = () => {
+        if (this.props.location.type === 'details') {
+            const some = this.set(this.props.object)
+            return <Details location={{
+                object: this.props.object,
+                fieldsArray: this.state.fieldsPropertyArray,
+                LinksPerObject: some.LinksPerObject,
+                LinksForEveryRow: some.LinksForEveryRow,
+                ButtonsForEveryRow: some.ButtonsForEveryRow,
+                fieldsToAdd: some.fieldsToAdd
+            }}
+            />
+
+        }
+        else
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
+                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                set={this.set} delObject={this.deleteObject}
+                validate={this.validate} erors={this.state.erors} submit={this.submit}
+                fieldsToSearch={this.state.fieldsToSearch} />
+
+    }
     render() {
         return (
             <div>
-                <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                    LinksForTable={this.state.LinksForTable}
-                    ButtonsForTable={this.state.ButtonsForTable}
-                    set={this.set} delObject={this.deleteObject}
-                    validate={this.validate} erors={this.state.erors} submit={this.submit}
-                    fieldsToSearch={this.state.fieldsPropertyArray.filter((f, index) => index !== 0)} />
+                {this.rend()}
             </div>
         )
     }

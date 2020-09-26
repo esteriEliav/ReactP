@@ -22,18 +22,18 @@ export class PropertyOwner extends Component {
         return null;
     }
     Search = (object) => {
-        Axios.post('PropertyOwner/AddPropertyOwner', { ...object }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
+        Axios.post('PropertyOwner/AddPropertyOwner', { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     updateObject = (object) => {
-        Axios.post('PropertyOwner/UpdatePropertyOwner', object).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
+        Axios.post('PropertyOwner/UpdatePropertyOwner', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
     addObject = (object) => {
         object.PropertyID = 1;
-        Axios.post('PropertyOwner/AddPropertyOwner', object).then(x => { alert('הדירה עודכנה בהצלחה') });
+        Axios.post('PropertyOwner/AddPropertyOwner', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('הדירה עודכנה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
@@ -43,7 +43,7 @@ export class PropertyOwner extends Component {
     state = {
 
         name: 'משכירים',
-        fieldsOwnersArray: [{ field: 'OwnerID', name: 'קוד משכיר', type: 'text' }, { field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
+        fieldsOwnersArray: /*Axios.get('PropertyOwner/getAllOwners') */[{ field: 'OwnerID', name: 'קוד משכיר', type: 'text' }, { field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
         OwnersArray: [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
         { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
@@ -70,32 +70,45 @@ export class PropertyOwner extends Component {
     }
 
     set = (object) => {
-        let LinksPerObject = [<Link to={{
-            pathname: '/Property',
-
-            objectsArray: Axios.post('PropertyOwner/getPropertiesbyOwnerID', object.OwnerID)
-                .then(res => res.data)
+        let LinksPerObject = [<Link to={{//שולח  רשימת דירות שמתקבלים מהפונקציה
+            pathname: '/Properties',
+            objects: Axios.post('PropertyOwner/GetPropertiesbyOwnerID', object.OwnerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+                .then(res => res.data),
+            type: 'table'
         }}>
-            דירות</Link>]//שולח  רשימת דירות שמתקבלים מהפונקציה
+            דירות</Link>]
         return {
             fieldsToAdd: this.state.fieldsToAdd, LinksForEveryRow: this.state.LinksForEveryRow,
             ButtonsForEveryRow: this.state.ButtonsForEveryRow, LinksPerObject: LinksPerObject
         }
     }
+    rend = () => {
+        if (this.props.location.type === 'details') {
+            const some = this.set(this.props.object)
+            return <Details location={{
+                object: this.props.object,
+                fieldsArray: this.state.fieldsOwnersArray,
+                LinksPerObject: some.LinksPerObject,
+                LinksForEveryRow: some.LinksForEveryRow,
+                ButtonsForEveryRow: some.ButtonsForEveryRow,
+                fieldsToAdd: some.fieldsToAdd
+            }}
+            />
+
+        }
+        else
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsOwnersArray} objectsArray={this.state.OwnersArray}
+                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                set={this.set} delObject={this.deleteObject}
+                validate={this.validate} erors={this.state.erors} submit={this.submit}
+                fieldsToSearch={this.state.fieldsToSearch} />
+
+    }
     render() {
         return (
 
             <div>
-
-                <h1>{this.props.id}</h1>
-                <Table name={this.state.name} fieldsArray={this.state.fieldsOwnersArray} objectsArray={this.state.OwnersArray}
-                    LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
-                    erors={this.state.erors} submit={this.submit}
-                    delObject={this.deleteObject} set={this.set} validate={this.validate}
-                    fieldsToSearch={this.state.fieldsOwnersArray.filter((field, index) => index !== 0)}
-                />
-
-
+                {this.rend()}
             </div>
 
         )
