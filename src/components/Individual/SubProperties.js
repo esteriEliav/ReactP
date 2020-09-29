@@ -51,15 +51,10 @@ export class SubProperties extends Component {
     }
     state = {
         name: 'תת נכסים',
-        fieldsPropertyArray: [{ field: 'SubPropertyID', name: 'קוד דירה', type: 'text' }, { field: 'PropertyID', name: 'בעלים', type: 'text' },
+        fieldsPropertyArray: [{ field: 'SubPropertyID', name: 'קוד תת נכס', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         { field: 'num', name: 'עיר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'רחוב', type: 'text' }],
         PropertiesArray:/* Axios.get('SubProperty/GetAllSubProperties')*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
-        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ type: 'Add', name: ' הוספת דירה', link: '/Form' }],
-        ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
-        ButtonsForTable: [],
-        fieldsToAdd: [],
         erors: []
 
     }
@@ -77,10 +72,20 @@ export class SubProperties extends Component {
     // setForAddCommonLinks = (LinksForEveryRow, LinksForTable, ButtonsForEveryRow) =>
     //  this.setState({ LinksForEveryRow: LinksForEveryRow, LinksForTable: LinksForTable, ButtonsForEveryRow: ButtonsForEveryRow })
     //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
-
+    setForTable = () => {
+        return {
+            LinksForTable: [<Link to={{
+                pathname: '/Form',
+                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת תת דירה',
+                LinksForEveryRow: [], ButtonsForEveryRow: [],
+                fieldsToAdd: []
+            }}> </Link>],
+            ButtonsForTable: []
+        }
+    }
     set = (object) => {
-
-        let LinksForEveryRow = [...this.state.LinksForEveryRow];
+        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         let fieldsToAdd = [];
         let tempobject = object;
         object.PropertyID = <Link
@@ -101,7 +106,7 @@ export class SubProperties extends Component {
             >v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: this.state.ButtonsForEveryRow,
+            ButtonsForEveryRow: ButtonsForEveryRow,
             object: tempobject, LinksPerObject: []
         };
     }
@@ -121,7 +126,7 @@ export class SubProperties extends Component {
         }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                setForTable={this.setForTable}
                 set={this.set} delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />

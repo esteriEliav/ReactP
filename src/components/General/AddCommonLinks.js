@@ -72,6 +72,8 @@ export class AddCommonLinks extends Component {
                 <Link to={{ pathname: '/PropertyOwner' }}>PropertyOwner</Link>
 
                 <hr />
+                <Link to={{ pathname: '/Renter' }}>Renters</Link>
+                <hr />
                 <Link to={{ pathname: '/propertyForRenter' }} >PropertyForRenter</Link>
 
                 <hr />

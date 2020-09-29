@@ -5,7 +5,6 @@ import Details from "./Details";
 
 export class Item extends Component {
     state = {
-
         LinksForEveryRow: [],
         ButtonsForEveryRow: [],
         fieldsToAdd: [],
@@ -40,7 +39,7 @@ export class Item extends Component {
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.props.Object[item.field]}</td> })}
 
                     {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={{
-                        pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: this.state.Object,
+                        pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: lin.link === '/Form' ? this.state.Object : this.props.Object,
                         LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
                         fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
                         erors: [], submit: this.props.submit, type: lin.type, name: lin.name

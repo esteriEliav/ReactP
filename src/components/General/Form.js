@@ -24,7 +24,7 @@ export class Form extends Component {
     change = (e, field) => {
 
         let tempObject = { ...this.state.Object };
-        tempObject[field] = e.target.value;
+        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         this.setState({ Object: tempObject })
 
     }
@@ -44,7 +44,8 @@ export class Form extends Component {
                 j += 1
                 return <div>
                     <label >{this.props.location.fieldsToAdd[j].name}</label>
-                    <input type={this.props.location.fieldsToAdd[j].type} name={this.props.location.fieldsToAdd[j].field} value={this.state.Object[this.props.location.fieldsToAdd[j].field]} onChange={(e) => { this.change(e, this.props.location.fieldsToAdd[j].field) }} />
+                    <input type={this.props.location.fieldsToAdd[j].type} name={this.props.location.fieldsToAdd[j].field} value={this.state.Object[this.props.location.fieldsToAdd[j].field]}
+                        onChange={(e) => { this.change(e, this.props.location.fieldsToAdd[j].field) }} />
                 </div>
 
 
@@ -64,7 +65,13 @@ export class Form extends Component {
                     {this.props.location.fieldsArray.map((field, index) =>
                         <span key={index}>
                             <label>{field.name}</label>
-                            <input type={field.type} id={field.field} placeholder={field.name} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
+                            {field.type === 'radio' ? field.radioOptions.map((rad, ind) => <div key={ind}><input type='radio' name={field.name} id={rad.id} value={rad.id}
+                                checked={this.state.Object[field.field] === rad.id} onChange={(e) => { this.change(e, field.field) }} />rad.name</div>)
+                                : field.type === 'checkbox' ? <input type='checkbox' checked={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
+                                    : field.type === 'select' ? <select value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }}>
+                                        {field.selectOptions.map((opp, ind) => <option key={opp.id} value={opp.id}>opp.name</option>)}</select>
+                                        : <input type={field.type} id={field.field} placeholder={field.name} value={this.state.Object[field.field]} onChange={(e) => { this.change(e, field.field) }} />
+                            }
                             {puterors(index)}
                             {this.props.location.type !== 'Search' && <br />}
                         </span>

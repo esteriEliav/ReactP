@@ -13,6 +13,7 @@ export class Main extends Component {
     }
     addObject = (object) => {
         object.PropertyID = 1;
+
         Axios.post('Task/AddTask', object).then(x => { alert('הנכס עודכן בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
@@ -22,17 +23,20 @@ export class Main extends Component {
         fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
         PropertiesArray: [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 },],//
-        LinksForEveryRow: [{ type: 'Add', name: 'לדווח על תקלה', link: '/ReportForm', index: 'end' }],
-        LinksForTable: [],
-        ButtonsForEveryRow: [],
-        ButtonsForTable: [],
-        fieldsToAdd: [],
+
+    }
+    setForTable = () => {
+        return {
+            LinksForTable: [],
+            ButtonsForTable: [],
+        }
 
     }
     set = (object) => {
+        let LinksForEveryRow = [{ type: 'Add', name: 'לדווח על תקלה', link: '/ReportForm', index: 'end' }]
         return {
-            fieldsToAdd: this.state.fieldsToAdd, LinksForEveryRow: this.state.LinksForEveryRow,
-            ButtonsForEveryRow: this.state.ButtonsForEveryRow, LinksPerObject: []
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
+            ButtonsForEveryRow: [], LinksPerObject: []
         }
     }
     render() {
@@ -41,9 +45,7 @@ export class Main extends Component {
 
                 <h1>{this.props.match.params.age}</h1>
                 <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                    LinksForTable={this.state.LinksForTable}
-                    ButtonsForTable={this.state.ButtonsForTable}
-
+                    setForTable={this.setForTable}
                     set={this.set} />
             </div>
         )

@@ -3,6 +3,7 @@ import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
+import { RenterList } from './Renter';
 
 
 /*
@@ -50,21 +51,18 @@ export class Rentals extends Component {
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
+    PaymentTypeOptions = Axios.get('Rental/GetAllPaymentTypes').then(res => res.data)
+    renters = RenterList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })//.then(res => res.
     state = {
         name: 'השכרות',
-        fieldsRentalsArray: [{ field: 'RentalID', name: 'קוד שכירות', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שוכר', type: 'text' },
-        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
+        fieldsArray: [{ field: 'RentalID', name: 'קוד שכירות', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: this.renters },
+        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: this.PaymentTypeOptions }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
-        RentalsArray:/* Axios.get('Rental/GetAllRentals')*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+        ObjectsArray:/* Axios.get('Rental/GetAllRentals')*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: true }],//
-        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ type: 'Add', name: ' הוספת שכירות', link: '/Form' }],
-        ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
-        ButtonsForTable: [],
-        fieldsToAdd: [],
         erors: []
 
     }
@@ -80,15 +78,31 @@ export class Rentals extends Component {
     }
     //אמורה להיות פונקציה שממפה עבור כל איידי את השם
 
-
+    setForTable = () => {
+        return {
+            LinksForTable: [<Link to={{
+                pathname: '/Form',
+                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת שכירות',
+                LinksForEveryRow: [], ButtonsForEveryRow: [],
+                fieldsToAdd: []
+            }}> </Link>],
+            ButtonsForTable: []
+        }
+    }
     set = (object) => {
-        let LinksForEveryRow = [...this.state.LinksForEveryRow];
-        let LinksPerObject = [];
-
+        const ownerobject = {}// Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        // .then(res => res.data)
+        let LinksPerObject = [<Link to={{
+            pathname: '/PropertyOwner',
+            Object: ownerobject,
+            type: 'details'
+        }}>:בעלים{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}</Link>];
+        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         object.PropertyID = <Link
             to={{
                 pathname: '/Properties',
-                object: Axios.post('Property/GetPropertyByPropertyID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }),
+                object: Axios.post('Property/GetPropertyByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }),
                 type: 'details'
             }}>
             {object.PropertyID}</Link>
@@ -101,7 +115,7 @@ export class Rentals extends Component {
                     type: 'details'
                 }}>נכס מחולק</Link>)
 
-        const userObject = Axios.post('PropertyOwner/GetOwnerByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
+        const userObject = Axios.post('Renter/GetRenterByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
         object.UserID = <Link
             to={{
                 pathname: '/Details',
@@ -111,8 +125,8 @@ export class Rentals extends Component {
             {userObject.FirstName + ' ' + userObject.LastName}</Link>
 
         return {
-            fieldsToAdd: this.state.fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: this.state.ButtonsForEveryRow, object: object,
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
+            ButtonsForEveryRow: ButtonsForEveryRow, object: object,
             LinksPerObject: LinksPerObject
         };
 
@@ -122,7 +136,7 @@ export class Rentals extends Component {
             const some = this.set(this.props.object)
             return <Details location={{
                 object: this.props.object,
-                fieldsArray: this.state.fieldsRentalsArray,
+                fieldsArray: this.state.fieldsArray,
                 LinksPerObject: some.LinksPerObject,
                 LinksForEveryRow: some.LinksForEveryRow,
                 ButtonsForEveryRow: some.ButtonsForEveryRow,
@@ -132,8 +146,8 @@ export class Rentals extends Component {
 
         }
         else
-            return <Table name={this.state.name} fieldsArray={this.state.fieldsRentalsArray} objectsArray={this.state.RentalsArray}
-                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
+                setForTable={this.setForTable}
                 set={this.set} delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />

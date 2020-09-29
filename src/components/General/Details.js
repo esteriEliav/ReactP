@@ -40,9 +40,7 @@ export class Details extends Component {
 
         return (
             <div>
-                {console.log('fieldsArray', this.props.location.fieldsArray),
-                    console.log('object', this.props.location.Object)
-                }
+
                 {this.props.location.fieldsArray.map((item, index) =>
 
                     <div key={index}>

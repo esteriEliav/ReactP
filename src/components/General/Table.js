@@ -10,6 +10,7 @@ import Details, { } from "./Details";
 export class Table extends Component {
 
     render() {
+        const some = this.props.setForTable()
         return (
             <div>
 
@@ -24,16 +25,10 @@ export class Table extends Component {
 
 
 
-                { this.props.LinksForTable.map((lin, index) => <div key={index}> <Link to={{
-                    pathname: lin.link,
-                    fieldsArray: this.props.fieldsArray, Object: {}, erors: [], submit: this.props.submit, type: lin.type, name: lin.name,
-                    LinksForEveryRow: [], ButtonsForEveryRow: [],
-                    fieldsToAdd: []
-                }}>
-                    {lin.name}</Link>
-                </div>
-                )}
-                { this.props.ButtonsForTable.map((but, index) => <button key={index} onClick={but['onclick']}>{but['name']}</button>)}
+                {some.LinksForTable.map((lin, index) => <div key={index}> {lin}</div>)}
+
+
+                {some.ButtonsForTable.map((but, index) => <button key={index} onClick={but['onclick']}>{but['name']}</button>)}
 
                 <table>
                     <tr> {this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>

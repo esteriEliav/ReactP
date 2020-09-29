@@ -3,6 +3,7 @@ import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
+import Form from '../General/Form';
 
 /*
 create table Tasks--משימות
@@ -63,10 +64,16 @@ export class Tasks extends Component {
              // .then(res => res.json())
              .then(x => { console.log('המטלה נוספה בהצלחה', x) });
              */
-        Axios.post('Task/GetAllTasks', {
+        Axios.post('Task/AddTask', object, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
         })
             .then(x => { alert('המטלה נוספה בהצלחה') });
+        //תנאי שבודק אם הבקשת הפוסט התקבלה
+        return true;
+    }
+    AddReport = (object) => {
+        Axios.post('Task/AddTask', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            .then(ress => { alert('המטלה נוספה בהצלחה') });
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
@@ -77,17 +84,15 @@ export class Tasks extends Component {
         //תנאי שבודק אם הבקשת הפוסט התקבלה
         return true;
     }
+    ClassificationOptions = Axios.get('Task/GetAllClassificationTypes').then(res => res.data.map(item => { return { id: item.ClassificationID, name: item.ClassificationName } }))
+    TaskTypeOptions = Axios.get('Task/GetAllTaskTypes').then(res => res.data.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }))
     state = {
         name: 'משימות',
-        fieldsTasksArray: [{ field: 'TaskID', name: 'קוד משימה', type: 'text' }, { field: 'TaskTypeId', name: 'סוג', type: 'text' }, { field: 'Description', name: 'תיאור', type: 'text' },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio' }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
-        TasksArray:/*Axios.get('Task/GetAllTasks') */[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+
+        fieldsArray: [{ field: 'TaskID', name: 'קוד משימה', type: 'text' }, { field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: this.TaskTypeOptions }, { field: 'Description', name: 'תיאור', type: 'text' },
+        { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: this.ClassificationOptions }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+        ObjectsArray:/*Axios.get('Task/GetAllTasks') */[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
-        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ type: 'Add', name: ' הוספת משימה', link: '/Form' }],
-        ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
-        ButtonsForTable: [],
-        fieldsToAdd: [],
         erors: []
 
     }
@@ -101,17 +106,32 @@ export class Tasks extends Component {
         }
         return false
     }
+    setForTable = () => {
+        return {
+            LinksForTable: [<Link to={{
+                pathname: '/Form',
+                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת משימה',
+                LinksForEveryRow: [], ButtonsForEveryRow: [],
+                fieldsToAdd: []
+            }}> </Link>],
+            ButtonsForTable: []
+        }
+    }
 
     set = (object) => {
-        let LinksForEveryRow = [...this.state.LinksForEveryRow];
+        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         let fieldsToAdd = [];
         let tempobject = object;
         let LinksPerObject = [];
 
-        // object.TaskTypeId = Axios.post('Task/GetTypeName', object.TaskTypeId, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
-        // object.ClassificationID = Axios.post('Task/GetClassificationName', object.ClassificationID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
-        // object.ClientClassificationID = Axios.post('Task/GetClassificationName', object.ClientClassificationID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
 
+        let typeObj = this.TaskTypeOptions.then(res => res.find(obj => obj.Id === object.TaskTypeId))
+        object.TaskTypeId = typeObj.Name
+        let classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClassificationID))
+        object.ClassificationID = classifObj.Name;
+        classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
+        object.ClientClassificationID = classifObj.Name;
         if (object.SubPropertyID !== null)
             LinksPerObject.push(<Link to={{
                 pathname: '/SubProperties',
@@ -129,7 +149,7 @@ export class Tasks extends Component {
 
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: this.state.ButtonsForEveryRow, object: tempobject,
+            ButtonsForEveryRow: ButtonsForEveryRow, object: tempobject,
             LinksPerObject: LinksPerObject
         };
     }
@@ -138,7 +158,7 @@ export class Tasks extends Component {
             const some = this.set(this.props.object)
             return <Details location={{
                 object: this.props.object,
-                fieldsArray: this.state.fieldsTasksArray,
+                fieldsArray: this.state.fieldsArray,
                 LinksPerObject: some.LinksPerObject,
                 LinksForEveryRow: some.LinksForEveryRow,
                 ButtonsForEveryRow: some.ButtonsForEveryRow,
@@ -147,11 +167,23 @@ export class Tasks extends Component {
             />
 
         }
+        else if (this.props.location.type === 'report') {
+
+            return <Form location={{
+                Object: {},
+                name: 'שלח',
+                type: 'Report',
+                fieldsArray: [{ field: 'Description', name: 'תיאור הבעיה', type: 'textarea' },
+                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions }],
+                submit: this.submit,
+                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [],
+            }} />
+        }
         else
             return <Table name={this.state.name}
-                fieldsArray={this.state.fieldsTasksArray}
-                objectsArray={this.state.TasksArray}
-                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+                fieldsArray={this.state.fieldsArray}
+                objectsArray={this.state.ObjectsArray}
+                setForTable={this.setForTable}
                 set={this.set}
                 delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}

@@ -3,6 +3,7 @@ import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from '../Axios'
 import Details from '../General/Details';
+import { ownersList } from './PropertyOwner'
 
 
 
@@ -74,9 +75,10 @@ export class Properties extends Component {
     deleteObject = (object) => {
         Axios.post('Property/DeleteProperty', object).then(x => { alert("הנכס נשמר בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
     }
+    owners = ownersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })//.then(res => res.
     state = {
         name: 'דירות',
-        fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד דירה', type: 'text' }, { field: 'OwnerID', name: 'בעלים', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' },
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד דירה', type: 'text' }, { field: 'OwnerID', name: 'בעלים', type: 'select', selectOptions: this.owners }, { field: 'CityName', name: 'עיר', type: 'text' },
         { field: 'StreetName', name: 'רחוב', type: 'text' }, { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' },
         { field: 'ApartmentNum', name: 'מספר דירה', type: 'number' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsDivided', name: 'מחולק?', type: 'checkbox' }, { field: 'ManagmentPayment', name: 'דמי ניהול', type: 'text' }, { field: 'IsPaid', name: 'שולם?', type: 'checkbox' },
@@ -86,14 +88,8 @@ export class Properties extends Component {
         fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
 
-        PropertiesArray: /*Axios.post('Property/GetAllProperties').then(res => res.data)*/[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-        { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }]//
-        ,
-        LinksForEveryRow: [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }],
-        LinksForTable: [{ type: 'Add', name: ' הוספת דירה', link: '/Form' }],
-        ButtonsForEveryRow: [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }],
-        ButtonsForTable: [],
-        fieldsToAdd: [],
+        ObjectsArray: /*Axios.post('Property/GetAllProperties').then(res => res.data)*/[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+        { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }],//
         erors: []
 
     }
@@ -107,14 +103,27 @@ export class Properties extends Component {
         }
         return false
     }
-    set = (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
+    setForTable = () => {
+        return {
+            LinksForTable: [<Link to={{
+                pathname: '/Form',
+                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת דירה',
+                LinksForEveryRow: [], ButtonsForEveryRow: [],
+                fieldsToAdd: []
+            }}> </Link>],
 
+            ButtonsForTable: [],
+
+        }
+    }
+    set = (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
+        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         let tempobject = { ...object };
         let fieldsToAdd = []
-        let LinksForEveryRow = [...this.state.LinksForEveryRow]
-        const ownerobject = Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-            .then(res => res.data)
-        tempobject.OwerID = <Link to={{
+        const ownerobject = {}// Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        // .then(res => res.data)
+        tempobject.OwnerID = <Link to={{
             pathname: '/PropertyOwner',
             Object: ownerobject,
             type: 'details'
@@ -145,9 +154,12 @@ export class Properties extends Component {
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'text', index: 10 })
         return {
             fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: this.state.ButtonsForEveryRow, object: tempobject
+            ButtonsForEveryRow: ButtonsForEveryRow, object: tempobject
             , LinksPerObject: []
         };
+
+    }
+    setForForm = (object) => {
 
     }
     rend = () => {
@@ -165,8 +177,8 @@ export class Properties extends Component {
 
         }
         else
-            return <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                LinksForTable={this.state.LinksForTable} ButtonsForTable={this.state.ButtonsForTable}
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
+                setForTable={this.setForTable}
                 set={this.set} delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />

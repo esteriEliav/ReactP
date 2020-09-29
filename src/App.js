@@ -16,6 +16,7 @@ import Rentals from "./components/Individual/Rentals";
 import Tasks from "./components/Individual/Tasks";
 import SubProperties from "./components/Individual/SubProperties";
 import ReportForm from "./components/Individual/ReportForm";
+import Renter from './components/Individual/Renter';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
         <Route path='/Rentals' component={Rentals} />
         <Route path='/Tasks' component={Tasks} />
         <Route path='/SubProperties' component={SubProperties} />
+        <Route path='/Renter' component={Renter} />
 
         {/*:type/:name/:submit/:fieldsArray/:Object/:fieldsToAdd/:LinksForEveryRow
         /:ButtonsForEveryRow/:LinksPerObject/:erors' */}
