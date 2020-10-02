@@ -39,10 +39,11 @@ export class Item extends Component {
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.props.Object[item.field]}</td> })}
 
                     {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={{
-                        pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: lin.link === '/Form' ? this.state.Object : this.props.Object,
+                        pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: lin.link === '/Form' ? this.props.Object : this.state.Object,
                         LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
                         fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
-                        erors: [], submit: this.props.submit, type: lin.type, name: lin.name
+                        submit: this.props.submit, type: lin.type, name: lin.name,
+                        setForForm: this.props.setForForm
 
                     }} >{lin.name} </Link></td>)}
                     {this.state.LinksPerObject.map((lin, index) => <span key={index}>{lin}  </span>)}
@@ -50,7 +51,8 @@ export class Item extends Component {
                         pathname: '/Details', fieldsArray: this.props.fieldsArray, Object: this.state.Object,
                         LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
                         fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
-                        submit: this.props.submit, erors: [],
+                        submit: this.props.submit, setForForm: this.props.setForForm
+
                     }}>
                         לפרטים נוספים</Link> </td>}
 

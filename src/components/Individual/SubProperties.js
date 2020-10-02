@@ -3,6 +3,9 @@ import Table from "../General/Table";
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
+import { CommonFunctions } from '../General/CommonFunctions';
+import SubPropertyObject from '../../Models-Object/SubPropertyObject'
+
 
 /*
 SubPropertyID int  not null identity,--קוד נכס בן
@@ -18,75 +21,78 @@ IsRented bit not null constraint DF_SubProperties_IsRented default 0
 
 
 export class SubProperties extends Component {
-    submit = (type, object) => {
-        let x = false;
-        if (type === 'Add')
-            x = this.addObject(object)
-        else if (type === 'Update')
-            x = this.updateObject(object)
-        else
-            x = this.Search(object)
-        if (x)
-            return <Redirect to='/SubProperties' />
-        return null;
-    }
-    Search = (object) => {
-        Axios.post('SubProperty/Search', { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    updateObject = (object) => {
-        Axios.post('SubProperty/UpdateSubProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הדירה נשמרה בהצלחה" + x) }, alert("תקלה: האוביקט לא נשמר"));
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    addObject = (object) => {
-        object.subPropertyID = 1;
-        Axios.post('SubProperty/AddSubProperty', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('הדירה עודכנה בהצלחה') });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    deleteObject = () => {
-        window.confirm("האוביקט ימחק מיד");
-    }
+
+
     state = {
         name: 'תת נכסים',
-        fieldsPropertyArray: [{ field: 'SubPropertyID', name: 'קוד תת נכס', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' },
-        { field: 'num', name: 'עיר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
-        { field: 'IsRented', name: 'רחוב', type: 'text' }],
-        PropertiesArray:/* Axios.get('SubProperty/GetAllSubProperties')*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true },
+        { field: 'num', name: 'מספר', type: 'text', required: true }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
+        { field: 'IsRented', name: 'מושכר?', type: 'checkbox' }],
+        ObjectsArray:/* Axios.get('SubProperty/GetAllSubProperties')*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+
+        fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
+        { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
         erors: []
 
     }
-    validate = (Number) => {
+    validate = object => {
+        let isErr = false
         let erors = []
-        if (Number < 1)
-            erors.push({ name: 'ערך לא חוקי', index: 4 })
-        if (erors.length > 0) {
-            this.setState({ erors: erors })
-            return true
+        this.state.fieldsArray.map(field => { erors[field.field] = "" })
+        let generalEror = ''
+        if (object.RoomsNum !== '' && !(parseFloat(object.RoomsNum).toString() === object.RoomsNum)) {
+
+            erors.RoomsNum = 'נא להקיש מספר'
+            isErr = true
         }
-        return false
+        if (object.Size !== '' && !(parseFloat(object.Size).toString() === object.Size)) {
+            erors.Size = 'נא להקיש מספר'
+            isErr = true
+        }
+        return { isErr: isErr, generalEror: generalEror, erors: erors }
+    }
+    submit = (type, object) => {
+        let path = 'SubProperties/' + type
+        path += type !== 'Search' ? 'SubProperties' : ''
+        if (type === 'Add' || type === 'Update') {
+            let newObj = SubPropertyObject()
+            if (type === 'Add')
+                newObj.SubPropertyID = 1
+            else
+                newObj.SubPropertyID = object.SubPropertyID
+            newObj.PropertyID = object.PropertyID
+            newObj.num = object.num
+            newObj.IsRented = object.IsRented
+            if (object.Size !== '')
+                newObj.Size = parseFloat(object.Size)
+            if (object.RoomsNum !== '')
+                newObj.RoomsNum = parseFloat(object.RoomsNum)
+
+
+            object = newObj
+
+        }
+        return CommonFunctions(type, object, this.state.ObjectsArray, '/SubProperty', path)
     }
 
-    // setForAddCommonLinks = (LinksForEveryRow, LinksForTable, ButtonsForEveryRow) =>
-    //  this.setState({ LinksForEveryRow: LinksForEveryRow, LinksForTable: LinksForTable, ButtonsForEveryRow: ButtonsForEveryRow })
+
     //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
     setForTable = () => {
         return {
             LinksForTable: [<Link to={{
                 pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת תת דירה',
+                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: ' הוספת תת דירה',
                 LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: []
-            }}> </Link>],
+                fieldsToAdd: [], setForForm: this.setForForm, validate: this.validate
+            }}> הוספת תת נכס</Link>],
             ButtonsForTable: []
         }
     }
+    setForForm = object => []
     set = (object) => {
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
-        let fieldsToAdd = [];
+
         let tempobject = object;
         object.PropertyID = <Link
             to={{
@@ -105,7 +111,7 @@ export class SubProperties extends Component {
                 }}
             >v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
         return {
-            fieldsToAdd: fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: ButtonsForEveryRow,
             object: tempobject, LinksPerObject: []
         };
@@ -115,7 +121,7 @@ export class SubProperties extends Component {
             const some = this.set(this.props.object)
             return <Details location={{
                 object: this.props.object,
-                fieldsArray: this.state.fieldsPropertyArray,
+                fieldsArray: this.state.fieldsArray,
                 LinksPerObject: some.LinksPerObject,
                 LinksForEveryRow: some.LinksForEveryRow,
                 ButtonsForEveryRow: some.ButtonsForEveryRow,
@@ -125,8 +131,8 @@ export class SubProperties extends Component {
 
         }
         else
-            return <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                setForTable={this.setForTable}
+            return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
+                setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />

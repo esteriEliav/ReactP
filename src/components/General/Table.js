@@ -19,7 +19,8 @@ export class Table extends Component {
                 {this.props.fieldsToSearch && <Form location={{
                     name: 'חיפוש', type: 'Search', fieldsArray: this.props.fieldsToSearch, Object: null,
                     LinksForEveryRow: [], ButtonsForEveryRow: [],
-                    fieldsToAdd: [], erors: [], submit: this.props.submit
+                    fieldsToAdd: [], erors: [], submit: this.props.submit, setForForm: () => []
+
                 }}></Form>}
 
 
@@ -35,7 +36,9 @@ export class Table extends Component {
                     {this.props.objectsArray.map(object =>
 
                         <Item key={Object[this.props.fieldsArray[0].field]}
-                            fieldsArray={this.props.fieldsArray} Object={object} set={this.props.set} submit={this.props.submit} />
+                            fieldsArray={this.props.fieldsArray} Object={object} set={this.props.set} submit={this.props.submit}
+                            setForForm={this.props.setForForm} />
+
                     )}
 
                 </table>

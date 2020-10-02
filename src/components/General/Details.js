@@ -19,7 +19,8 @@ export class Details extends Component {
                     Object: this.props.location.Object,
                     fieldsArray: this.props.location.fieldsArray, erors: [], submit: this.props.location.submit, type: 'Update', name: 'ערוך',
                     LinksForEveryRow: this.props.location.LinksForEveryRow, ButtonsForEveryRow: this.props.location.ButtonsForEveryRow,
-                    fieldsToAdd: this.props.location.fieldsToAdd
+                    fieldsToAdd: this.props.location.fieldsToAdd, setForForm: this.props.setForForm
+
                 }}>
                     {this.props.location.LinksForEveryRow[i].name}</Link>)
                 i += 1

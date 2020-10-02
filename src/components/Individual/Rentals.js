@@ -4,6 +4,9 @@ import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
 import { RenterList } from './Renter';
+import { propertyList } from './Properties';
+import { CommonFunctions } from '../General/CommonFunctions';
+import RentalObject from '../../Models-Object/RentalObject';
 
 
 /*
@@ -18,64 +21,67 @@ EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
 export class Rentals extends Component {
-    submit = (type, object) => {
-        let x = false;
-        if (type === 'Add')
-            x = this.addObject(object)
-        else if (type === 'Update')
-            x = this.updateObject(object)
-        else
-            x = this.Search(object)
-        if (x)
-            return <Redirect to='/Rentals' />
-        return null;
-    }
-    Search = (object) => {
-        Axios.post('Rental/Search', { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert("הנכס נשמר בהצלחה" + x) });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    updateObject = (object) => {
-        Axios.post('Rental/UpdateRental', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('השכירות נוספה בהצלחה') });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    addObject = (object) => {
-        object.RentalID = 1;
-        Axios.post('Rental/AddRental', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('השכירות נוספה בהצלחה') });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
-    deleteObject = (object) => {
-        Axios.post('Rental/DeleteRental', object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(x => { alert('השכירות נמחקה בהצלחה') });
-        //תנאי שבודק אם הבקשת הפוסט התקבלה
-        return true;
-    }
     PaymentTypeOptions = Axios.get('Rental/GetAllPaymentTypes').then(res => res.data)
     renters = RenterList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })//.then(res => res.
     state = {
         name: 'השכרות',
-        fieldsArray: [{ field: 'RentalID', name: 'קוד שכירות', type: 'text' }, { field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: this.renters },
-        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: this.PaymentTypeOptions }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true }, { field: 'UserID', name: 'שוכר', type: 'select', /*selectOptions: this.renters*/ },
+        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', /*radioOptions: this.PaymentTypeOptions,*/ required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
         ObjectsArray:/* Axios.get('Rental/GetAllRentals')*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
-        { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: true }],//
-        erors: []
+        { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
+
 
     }
-    validate = (Number) => {
+
+    validate = object => {
+        let isErr = false
         let erors = []
-        if (Number < 1)
-            erors.push({ name: 'ערך לא חוקי', index: 4 })
-        if (erors.length > 0) {
-            this.setState({ erors: erors })
-            return true
+        this.state.fieldsArray.map(field => { erors[field.field] = "" })
+        let generalEror = ''
+        if (object.RentPayment !== '' && !(parseFloat(object.RentPayment).toString() === object.RentPayment)) {
+
+            erors.RentPayment = 'נא להקיש מספר'
+            isErr = true
         }
-        return false
+        if (object.EnteryDate > object.EndDate) {
+            generalEror = 'תאריך כניסה מאוחר מתאריך יציאה'
+            isErr = true
+        }
+        return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
+    submit = (type, object) => {
+        let path = 'Rental/' + type
+        path += type !== 'Search' ? 'Rental' : ''
+        if (type === 'Add' || type === 'Update') {
+            let newObj = RentalObject()
+            if (type === 'Add')
+                newObj.RentalID = 1
+            else
+                newObj.RentalID = object.RentalID
+            newObj.PropertyID = object.PropertyID
+            newObj.SubPropertyID = object.SubPropertyID
+            if (object.Phone !== '')
+                newObj.UserID = object.UserID
+            if (object.RentPayment !== '')
+                newObj.RentPayment = parseFloat(object.RentPayment)
+            newObj.PaymentTypeID = object.PaymentTypeID
+            if (object.EnteryDate !== '')
+                newObj.EnteryDate = object.EnteryDate
+            if (object.EndDate !== '')
+                newObj.EndDate = object.EndDate
+            newObj.ContactRenew = object.ContactRenew
+
+
+            object = newObj
+
+        }
+        return CommonFunctions(type, object, this.state.ObjectsArray, '/Rentals', path)
+    }
+
     //אמורה להיות פונקציה שממפה עבור כל איידי את השם
 
     setForTable = () => {
@@ -84,11 +90,12 @@ export class Rentals extends Component {
                 pathname: '/Form',
                 fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת שכירות',
                 LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: []
-            }}> </Link>],
+                fieldsToAdd: [], setForForm: this.setForForm, validate: this.validate
+            }}> הוספת השכרה</Link>],
             ButtonsForTable: []
         }
     }
+    setForForm = object => []
     set = (object) => {
         const ownerobject = {}// Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         // .then(res => res.data)
@@ -96,7 +103,7 @@ export class Rentals extends Component {
             pathname: '/PropertyOwner',
             Object: ownerobject,
             type: 'details'
-        }}>:בעלים{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}</Link>];
+        }}>{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}:בעלים</Link>];
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         object.PropertyID = <Link
@@ -147,7 +154,7 @@ export class Rentals extends Component {
         }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
-                setForTable={this.setForTable}
+                setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.deleteObject}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
