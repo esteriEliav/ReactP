@@ -5,7 +5,9 @@ class EventDetails extends React.Component {
 
   render() {
     return (
-    <h1>{this.props.match.params.id} Details </h1>
+    <h1>{this.props.match.params.id} משימה </h1>
+    // לשרת ומציגה את פרטי האובייקט.....
+    
     )
   }
 }

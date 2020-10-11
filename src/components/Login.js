@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Link} from 'react-router-dom';
 
 export class Login extends Component {
   state =
@@ -12,7 +13,7 @@ export class Login extends Component {
     onSubmit = (e) => {
         e.preventDefault();
         if(fun())
-            alert(" ברוכים הבאים" + this.state.userName);
+            alert("ברוכים הבאים " + this.state.userName);
             //אפשרות גישה לאתר
         else
             alert("שם משתמש או סיסמה שגויים")
@@ -36,7 +37,8 @@ export class Login extends Component {
                 </div>
                 <div className="login-item">
                 {/* הקישור יפנה לדף של שחזור סיסמה */}
-                <a href="@">שכחת סיסמה?</a>
+               {/*<a href="@">שכחת סיסמה?</a>*/} 
+               <Link to="/signup" ><a href="@">שכחת סיסמה?</a></Link>
                 </div>
         </form>
     )
