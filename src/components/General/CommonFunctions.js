@@ -4,8 +4,9 @@ import { Link, Redirect } from 'react-router-dom';
 
 
 
-
+//פונקציה שמוסיפה/מוחקת/מעדכנת אוביקט וגם מבצעת חיפוש
 const Search = (object, objects, path) => {
+    debugger;
     Axios.post(path, { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(res => {
             if (res.status === 200) {
@@ -22,6 +23,7 @@ const Search = (object, objects, path) => {
             });
 }
 const updateObject = (object, path) => {
+    debugger;
     Axios.post(path, object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(x => {
             if (x.status === 200) {
@@ -40,6 +42,7 @@ const updateObject = (object, path) => {
 const addObject = (object, path) => {
     let bool = true
     object.UserID = 1;
+    debugger;
     Axios.post(path, object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(x => {
             if (x.status === 200) {
@@ -70,7 +73,7 @@ export const CommonFunctions = (type, object, objects, redirect, path) => {
     else if (type === 'Search') {
         objects = Search(object, objects, path)
     }
-    debugger
+
     if (x) {
 
         return <Redirect to={{

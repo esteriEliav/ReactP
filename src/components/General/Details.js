@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject
 */
 
-
+//קומפוננטה המציגה פרטים של כל אוביקט
 export class Details extends Component {
     render() {
         let i = 0, j = 0, k = 0, x
-        const func = (index) => {
+        const func = (index) => {//פונקציה שמחזירה את כל הקישורים,הלחצנים והשדות עבור האוביקט בשביל שדה מסוים
             let items = [];
             {
                 //console.log('i', this.props.location.i); console.log('j', this.props.location.j); console.log('k', this.props.location.k); console.log('index', index);
@@ -50,8 +50,6 @@ export class Details extends Component {
                     <label>{this.props.location.Object[item.field]}</label>
                         <span>
                             {func(index).map(item => { return item })}
-
-
                         </span>
 
                     </div>

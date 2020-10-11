@@ -45,6 +45,7 @@ export class PropertyOwner extends Component {
                 newObj.Email = object.Email
 
             object = newObj
+            debugger
 
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/PropertyOwner', path)
@@ -61,7 +62,6 @@ export class PropertyOwner extends Component {
             generalEror = 'חובה להכניס אימייל או טלפון'
             isErr = true
         }
-        isErr = true
         return { isErr: isErr, generalEror: generalEror, erors: erors }
 
     }

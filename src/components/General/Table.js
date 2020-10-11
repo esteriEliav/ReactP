@@ -6,7 +6,7 @@ import Details, { } from "./Details";
 
 
 
-
+//קומפוננטה להצגת טבלה
 export class Table extends Component {
 
     render() {
@@ -16,7 +16,7 @@ export class Table extends Component {
 
                 <h1>{this.props.name}</h1>
 
-                {this.props.fieldsToSearch && <Form location={{
+                {this.props.fieldsToSearch && <Form location={{//פורם לחיפוש
                     name: 'חיפוש', type: 'Search', fieldsArray: this.props.fieldsToSearch, Object: null,
                     LinksForEveryRow: [], ButtonsForEveryRow: [],
                     fieldsToAdd: [], erors: [], submit: this.props.submit, setForForm: () => []

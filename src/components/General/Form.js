@@ -5,9 +5,10 @@ import LabelInput from './LabelInput'
 /*
 except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject,submit,name,type
 */
+//(קומפוננטת פורם לכל פורם שהוא (הוספת/עדכון אוביקט וכן לחיפוש
 export class Form extends Component {
 
-    state = {
+    state = {//לכל קומפוננטה יש אוביקט, שדות שצריך להוסיף לו בהתאם לאוביקט, שגיאות אם הוקשמשהו לא חוקי, ושדה המציין אם הקומפוננטה סיימה את פעולתה וניתן לחזור להצגת האוביקטים
         Object: { ...this.props.location.Object },
         fieldsToAdd: [],
         isRedirect: false,
@@ -17,18 +18,18 @@ export class Form extends Component {
     }
     componentDidMount = () => {
         let tempObject = { ...this.state.Object };
-        if (Object.keys(tempObject).length === 0) {
+        if (Object.keys(tempObject).length === 0) {//אם האוביקט שנשלח, ריק, יש ליצור אוביקט חדש
             this.props.location.fieldsArray.map(field => { tempObject[field.field] = "" });
             //this.props.location.fieldsToAdd.map(field => { tempObject[field.field] = "" });
             this.setState({ Object: tempObject });
 
         }
-        else
+        else//אם לא יש להוסיף את השדות הנוספים בהתאם לאוביקט
             this.setState({ fieldsToAdd: this.props.location.setForForm(this.state.Object) });
 
 
     }
-    change = (e, field) => {
+    change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
 
         let tempObject = { ...this.state.Object };
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -41,7 +42,7 @@ export class Form extends Component {
         let j = 0;
 
 
-        const func = (index) => {
+        const func = (index) => {//פונקציה המרנדרת את השדות הנוספים
             const fieldsToAdd = this.state.fieldsToAdd[j]
             while (j < this.state.fieldsToAdd.length && fieldsToAdd.index === index) {
                 j += 1
@@ -57,13 +58,18 @@ export class Form extends Component {
 
         const submitHandler = (e) => {
             e.preventDefault();
-            const val = this.props.location.validate(this.state.Object)
-            if (val.isErr)
+            let isStop = false
+            if (this.props.location.type !== 'Search') {
+                const val = this.props.location.validate(this.state.Object)
+                isStop = val.isErr
+                    (isStop)
                 this.setState({ generalEror: val.generalEror, erors: val.erors })
-            else
+            }
+            if (!isStop)
                 this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
+
         }
-        const focusHandler = (e) => {
+        const focusHandler = (e) => {//כשמתמקדים על שדה אם אינו ניתן לעריכה, תוצג הודעה
             console.log(e.target.value)
             if (e.target.readOnly) {
                 let erors = { ...this.state.erors }
@@ -84,10 +90,11 @@ export class Form extends Component {
                             <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} focusHandler={focusHandler} />
                             {this.state.erors[field.field] && <><br /><em>{this.state.erors[field.field]}</em></>}
                             {func(index)}
-                            {this.props.location.type !== 'Search' && <p />}
+                            {this.props.location.type !== 'Search' && <p />}{/* אם לא מדובר בפורם לחיפוש יש לרווח בין האינפוטים */}
                         </span>
 
                     )}
+                    {/* באטן של סבמיט */}
                     <button type={this.props.location.type} name={this.props.location.name} >{this.props.location.name}</button>
 
                 </form>
