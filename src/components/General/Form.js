@@ -62,8 +62,8 @@ export class Form extends Component {
             if (this.props.location.type !== 'Search') {
                 const val = this.props.location.validate(this.state.Object)
                 isStop = val.isErr
-                    (isStop)
-                this.setState({ generalEror: val.generalEror, erors: val.erors })
+                if (isStop)
+                    this.setState({ generalEror: val.generalEror, erors: val.erors })
             }
             if (!isStop)
                 this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })

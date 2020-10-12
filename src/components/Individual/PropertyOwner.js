@@ -84,7 +84,7 @@ export class PropertyOwner extends Component {
         let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
         let LinksPerObject = [<Link to={{//שולח  רשימת דירות שמתקבלים מהפונקציה
             pathname: '/Properties',
-            objects: Axios.post('PropertyOwner/GetPropertiesbyOwnerID', object.OwnerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+            objects: Axios.post('PropertyOwner/GetPropertiesbyOwnerID', Number(object.OwnerID), { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
                 .then(res => res.data),
             type: 'table'
         }}>
