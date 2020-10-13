@@ -2,6 +2,13 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
 
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
+
+
+
+
+
+
 /*
 except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject,submit,name,type
 */
@@ -13,7 +20,8 @@ export class Form extends Component {
         fieldsToAdd: [],
         isRedirect: false,
         generalEror: '',
-        erors: {}
+        erors: {},
+        selectedFile: {}
 
     }
     componentDidMount = () => {
@@ -31,12 +39,33 @@ export class Form extends Component {
     }
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
 
+        if (e.target.type === 'file') {
+            let reader = new FileReader();
+            reader.readAsDataURL(e.target.files[0]);
+            reader.onload = (fr) => {
+                console.log('data', reader.result)
+                let obj = { ...this.state.Object }
+                obj.add = new String(reader.result)
+                this.setState({ Object: obj })
+            };
+            reader.onerror = function (error) {
+                console.log('Error: ', error);
+            };
+            this.setState({
+                selectedFile: e.target
+            })
+
+        }
+
         let tempObject = { ...this.state.Object };
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+
+
 
         this.setState({ Object: tempObject, fieldsToAdd: this.props.location.setForForm(tempObject) })
 
     }
+
     render() {
 
         let j = 0;
@@ -57,6 +86,7 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
+
             e.preventDefault();
             let isStop = false
             if (this.props.location.type !== 'Search') {
@@ -64,10 +94,17 @@ export class Form extends Component {
                 isStop = val.isErr
                 if (isStop)
                     this.setState({ generalEror: val.generalEror, erors: val.erors })
-            }
-            if (!isStop)
-                this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
 
+                if (!isStop) {
+                    debugger
+                    // let obj = { ...this.state.Object }
+                    // obj.document = obj.add
+                    // this.setState({ Object: obj })
+
+                    this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
+
+                }
+            }
         }
         const focusHandler = (e) => {//כשמתמקדים על שדה אם אינו ניתן לעריכה, תוצג הודעה
             console.log(e.target.value)
@@ -80,6 +117,7 @@ export class Form extends Component {
         }
         return (
             <React.Fragment>
+
 
                 <form onSubmit={submitHandler}>
                     <p> <em>{this.state.generalEror}</em><br /></p>
@@ -94,6 +132,8 @@ export class Form extends Component {
                         </span>
 
                     )}
+                    {func('end')}
+                    {this.props.location.type !== 'Search' && <p />}
                     {/* באטן של סבמיט */}
                     <button type={this.props.location.type} name={this.props.location.name} >{this.props.location.name}</button>
 

@@ -9,7 +9,7 @@ export class Item extends Component {
         LinksForEveryRow: [],
         ButtonsForEveryRow: [],
         fieldsToAdd: [],
-        Object: [],
+        Object: {},
         LinksPerObject: [],
         isToomatch: false
 
@@ -58,7 +58,8 @@ export class Item extends Component {
                     }}>
                         לפרטים נוספים</Link> </td>}
 
-                    {this.state.ButtonsForEveryRow.map((but, index) => <td><button key={index} onClick={() => but.onclick()}>{but.name}</button></td>)}{/*בעבור כל שורה באטנים מתאימים */}
+                    {this.state.ButtonsForEveryRow.map((but, index) => <td><button key={index} onClick={() => but.onclick(but.type, this.state.Object)}>{but.name}</button></td>)}{/*בעבור כל שורה באטנים מתאימים */}
+                    {console.log('this.state.Object', this.state.Object)}
 
                 </tr>
 

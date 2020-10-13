@@ -20,6 +20,7 @@ const property = () => {
         IsRented: null,
         RoomsNum: null,
         ApartmentNum: null,
+        document: null
     }
 }
 export default property;

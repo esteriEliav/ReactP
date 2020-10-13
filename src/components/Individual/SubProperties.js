@@ -3,7 +3,7 @@ import Table from "../General/Table";
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
-import { CommonFunctions } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import SubPropertyObject from '../../Models-Object/SubPropertyObject'
 
 
@@ -28,7 +28,7 @@ export class SubProperties extends Component {
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true },
         { field: 'num', name: 'מספר', type: 'text', required: true }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'מושכר?', type: 'checkbox' }],
-        ObjectsArray:/* Axios.get('SubProperty/GetAllSubProperties')*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+        ObjectsArray:/*SubPropertiesList */[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
@@ -67,10 +67,15 @@ export class SubProperties extends Component {
                 newObj.Size = parseFloat(object.Size)
             if (object.RoomsNum !== '')
                 newObj.RoomsNum = parseFloat(object.RoomsNum)
-
+            if (object.add)
+                newObj.document = object.add
 
             object = newObj
 
+        }
+        else if (type === 'Delete') {
+            let id = new Number(object.SubPropertyID)
+            object = id
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/SubProperty', path)
     }
@@ -91,13 +96,13 @@ export class SubProperties extends Component {
     setForForm = object => []
     set = (object) => {
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
 
         let tempobject = object;
         object.PropertyID = <Link
             to={{
                 pathname: '/Properties',
-                object: Axios.post('Propety/GetPropertyByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                object: postFunction('Propety/GetPropertyByID', object.PropertyID),
                 type: 'details'
             }}
         ></Link>
@@ -106,7 +111,7 @@ export class SubProperties extends Component {
             tempobject.IsRented = <Link
                 to={{
                     pathname: '/Rentals',
-                    object: Axios.post('Property/GetRentalBySubPropertyID', object.SubPropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                    object: postFunction('Property/GetRentalBySubPropertyID', object.SubPropertyID),
                     type: 'details'
                 }}
             >v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
@@ -133,7 +138,7 @@ export class SubProperties extends Component {
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
-                set={this.set} delObject={this.deleteObject}
+                set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
 
@@ -149,4 +154,4 @@ export class SubProperties extends Component {
 }
 
 export default SubProperties;
-//export const fieldsArray = this.state.fieldsArray;
+export const SubPropertiesList = [];// GetFunction('SubProperty/GetAllSubProperties');

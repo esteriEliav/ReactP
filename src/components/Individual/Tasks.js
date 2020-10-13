@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
 import Form from '../General/Form';
-import { CommonFunctions } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import TaskObject from '../../Models-Object/TaskObject'
 
 /*
@@ -25,15 +25,15 @@ HandlingWay nvarchar(max),--אופן טיפול
 
  */
 export class Tasks extends Component {
-    ClassificationOptions = Axios.get('Task/GetAllClassificationTypes').then(res => res.data.map(item => { return { id: item.ClassificationID, name: item.ClassificationName } }))
-    TaskTypeOptions = []//Axios.get('Task/GetAllTaskTypes').then(res => res.data.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }))
+    ClassificationOptions = GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
+    TaskTypeOptions = []//GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
     state = {
         name: 'משימות',
 
         fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ }, { field: 'Description', name: 'תיאור', type: 'text', required: true },
         { field: 'ClassificationID', name: 'סווג', type: 'radio', /*radioOptions: this.ClassificationOptions */ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
-        ObjectsArray:/*Axios.get('Task/GetAllTasks') */[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+        ObjectsArray:/* tasksLists*/[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
 
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ },
@@ -82,10 +82,14 @@ export class Tasks extends Component {
                 newObj.HandlingDate = object.HandlingDate
             if (object.HandlingWay !== '')
                 newObj.HandlingWay = object.HandlingWay
-
-
+            if (object.add)
+                newObj.document = object.add
             object = newObj
 
+        }
+        else if (type === 'Delete') {
+            let id = new Number(object.TaskID)
+            object = id
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/Tasks', path)
     }
@@ -118,7 +122,7 @@ export class Tasks extends Component {
 
 
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
 
         let tempobject = object;
         let LinksPerObject = [];
@@ -133,7 +137,7 @@ export class Tasks extends Component {
         if (object.SubPropertyID !== null)
             LinksPerObject.push(<Link to={{
                 pathname: '/SubProperties',
-                object: Axios.post('SubProperty/GetSubPropertyByID', object.SubPropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                object: postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID),
                 type: 'details'
             }} >נכס מחולק</Link>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
 
@@ -177,7 +181,7 @@ export class Tasks extends Component {
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable}
                 set={this.set} setForForm={this.setForForm}
-                delObject={this.deleteObject}
+                delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
     }
@@ -193,3 +197,4 @@ export class Tasks extends Component {
 }
 
 export default Tasks
+export const tasksLists = [];/* GetFunction('Task/GetAllTasks');*/

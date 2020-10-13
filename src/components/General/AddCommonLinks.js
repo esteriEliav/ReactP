@@ -1,74 +1,47 @@
+import Axios from 'axios';
 import React, { Component } from 'react'
 import Table from '../General/Table'
-
-
-//import Main1 from "../Individual/PropertyOwner";
-//import PropertyForRenter from "../Individual/PropertyForRenter";
-//import Properties from "../Individual/Properties";
+import Main1 from "../Individual/PropertyOwner";
+import PropertyForRenter from "../Individual/PropertyForRenter";
+import Properties from "../Individual/Properties";
 import Rentals from "../Individual/Rentals";
 import Tasks from "../Individual/Tasks";
 import SubProperties from "../Individual/SubProperties";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import TasksPopUp from "../Individual/TasksPopUp";
 import { Link } from 'react-router-dom';
+import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 
 
 export class AddCommonLinks extends Component {
 
 
-    /*  state = {
-  
-          LinksForEveryRow: [{ name: 'עריכה', link: '/Form' }, ...this.props.LinksForEveryRow],
-          LinksForTable: [...this.props.LinksForTable, { name: '  הוספת ' + this.props.name, link: '/Form' }],
-          ButtonsForEveryRow: [...this.props.ButtonsForEveryRow, { name: 'מחיקה', onclick: this.props.delObject }],
-  
-      }
-      // componentWillMount = () => {
-      //   this.props.setForAddCommonLinks(this.state.LinksForEveryRow, this.state.LinksForTable, this.state.ButtonsForEveryRow)
-      //  }
-  
-  
-      componentWillMount = () => {
-          let LinksForEveryRow = [{ name: 'עריכה', link: '/Form' }];
-          let LinksForTable = [{ name: '  הוספת ' + this.props.name, link: '/Form' }];
-          let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.props.delObject }];
-          this.props.setForAddCommonLinks(LinksForEveryRow, LinksForTable, ButtonsForEveryRow)
-      }
-      */
-    /*componentWillMount = () => {
-      let LinksForEveryRow = [{ name: 'עריכה', link: '/Form', index: 'end' }, ...this.props.LinksForEveryRow];
-       let LinksForTable = [...this.props.LinksForTable, { name: '  הוספת ' + this.props.name, link: '/Form' }];
-       let ButtonsForEveryRow = [...this.props.ButtonsForEveryRow, { name: 'מחיקה', onclick: this.props.delObject, index: 'end' }];
-
-       this.props.setForAddCommonLinks(LinksForEveryRow, LinksForTable, ButtonsForEveryRow)
-       
-       // console.log('ButtonsForEveryRow', ButtonsForEveryRow)
-       //{ console.log('LinksForEveryRow-addcom..', LinksForEveryRow) }
-   }*/
 
     render() {
 
-        /*  let name = [...this.props.name];
-          let fieldsArray = [...this.props.fieldsArray];
-          let objectsArray = [...this.props.objectsArray];
-          let LinksForEveryRow = [...this.props.LinksForEveryRow,
-          { name: 'עריכה', link: '/Form' }];
-          let LinksForTable = [...this.props.LinksForTable, { name: 'הוספת' + { name }, link: '/Form' }];
-          let ButtonsForEveryRow = [...this.props.ButtonsForEveryRow, { name: 'מחיקה', onclick: this.props.delObject }];
-          let ButtonsForTable = [...this.props.ButtonsForTable];
-          this.props.set(name, fieldsArray, objectsArray, LinksForEveryRow, LinksForTable, ButtonsForEveryRow, ButtonsForTable)
-          */
-        //this.props.set(this.state.name, this.state.fieldsArray, this.state.objectsArray, this.state.LinksForEveryRow, this.state.LinksForTable) 
-
-        //                <button onClick={() => this.props.set(this.state.name, this.state.fieldsArray, this.state.objectsArray, this.state.LinksForEveryRow, this.state.LinksForTable)}>a</button>
 
         /*GetState = (myState) => {
             return myState;
         }*/
+
+
+        var cron = require('node-cron');
+        const i = () => {
+            cron.schedule(' */30 * * * *', () => {
+                console.log('running every minute 1, 2, 4 and 5');
+
+            });
+        }
+
+
         return (
 
             <div>
-                <h1>{this.props.name}</h1>
-                <h1>{this.props.age}</h1>
+                {i()}
+                <button onClick={() => {
+                    Axios.post('PropertyOwner/GetPropertiesbyOwnerID', 2, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+                        .then(res => console.log('res', res.data))
+                }}>aaa</button>
                 <Link to={{ pathname: '/PropertyOwner' }}>PropertyOwner</Link>
 
                 <hr />
@@ -85,6 +58,7 @@ export class AddCommonLinks extends Component {
                 <hr />
                 <Link to={{ pathname: '/SubProperties' }}>SubProperties</Link>
                 <hr />
+
             </div>
         )
     }
