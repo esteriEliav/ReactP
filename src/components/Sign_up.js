@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import Axios from "./Axios";
 
 export class Sign_up extends Component {
   state =
     {
         userName:'',
-        password: '',
+        email: '',
         phone:''
     } 
 
@@ -12,7 +13,8 @@ export class Sign_up extends Component {
 //
     onSubmit = (e) => {
         e.preventDefault();
-        if(fun())
+        //פונקצייה שבודקת האם יש  שם ומייל או ,SMS ושולחת לשם
+        if(fun())//forgotpassword
             alert(this.state.userName+" סיסמא נשלחה אליך !!!!!!!!!!");
             //באם אין פון או מייל זה 
         else
@@ -30,9 +32,9 @@ export class Sign_up extends Component {
       
                 <label className="login-item" htmlFor="user-name">שם משתמש</label>
                 <input className="login-item input-field" type="text" name="user-name" value={this.state.userName} id="name" placeholder="שם משתמש" onChange={this.handleChange('userName')} />                  
-                <label className="login-item" htmlFor="password">אימות לאימיל </label> 
-                <input className="login-item input-field" type="password" name="password" value={this.state.password} id="password" placeholder="מייל" onChange={this.handleChange('password')} /> 
-                <label className="login-item" htmlFor="phone">אימות לנייד </label> 
+                <label className="login-item" htmlFor="email">אימות אימייל</label> 
+                <input className="login-item input-field" type="email" name="email" value={this.state.email} id="email" placeholder="מייל" onChange={this.handleChange('email')} /> 
+                <label className="login-item" htmlFor="phone">אימות</label> 
                 <input className="login-item input-field" type="phone" name="phone" value={this.state.phone} id="phone" placeholder="פון" onChange={this.handleChange('phone')} />                           
                 <div className="login-item">
                     <input className="login-button" type="submit" value="שליחה"/>
@@ -45,8 +47,8 @@ export class Sign_up extends Component {
     )
   }
 }
-//זו כביכול הפונקציה שתחזור מהשרת
-function fun(params) {
+ function fun() {
+
   return true;
     //  return false;
 }

@@ -3,20 +3,32 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import { withRouter } from 'react-router-dom';
 import hebLocale from '@fullcalendar/core/locales/he';
+import axios from 'axios';
 
 class Calendar extends React.Component {
     state={
-        events:[
-            {id:1, title: 'משימה', date: '2020-09-01'},
-            {id:2, title: 'משימה', date: '2020-09-02' }
-        ]
+        events:[]
     }
     componentDidMount(){
+      axios.get('https://jsonplaceholder.typicode.com/users')
+      .then( response =>{
+      const events = response.data.slice(0,4);
+      const updatedevents = events.map(event => {
+        return {
+          id: event.id,
+          title: event.name,
+          date: '2020-10-14'
+        }
+      });
+      
+     this.setState({events: updatedevents});
       //Get call to the events Api
+      
+    })
     }
   
     routeChange= (arg) =>  {//מעבירה את המשתמש לדף פרטי אירוע על פי האירוע שלחץ עליו
-      let path = '/EventDetails/'+arg.event.id;
+      let path = '/EventDetails/'+ arg.event.id;
       this.props.history.push(path);// מעבר לדף פרטי אירוע על ידי ההיסטוריה
     }
   render() {
