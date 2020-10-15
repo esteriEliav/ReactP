@@ -49,24 +49,14 @@ export class Form extends Component {
                 this.setState({ Object: obj })
             };
             reader.onerror = function (error) {
-                console.log('Error: ', error);
-            };
-            this.setState({
-                selectedFile: e.target
-            })
-
-        }
-
+                console.log('Error: ', error)}
+            }
         let tempObject = { ...this.state.Object };
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-
-
-
         this.setState({ Object: tempObject, fieldsToAdd: this.props.location.setForForm(tempObject) })
-
-    }
-
-    render() {
+            }
+        
+    render(){
 
         let j = 0;
 
@@ -86,11 +76,8 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
-<<<<<<< HEAD
-            debugger;
-=======
+            debugger
 
->>>>>>> 7d4e1c426bcedbca0e8b73ff4483e52ed7a3cc94
             e.preventDefault();
             let isStop = false
             if (this.props.location.type !== 'Search') {
@@ -98,7 +85,6 @@ export class Form extends Component {
                 isStop = val.isErr
                 if (isStop)
                     this.setState({ generalEror: val.generalEror, erors: val.erors })
-
                 if (!isStop) {
                     debugger
                     // let obj = { ...this.state.Object }
@@ -106,10 +92,10 @@ export class Form extends Component {
                     // this.setState({ Object: obj })
 
                     this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
-
-                }
             }
         }
+            }
+        
         const focusHandler = (e) => {//כשמתמקדים על שדה אם אינו ניתן לעריכה, תוצג הודעה
             console.log(e.target.value)
             if (e.target.readOnly) {
@@ -148,7 +134,8 @@ export class Form extends Component {
 
         )
     }
+
 }
 
 
-export default Form
+export default Form;

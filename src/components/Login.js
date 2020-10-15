@@ -12,7 +12,7 @@ export class Login extends Component{
 
     onSubmit = (e) => {
         e.preventDefault();
-        //if(fun())
+        debugger;
         Axios.post("User/Ifhaveuse",{...this.state}, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(xx=> {
             if(xx.status === 200)

@@ -29,9 +29,7 @@ export class Rentals extends Component {
             console.log('res.data',res.data)},res=>{console.log('res.data',res)})
         console.log('obj',this.obj)
     }
-    PaymentTypeOptions = Axios.get('Rental/GetAllPaymentTypes').then(res => res.data)
-    renters = RenterList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })//.then(res => res.
-
+    
     PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
     renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
 
@@ -44,9 +42,9 @@ export class Rentals extends Component {
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
 
-        ObjectsArray:this.obj /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+        /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
 
-        ObjectsArray:/*rentalsList */[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+        ObjectsArray:/*rentalsList*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
 
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
 

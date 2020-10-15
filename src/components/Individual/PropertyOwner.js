@@ -20,14 +20,13 @@ export class PropertyOwner extends Component {
         name: 'משכירים',
         fieldsArray: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
-      //  { field: 'Phone', name: 'טלפון', type: 'tel', pattern:/\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
-        { field: 'Email', name: 'אימייל', type: 'email' }],
-        ObjectsArray:this.obj  /*[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+       { field: 'Phone', name: 'טלפון', type: 'tel', pattern:/\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
+        {field:'Email',name:'אימייל',type:'email'}],
+         /*[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
         { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
         { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }],
 */
-,
-        { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+
         ObjectsArray: ownersList
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
