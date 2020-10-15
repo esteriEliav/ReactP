@@ -3,17 +3,18 @@ import { Link } from 'react-router-dom';
 import Form from './Form';
 import Details from "./Details";
 
+//קומפוננטה להצגת שורה בטבלה
 export class Item extends Component {
     state = {
         LinksForEveryRow: [],
         ButtonsForEveryRow: [],
         fieldsToAdd: [],
-        Object: [],
+        Object: {},
         LinksPerObject: [],
         isToomatch: false
 
     }
-    componentWillMount = () => {
+    componentWillMount = () => {//בעבורכל אוביקט יש לעדכן אותו ואת כל השדות והקישורים הקשורים אליו
         let gen = this.props.set(this.props.Object)
         this.setState({
             LinksForEveryRow: gen.LinksForEveryRow,
@@ -22,6 +23,7 @@ export class Item extends Component {
             Object: gen.object,
             LinksPerObject: gen.LinksPerObject
         });
+        //אם יש מידי הרבה שדות , לא נציג את כולם ונוסיף קישור לפרטים מלאים
         if (this.props.fieldsArray.length > 5 || this.props.fieldsArray.length + this.state.LinksForEveryRow.length + this.state.ButtonsForEveryRow.length + this.state.fieldsToAdd.length > 8)
             this.setState({ isToomatch: true })
     }
@@ -38,7 +40,7 @@ export class Item extends Component {
             <React.Fragment>
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.props.Object[item.field]}</td> })}
 
-                    {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={{
+                    {this.state.LinksForEveryRow.map((lin, index) => <td><Link key={index} to={{/*בעבור כל שורה קישורים מתאימים */
                         pathname: lin.link, fieldsArray: this.props.fieldsArray, Object: lin.link === '/Form' ? this.props.Object : this.state.Object,
                         LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
                         fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
@@ -46,8 +48,8 @@ export class Item extends Component {
                         setForForm: this.props.setForForm
 
                     }} >{lin.name} </Link></td>)}
-                    {this.state.LinksPerObject.map((lin, index) => <span key={index}>{lin}  </span>)}
-                    {this.state.isToomatch && <td><Link to={{
+                    {this.state.LinksPerObject.map((lin, index) => <span key={index}>{lin}  </span>)}{/*בעבור כל אוביקט קישורים מתאימים */}
+                    {this.state.isToomatch && <td><Link to={{/*אם יש מידי הרבה שדות, קישור לפרטים מלאים */
                         pathname: '/Details', fieldsArray: this.props.fieldsArray, Object: this.state.Object,
                         LinksForEveryRow: this.state.LinksForEveryRow, ButtonsForEveryRow: this.state.ButtonsForEveryRow,
                         fieldsToAdd: this.state.fieldsToAdd, LinksPerObject: this.state.LinksPerObject,
@@ -56,7 +58,8 @@ export class Item extends Component {
                     }}>
                         לפרטים נוספים</Link> </td>}
 
-                    {this.state.ButtonsForEveryRow.map((but, index) => <td><button key={index} onClick={() => but.onclick()}>{but.name}</button></td>)}
+                    {this.state.ButtonsForEveryRow.map((but, index) => <td><button key={index} onClick={() => but.onclick(but.type, this.state.Object)}>{but.name}</button></td>)}{/*בעבור כל שורה באטנים מתאימים */}
+                    {console.log('this.state.Object', this.state.Object)}
 
                 </tr>
 

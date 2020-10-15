@@ -6,7 +6,7 @@ import MPropertyForRenterain1 from './PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunctions } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import RenterObject from '../../Models-Object/RenterObject'
 
 // public int UserID { get; set; }
@@ -23,11 +23,11 @@ export class Renter extends Component {
     state = {
 
         name: 'שוכרים',
-        fieldsArray: /*Axios.get('Renter/GetAllRenters') */[{ field: 'FirstName', name: 'שם פרטי', type: 'text' },
+        fieldsArray: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' },
         { field: 'LastName', name: 'שם משפחה', type: 'text' }, { field: 'SMS', name: 'SMS', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, , { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g }
-            , { field: 'UserName', name: 'שם משתמש', type: 'text' }, { field: 'Password', name: 'סיסמא', type: 'text' }],
-        ObjectsArray: [{ OwnerID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
+            , { field: 'UserName', name: 'שם משתמש', type: 'text' }, { field: 'Password', name: 'סיסמא', type: 'text' }, , { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+        ObjectsArray: /*rentersList */[{ OwnerID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
         { OwnerID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
         { OwnerID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
 
@@ -44,8 +44,6 @@ export class Renter extends Component {
             generalEror = 'SMS חובה להכניס אימייל או '
             isErr = true
         }
-        debugger
-        isErr = true
         return { isErr: isErr, generalEror: generalEror, erors: erors }
 
     }
@@ -73,9 +71,14 @@ export class Renter extends Component {
                 newObj.UserName = object.UserName
             if (object.Password !== '')
                 newObj.Password = object.Password
-
+            if (object.add)
+                newObj.document = object.add
             object = newObj
 
+        }
+        else if (type === 'Delete') {
+            let id = new Number(object.UserID)
+            object = id
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/Renter', path)
     }
@@ -96,11 +99,10 @@ export class Renter extends Component {
     setForForm = () => []
     set = object => {
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
         let LinksPerObject = [<Link to={{//שולח  רשימת דירות שמתקבלים מהפונקציה
             pathname: '/Properties',
-            objects: Axios.post('Renter/getPropertiesbyRenterID', object.OwnerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-                .then(res => res.data),
+            objects: postFunction('Renter/getPropertiesbyRenterID', object.OwnerID),
             type: 'table'
         }}>
             דירות ששוכר</Link>]
@@ -126,7 +128,7 @@ export class Renter extends Component {
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
-                set={this.set} delObject={this.deleteObject}
+                set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
 
@@ -142,5 +144,5 @@ export class Renter extends Component {
     }
 }
 
-export default Renter
-export const RenterList = []//Axios.get('Renter/getAllRenters').then(res => res.data)
+export default Renter;
+export const rentersList = [];//GetFunction('Renter/GetAllRenters');

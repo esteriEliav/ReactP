@@ -8,7 +8,8 @@ const renter = () => {
         Phone: null,
         RoleID: null,
         UserName: null,
-        Password: null
+        Password: null,
+        document: null
     }
 }
 export default renter

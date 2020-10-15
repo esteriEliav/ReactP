@@ -5,7 +5,7 @@ import MPropertyForRenterain1 from './PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunctions } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
 
 
@@ -20,12 +20,16 @@ export class PropertyOwner extends Component {
         name: 'משכירים',
         fieldsArray: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
-        { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
+      //  { field: 'Phone', name: 'טלפון', type: 'tel', pattern:/\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }],
         ObjectsArray:this.obj  /*[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
         { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
         { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }],
-*/,
+*/
+,
+        { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+        ObjectsArray: ownersList
+
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
     }
@@ -35,22 +39,27 @@ export class PropertyOwner extends Component {
         let path = 'PropertyOwner/' + type
         path += type !== 'Search' ? 'PropertyOwner' : ''
         if (type === 'Add' || type === 'Update') {
-            let newObj = PropertyOwnerObject()
+            let OwnerID = object.OwnerID, OwnerFirstName = null, OwnerLastName = null, Phone = null, Email = null
+
             if (type === 'Add')
-                newObj.OwnerID = 1
-            else
-                newObj.OwnerID = object.OwnerID
+                OwnerID = 1
             if (object.OwnerFirstName !== '')
-                newObj.OwnerFirstName = object.OwnerFirstName
+                OwnerFirstName = object.OwnerFirstName
             if (object.OwnerLastName !== '')
-                newObj.OwnerLastName = object.OwnerLastName
+                OwnerLastName = object.OwnerLastName
             if (object.Phone !== '')
-                newObj.Phone = object.Phone
+                Phone = object.Phone
             if (object.Email !== '')
-                newObj.Email = object.Email
+                Email = object.Email
 
-            object = newObj
+            object = new PropertyOwnerObject(OwnerID, OwnerFirstName, OwnerLastName, Phone, Email, object.add)
+            debugger
 
+        }
+        else if (type === 'Delete') {
+            object.OwnerID = 1
+            let id = new Number(object.OwnerID)
+            object = id
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/PropertyOwner', path)
     }
@@ -74,7 +83,7 @@ export class PropertyOwner extends Component {
         return {
             LinksForTable: [<Link to={{
                 pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: 'הוספת משכיר',
+                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: 'הוסף',
                 LinksForEveryRow: [], ButtonsForEveryRow: [],
                 fieldsToAdd: [], setForForm: this.setForForm,
                 validate: this.validate
@@ -85,17 +94,19 @@ export class PropertyOwner extends Component {
     }
     setForForm = object => []
     set = (object) => {
+
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
         let LinksPerObject = [<Link to={{//שולח  רשימת דירות שמתקבלים מהפונקציה
             pathname: '/Properties',
-            objects: Axios.post('PropertyOwner/GetPropertiesbyOwnerID', object.OwnerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-                .then(res => res.data),
+            objects: postFunction('PropertyOwner/GetPropertiesbyOwnerID', Number(object.OwnerID)),
             type: 'table'
         }}>
             דירות</Link>]
+        //LinksPerObject.push(<input type="file" name="file" onChange={onChangeHandler} />
+
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object: object,
             ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
         }
     }
@@ -116,9 +127,9 @@ export class PropertyOwner extends Component {
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
-                set={this.set} delObject={this.deleteObject}
+                set={this.set} delObject={this.submit}
                 validate={this.validate} submit={this.submit}
-                fieldsToSearch={this.state.fieldsArray} />
+                fieldsToSearch={this.state.fieldsArray.filter((i, ind) => ind != 4)} />
 
     }
     render() {
@@ -132,7 +143,7 @@ export class PropertyOwner extends Component {
     }
 }
 
-export default PropertyOwner
-export const ownersList = [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+export default PropertyOwner;
+export const ownersList =/*GetFunction('PropertyOwner/getAllOwners')*/[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
 { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
-{ OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }]//Axios.get('PropertyOwner/getAllOwners').then(res => res.data)
+{ OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];

@@ -3,9 +3,9 @@ import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
-import { RenterList } from './Renter';
+import { rentersList } from './Renter';
 import { propertyList } from './Properties';
-import { CommonFunctions } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import RentalObject from '../../Models-Object/RentalObject';
 
 
@@ -31,17 +31,25 @@ export class Rentals extends Component {
     }
     PaymentTypeOptions = Axios.get('Rental/GetAllPaymentTypes').then(res => res.data)
     renters = RenterList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })//.then(res => res.
+
+    PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
+    renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
+
     state = {
         name: 'השכרות',
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true }, { field: 'UserID', name: 'שוכר', type: 'select', /*selectOptions: this.renters*/ },
         { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', /*radioOptions: this.PaymentTypeOptions,*/ required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
-        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
+        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }, , { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
+
         ObjectsArray:this.obj /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+
+        ObjectsArray:/*rentalsList */[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
-*/
+
 
     }
 
@@ -82,10 +90,15 @@ export class Rentals extends Component {
             if (object.EndDate !== '')
                 newObj.EndDate = object.EndDate
             newObj.ContactRenew = object.ContactRenew
-
+            if (object.add)
+                newObj.document = object.add
 
             object = newObj
 
+        }
+        else if (type === 'Delete') {
+            let id = new Number(object.RentalID)
+            object = id
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/Rentals', path)
     }
@@ -105,19 +118,18 @@ export class Rentals extends Component {
     }
     setForForm = object => []
     set = (object) => {
-        const ownerobject = {}// Axios.post('PropertyOwner/GetOwnerByID', object.OwerID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-        // .then(res => res.data)
+        const ownerobject = {}// postFunction('PropertyOwner/GetOwnerByID', object.OwerID) 
         let LinksPerObject = [<Link to={{
             pathname: '/PropertyOwner',
             Object: ownerobject,
             type: 'details'
         }}>{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}:בעלים</Link>];
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', onclick: this.deleteObject, index: 'end' }]
+        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
         object.PropertyID = <Link
             to={{
                 pathname: '/Properties',
-                object: Axios.post('Property/GetPropertyByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }),
+                object: postFunction('Property/GetPropertyByID', object.PropertyID),
                 type: 'details'
             }}>
             {object.PropertyID}</Link>
@@ -126,11 +138,11 @@ export class Rentals extends Component {
             LinksPerObject.push(<Link
                 to={{
                     pathname: '/SubProperties',
-                    object: Axios.post('SubProperty/GetSubPropertyByID', object.SubPropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data),
+                    object: postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID),
                     type: 'details'
                 }}>נכס מחולק</Link>)
 
-        const userObject = Axios.post('Renter/GetRenterByID', object.PropertyID, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => res.data)
+        const userObject = postFunction('Renter/GetRenterByID', object.PropertyID)
         object.UserID = <Link
             to={{
                 pathname: '/Details',
@@ -163,7 +175,7 @@ export class Rentals extends Component {
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
-                set={this.set} delObject={this.deleteObject}
+                set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
 
@@ -181,3 +193,4 @@ export class Rentals extends Component {
 }
 
 export default Rentals
+export const rentalsList = [];// GetFunction('Rental/GetAllRentals');
