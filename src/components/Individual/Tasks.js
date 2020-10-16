@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
+import { propertiesList } from './Properties'
+import { SubPropertiesList } from './SubProperties'
+
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
 import Form from '../General/Form';
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import TaskObject from '../../Models-Object/TaskObject'
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 
 /*
 create table Tasks--משימות
@@ -22,10 +27,10 @@ DateForHandling datetime not null,--תאריך לטיפול
 IsHandled bit constraint DF_Tasks_IsHandled default 0, --האם טופל
 HandlingDate datetime,--תאריך טיפול
 HandlingWay nvarchar(max),--אופן טיפול
-
  */
 export class Tasks extends Component {
     ClassificationOptions = GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
+    propertiesOptions = propertiesList.map(item => { return { id: item.PropertyID, name: item.PropertyID + ':' + item.StreetID + ' ' + item.Number + ' ' + item.CityID } })
     TaskTypeOptions = []//GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
     state = {
         name: 'משימות',
@@ -39,6 +44,7 @@ export class Tasks extends Component {
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ },
         { field: 'ClassificationID', name: 'סווג', type: 'radio',/* radioOptions: this.ClassificationOptions*/ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+        isAutho: false
 
     }
 
@@ -82,14 +88,22 @@ export class Tasks extends Component {
                 newObj.HandlingDate = object.HandlingDate
             if (object.HandlingWay !== '')
                 newObj.HandlingWay = object.HandlingWay
-            if (object.add)
-                newObj.document = object.add
+            if (object.add) {
+                newObj.docName = object.document
+                newObj.Dock = object.add
+
+            }
             object = newObj
 
         }
         else if (type === 'Delete') {
             let id = new Number(object.TaskID)
             object = id
+        }
+        if (type === 'Update' && object.IsHandled === true) {
+            const ret = CommonFunctions(type, object, this.state.ObjectsArray, '/Tasks', path)
+            CommonFunctions('Delete', object, this.state.ObjectsArray, '/Tasks', '/Tasks/DeleteTask')
+            return ret;
         }
         return CommonFunctions(type, object, this.state.ObjectsArray, '/Tasks', path)
     }
@@ -108,18 +122,36 @@ export class Tasks extends Component {
     }
     setForForm = object => {
         let fieldsToAdd = [];
-        // if (this.TaskTypeOptions.find(type => type.id === object.TaskTypeId).name === 'תקלה')
-        //     fieldsToAdd.push({ field: 'ClientClassificationID', name: 'סווג לקוח', type: 'text', index: 3 },//פונקציה שמחזירה שם סווג
-        //         { field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 3 })
+        if (object.TaskTypeId === 1 || object.TaskTypeId === 2) {
+            fieldsToAdd.push({ field: 'PropertyID', name: 'סווג לקוח', type: 'select', index: 1,/*selectOptions:this.propertiesOptions*/ });
+            const property = propertiesList.find((item => item.PropertyID === object.PropertyID))
+
+            if (property && property[0] && property[0].IsDivided) {
+                const SubProperties = SubPropertiesList.filter(item => item.PropertyID === object.PropertyID)
+                const subPropertiesOptions = SubProperties.map(item => { return { id: item.SubPropertyID, name: item.num } })
+                fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח', type: 'select', index: 1,/*selectOptions:subPropertiesOptions*/ });
+            }
+        }
+
+        if (object.TaskTypeId === 1) {
+            fieldsToAdd.push(/*{ field: 'ClientClassificationID', name: 'סווג לקוח', type: 'radio', index: 2,radioOptions: this.ClassificationOptions  },*///פונקציה שמחזירה שם סווג
+                { field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 2 })
+
+        }
 
         if (object.IsHandled)
-            fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 6 },
-                { field: 'HandlingWay', name: 'אופן טיפול', type: 'text', index: 6 })
-        return fieldsToAdd;
+            fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 4 },
+                { field: 'HandlingWay', name: 'אופן טיפול', type: 'texterea', index: 4 })
+        const LinksPerObject = []
+        return { fieldsToAdd, LinksPerObject };
 
     }
     set = (object) => {
 
+
+        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 6 })
+        if (docks && docks[0])
+            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
@@ -143,13 +175,34 @@ export class Tasks extends Component {
 
 
         return {
-            fieldsToAdd: this.setForForm(object), LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd: this.setForForm(object).fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: ButtonsForEveryRow, object: tempobject,
             LinksPerObject: LinksPerObject
         };
     }
     rend = () => {
-        if (this.props.location.type === 'details') {
+        if (this.props.user.RoleID != 1 && this.props.user.RoleID != 2 && this.props.user.RoleID != 3) {
+            return <Redirect to='/a' />
+        }
+
+        if (this.props.location.type === 'report') {
+
+            return <Form location={{
+                Object: { PropertyID: this.props.location.PropertyID, SubPropertyID: this.props.location.SubPropertyID },
+                name: 'שלח',
+                type: 'Report',
+                fieldsArray: [{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
+                    // { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions }
+                ],
+                submit: this.submit, setForForm: this.setForForm,
+                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
+            }} />
+        }
+        else if (this.props.user.RoleID != 1 && this.props.user.RoleID != 2) {
+            return <Redirect to='/a' />
+        }
+
+        else if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
             return <Details location={{
                 object: this.props.object,
@@ -162,20 +215,20 @@ export class Tasks extends Component {
             />
 
         }
-        else if (this.props.location.type === 'report') {
+
+        else if (this.props.location.type === 'form') {
 
             return <Form location={{
-                Object: { PropertyID: this.props.location.PropertyID, SubPropertyID: this.props.location.SubPropertyID },
-                name: 'שלח',
-                type: 'Report',
-                fieldsArray: [{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
-                    // { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions }
-                ],
-                submit: this.submit, setForForm: () => [],
+                Object: this.props.location.object,
+                name: 'עדכן',
+                type: this.props.location.formType,
+                fieldsArray: this.state.fieldsArray,
+                submit: this.submit, setForForm: this.setForForm,
                 LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
             }} />
         }
-        else
+        else {
+
             return <Table name={this.state.name}
                 fieldsArray={this.state.fieldsArray}
                 objectsArray={this.state.ObjectsArray}
@@ -184,6 +237,7 @@ export class Tasks extends Component {
                 delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit}
                 fieldsToSearch={this.state.fieldsToSearch} />
+        }
     }
     render() {
 
@@ -196,5 +250,5 @@ export class Tasks extends Component {
     }
 }
 
-export default Tasks
+export default connect(mapStateToProps)(Tasks)
 export const tasksLists = [];/* GetFunction('Task/GetAllTasks');*/

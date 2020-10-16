@@ -6,7 +6,8 @@ const subProperty = () => {
         IsRented: null,
         Size: null,
         RoomsNum: null,
-        document: null
+        Dock: null,
+        docName: null
     }
 }
 export default subProperty

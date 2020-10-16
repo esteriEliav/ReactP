@@ -17,6 +17,7 @@ import Tasks from "./components/Individual/Tasks";
 import SubProperties from "./components/Individual/SubProperties";
 import ReportForm from "./components/Individual/ReportForm";
 import Renter from './components/Individual/Renter';
+import NotFound from './components/General/NotFound';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
 
 
       <Switch>
+
         <Route path="/Calendar" component={Calendar} />
         <Route path='/EventDetails/:id' exact strict component={EventDetails} />
         <Route path="/login" component={Login} />
@@ -38,14 +40,16 @@ function App() {
         <Route path='/Rentals' component={Rentals} />
         <Route path='/Tasks' component={Tasks} />
         <Route path='/SubProperties' component={SubProperties} />
+        <Route path='/Form' component={Form} />
         <Route path='/Renter' component={Renter} />
 
         {/*:type/:name/:submit/:fieldsArray/:Object/:fieldsToAdd/:LinksForEveryRow
         /:ButtonsForEveryRow/:LinksPerObject/:erors' */}
-        <Route path='/Form' component={Form} />
+
 
 
         <Route path='/Details' component={Details}></Route>
+        <Route component={NotFound} />
       </Switch>
 
     </div>

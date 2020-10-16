@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-//import Popup from 'reactjs-popup';
+import Popup from 'reactjs-popup';
 import Axios from '../Axios'
 import { Link } from 'react-router-dom';
 
@@ -7,15 +7,10 @@ import { Link } from 'react-router-dom';
 
 export class TasksPopUp extends Component {
     state = {
-        isOpen: this.props.isOpen,
+
         timepassed: [],
         urgent: [],
     }
-    closeModal = () => {
-        this.setState({ isOpen: false })
-    }
-
-
 
     componentDidMount = () => {
         // Axios.get('Task/Getthis.state.timepassedTasks').then(res => {
@@ -31,19 +26,16 @@ export class TasksPopUp extends Component {
     }
     render() {
         return (
+            <Popup open={this.props.isOpen} closeOnDocumentClick={false} className="modal" keepTooltipInside={true} position='bottom left' modal>
 
-
-            <div>
-                {/* // <Popup open={this.state.isOpen} closeOnDocumentClick={false} className="modal" keepTooltipInside={true} position='bottom left' modal> */}
-
-                <a className="close" onClick={this.closeModal}>
+                <a className="close" onClick={this.props.closeModal}>
                     &times;
               </a>
                 <h3 dir='rtl'> {this.state.timepassed.length} משימות שעבר זמנם <Link to={{ pathname: '/Tasks', objectArray: this.state.timepassed, type: 'table' }}>לפרטים</Link>  </h3>
                 <h3 dir='rtl'>{this.state.urgent.length}  משימות דחופות <Link to={{ pathname: '/Tasks', objectArray: this.state.urgent, type: 'table' }}>לפרטים</Link></h3>
 
-                {/* // </Popup> */}
-            </div>
+            </Popup>
+
 
 
         )

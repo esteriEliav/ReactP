@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
+import Form from '../General/Form'
+
 import { Link, Redirect } from 'react-router-dom';
 import Axios from '../Axios'
 import Details from '../General/Details';
@@ -7,6 +9,8 @@ import { ownersList } from './PropertyOwner'
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import PropertyObject from '../../Models-Object/PropertyObject';
 import DocumentObject from '../../Models-Object/DocumentObject'
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 
 
 
@@ -41,7 +45,7 @@ export class Properties extends Component {
         { field: 'ApartmentNum', name: 'מספר דירה', type: 'number' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsDivided', name: 'מחולק?', type: 'checkbox' }, { field: 'ManagmentPayment', name: 'דמי ניהול', type: 'text' }, { field: 'IsPaid', name: 'שולם?', type: 'checkbox' },
         { field: 'IsRented', name: 'מושכר', type: 'checkbox' }, { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' },
-        { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+        { field: 'document', name: 'מסמך', type: 'file', index: 'end' }],
 
 
         fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
@@ -49,8 +53,9 @@ export class Properties extends Component {
 
         ObjectsArray:/*propertiesList*/[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
         { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: false, IsRented: false, IsExclusivity: false }],//
-
+        isAutho: false//true
     }
+
     validate = object => {
         let isErr = false
         let erors = []
@@ -104,8 +109,11 @@ export class Properties extends Component {
             if (object.exclusivityPersons !== '')
                 newObj.exclusivityPersons = object.exclusivityPersonsnpm
             newObj.IsWarranty = object.IsWarranty
-            if (object.add)
-                newObj.document = object.add
+            if (object.add) {
+                newObj.docName = object.document
+                newObj.Dock = object.add
+
+            }
 
             object = newObj
 
@@ -133,54 +141,88 @@ export class Properties extends Component {
 
         }
     }
+    linkToAddPropertyOwner = <Link to={{
+        pathname: '/PropertyOwner',
+        type: 'Add',
+        name: 'הוסף משכיר',
+        index: 1,
+        object: {}
+
+    }}> הוסף משכיר</Link>
+
     set = (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
-        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        let LinksPerObject = []
         let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
         let tempobject = { ...object };
-
+        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
+        //const docks=postFunction('')
         const ownerobject = {}// postFunction('PropertyOwner/GetOwnerByID', object.OwerID)
+
+        if (object.IsDivided) {
+            tempobject.IsDivided = <Link to={{
+                pathname: '/SubProperties',
+                objects: postFunction('SubProperty/GetSubPropertiesOfParentProperty', object.PropertyID),
+                type: 'table'
+            }} >V</Link>//ששולח פרטי נכסי בן של הדירה
+            LinksPerObject.push(<Link to={{
+                pathname: '/SubProperty',
+                type: 'Add',
+                name: 'הוסף נכס מחולק',
+                index: 8,
+                object: { propertyID: tempobject.propertyID }
+
+            }}>הוסף נכס מחולק</Link>)
+
+        }
+
+        else
+            tempobject.IsDivided = 'X'
+
+        const rentalObject = postFunction('Property/GetRentalByPropertyID', object.propertyID)
+        if (object.IsRented) {
+            tempobject.IsRented = <Link to={{
+                pathname: '/Rentals',
+                objects: rentalObject,
+                type: 'table'
+            }}>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
+            LinksPerObject.push(<Link to={{
+                pathname: '/Rentals',
+                type: 'form',
+                name: 'הוסף השכרה',
+                index: 8,
+                object: { propertyID: tempobject.propertyID }
+
+            }}>הוסף השכרה</Link>)
+        }
+        else
+            tempobject.IsDivided = 'X'
+
+        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 1 })
+        if (docks && docks[0])
+            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         tempobject.OwnerID = <Link to={{
             pathname: '/PropertyOwner',
             Object: ownerobject,
             type: 'details'
         }}>
             {ownerobject.firstName + ' ' + ownerobject.lastName}</Link>
-
-        if (object.IsDivided)
-            tempobject.IsDivided = <Link to={{
-                pathname: '/SubProperties',
-                objects: postFunction('SubProperty/GetSubPropertiesOfParentProperty', object.PropertyID),
-                type: 'table'
-            }} >V</Link>//ששולח פרטי נכסי בן של הדירה
-        else
-            tempobject.IsDivided = 'X'
-
-        const rentalObject = postFunction('Property/GetRentalByPropertyID', object.propertyID)
-        if (object.IsRented)
-            tempobject.IsRented = <Link to={{
-                pathname: '/Rentals',
-                objects: rentalObject,
-                type: 'table'
-            }}>V</Link>//ושולח פרטי השכרה שמתקבלים מהפונקציה
-        else
-            tempobject.IsDivided = 'X'
-
-
         return {
-            fieldsToAdd: this.setForForm(object), LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd: this.setForForm(object).fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: ButtonsForEveryRow, object: tempobject
-            , LinksPerObject: []
+            , LinksPerObject: LinksPerObject
         };
 
     }
     setForForm = (object) => {
         let fieldsToAdd = []
+        let LinksPerObject = [this.linkToAddPropertyOwner]
         console.log('IsExclusivity', object.IsExclusivity)
         if (object.IsExclusivity)
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select',/* selectOptions: this.exclusivityPersons,*/ index: 13 })
-        return fieldsToAdd
+        return { fieldsToAdd, LinksPerObject }
 
     }
+
     rend = () => {
         if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
@@ -194,6 +236,19 @@ export class Properties extends Component {
             }}
             />
 
+        }
+
+        else if (this.props.location.type === 'form') {
+
+            return <Form location={{
+                Object: this.props.location.object,
+                name: this.props.location.name,
+                type: this.props.location.type,
+                fieldsArray: this.state.fieldsArray,
+                submit: this.submit, setForForm: this.setForForm,
+                LinksPerObject: [], LinksForEveryRow: [this.linkToAddPropertyOwner]
+                , ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
+            }} />
         }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
@@ -209,13 +264,14 @@ export class Properties extends Component {
         return (
 
             <div>
+                {/* {this.props.location.authorization()} */}
                 {this.rend()}
             </div>
         )
     }
 }
 
-export default Properties
+export default connect(mapStateToProps)(Properties)
 
 
 export const propertiesList = [];//GetFunction('Property/GetAllProperties');

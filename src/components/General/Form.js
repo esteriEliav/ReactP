@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
-
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 
 
@@ -18,10 +17,12 @@ export class Form extends Component {
     state = {//לכל קומפוננטה יש אוביקט, שדות שצריך להוסיף לו בהתאם לאוביקט, שגיאות אם הוקשמשהו לא חוקי, ושדה המציין אם הקומפוננטה סיימה את פעולתה וניתן לחזור להצגת האוביקטים
         Object: { ...this.props.location.Object },
         fieldsToAdd: [],
+        LinksPerObject: this.props.location.setForForm(this.props.location.Object).LinksPerObject,
         isRedirect: false,
         generalEror: '',
         erors: {},
-        selectedFile: {}
+
+
 
     }
     componentDidMount = () => {
@@ -33,56 +34,75 @@ export class Form extends Component {
 
         }
         else//אם לא יש להוסיף את השדות הנוספים בהתאם לאוביקט
-            this.setState({ fieldsToAdd: this.props.location.setForForm(this.state.Object) });
-
+        {
+            const links = this.props.location.setForForm(this.state.Object)
+            this.setState({ fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject });
+        }
 
     }
+
+
+
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
 
         if (e.target.type === 'file') {
+            debugger
             let reader = new FileReader();
             reader.readAsDataURL(e.target.files[0]);
             reader.onload = (fr) => {
                 console.log('data', reader.result)
                 let obj = { ...this.state.Object }
                 obj.add = new String(reader.result)
+
                 this.setState({ Object: obj })
+                debugger
+
             };
             reader.onerror = function (error) {
                 console.log('Error: ', error);
             };
-            this.setState({
-                selectedFile: e.target
-            })
 
         }
 
         let tempObject = { ...this.state.Object };
+        console.log('e.target.checked', e.target.checked)
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
 
 
+        const links = this.props.location.setForForm(tempObject)
+        this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject });
 
-        this.setState({ Object: tempObject, fieldsToAdd: this.props.location.setForForm(tempObject) })
 
     }
 
     render() {
 
-        let j = 0;
+        let j = 0, i = 0;
 
 
         const func = (index) => {//פונקציה המרנדרת את השדות הנוספים
-            const fieldsToAdd = this.state.fieldsToAdd[j]
+            let items = []
+            const links = this.state.LinksPerObject
+            //debugger;
+            while (i < links.length && links[i].props.to.index === index) {
+
+                items.push(<span>{links[i]}<p /></span>)
+                i += 1
+
+            }
+            let fieldsToAdd = this.state.fieldsToAdd[j]
             while (j < this.state.fieldsToAdd.length && fieldsToAdd.index === index) {
-                j += 1
-                return <span>
+                fieldsToAdd = this.state.fieldsToAdd[j]
+                items.push(<span>
                     <p />
                     <LabelInput field={fieldsToAdd} content={this.state.Object[fieldsToAdd.field]} change={this.change} />
 
-                </span>
-
-
+                </span>)
+                j += 1
             }
+
+            return items
+
         }
 
         const submitHandler = (e) => {
@@ -96,10 +116,6 @@ export class Form extends Component {
                     this.setState({ generalEror: val.generalEror, erors: val.erors })
 
                 if (!isStop) {
-                    debugger
-                    // let obj = { ...this.state.Object }
-                    // obj.document = obj.add
-                    // this.setState({ Object: obj })
 
                     this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
 

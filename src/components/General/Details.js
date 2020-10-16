@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 /*
 except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject
 */
@@ -14,7 +15,7 @@ export class Details extends Component {
                 //console.log('i', this.props.location.i); console.log('j', this.props.location.j); console.log('k', this.props.location.k); console.log('index', index);
             }//
             while (i < this.props.location.LinksForEveryRow.length && this.props.location.LinksForEveryRow[i].index === index) {
-                items.push(<Link to={{
+                items.push(<div><Link to={{
                     pathname: this.props.location.LinksForEveryRow[i].link, type: this.props.location.LinksForEveryRow[i].type,
                     Object: this.props.location.Object,
                     fieldsArray: this.props.location.fieldsArray, erors: [], submit: this.props.location.submit, type: 'Update', name: 'ערוך',
@@ -22,22 +23,22 @@ export class Details extends Component {
                     fieldsToAdd: this.props.location.fieldsToAdd, setForForm: this.props.setForForm
 
                 }}>
-                    {this.props.location.LinksForEveryRow[i].name}</Link>)
+                    {this.props.location.LinksForEveryRow[i].name}</Link><p /></div>)
                 i += 1
 
             }
             while (j < this.props.location.ButtonsForEveryRow.length && this.props.location.ButtonsForEveryRow[j].index === index) {
-                items.push(<button onClick={this.props.location.ButtonsForEveryRow[j].onclick}>{this.props.location.ButtonsForEveryRow[j].name}</button>)
+                items.push(<div><button onClick={this.props.location.ButtonsForEveryRow[j].onclick}>{this.props.location.ButtonsForEveryRow[j].name}</button><p /></div>)
 
                 j += 1
             }
             while (k < this.props.location.fieldsToAdd.length && this.props.location.fieldsToAdd[k].index === index) {
-                items.push(<div><label >{this.props.location.fieldsToAdd[k].name}</label><label>{this.props.location.Object[this.props.location.fieldsToAdd[k].field]}</label></div>)
+                items.push(<div><label >{this.props.location.fieldsToAdd[k].name}</label><label>{this.props.location.Object[this.props.location.fieldsToAdd[k].field]}</label><p /></div>)
                 k += 1
             }
+
             return items
         }
-
 
         return (
             <div>
@@ -46,17 +47,18 @@ export class Details extends Component {
 
                     <div key={index}>
 
-                        <label>{item.name}</label>:
-                    <label>{this.props.location.Object[item.field]}</label>
+                        <label dir='rtl'>{item.name}</label>:
+
+                  <label dir='rtl'>{this.props.location.Object[item.field]}</label>
                         <span>
                             {func(index).map(item => { return item })}
                         </span>
-
+                        <p /><p />
                     </div>
 
                 )}
                 {func('end').map(item => { return item })}
-                {this.props.location.LinksPerObject.map((link, index) => <span key={index}>{link} </span>)}
+                {this.props.location.LinksPerObject.map((link, index) => <span key={index}>{link}<p /> </span>)}
 
             </div>
         )

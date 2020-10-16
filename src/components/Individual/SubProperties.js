@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 import Table from "../General/Table";
+import Form from '../General/Form'
+
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import SubPropertyObject from '../../Models-Object/SubPropertyObject'
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 
 
 /*
@@ -32,9 +36,10 @@ export class SubProperties extends Component {
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
-        erors: []
+        isAutho: false//true
 
     }
+
     validate = object => {
         let isErr = false
         let erors = []
@@ -52,8 +57,8 @@ export class SubProperties extends Component {
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
     submit = (type, object) => {
-        let path = 'SubProperties/' + type
-        path += type !== 'Search' ? 'SubProperties' : ''
+        let path = 'SubProperty/' + type
+        path += type !== 'Search' ? 'SubProperty' : ''
         if (type === 'Add' || type === 'Update') {
             let newObj = SubPropertyObject()
             if (type === 'Add')
@@ -67,8 +72,10 @@ export class SubProperties extends Component {
                 newObj.Size = parseFloat(object.Size)
             if (object.RoomsNum !== '')
                 newObj.RoomsNum = parseFloat(object.RoomsNum)
-            if (object.add)
-                newObj.document = object.add
+            if (object.add) {
+                newObj.docName = object.document
+                newObj.Dock = object.add
+            }
 
             object = newObj
 
@@ -77,26 +84,31 @@ export class SubProperties extends Component {
             let id = new Number(object.SubPropertyID)
             object = id
         }
-        return CommonFunctions(type, object, this.state.ObjectsArray, '/SubProperty', path)
+        return CommonFunctions(type, object, this.state.ObjectsArray, '/SubProperties', path)
     }
 
 
     //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
     setForTable = () => {
         return {
-            LinksForTable: [<Link to={{
-                pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: ' הוספת תת דירה',
-                LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: [], setForForm: this.setForForm, validate: this.validate
-            }}> הוספת תת נכס</Link>],
+            LinksForTable: [],
             ButtonsForTable: []
         }
     }
-    setForForm = object => []
+    setForForm = object => {
+        const fieldsToAdd = []
+        const LinksPerObject = []
+        return { fieldsToAdd, LinksPerObject }
+    }
     set = (object) => {
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
+        let LinksPerObject = []
+
+
+        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 5 })
+        if (docks && docks[0])
+            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let tempobject = object;
         object.PropertyID = <Link
@@ -107,7 +119,7 @@ export class SubProperties extends Component {
             }}
         ></Link>
 
-        if (object.IsRented)
+        if (object.IsRented) {
             tempobject.IsRented = <Link
                 to={{
                     pathname: '/Rentals',
@@ -115,6 +127,19 @@ export class SubProperties extends Component {
                     type: 'details'
                 }}
             >v</Link>//שולח פרטי השכרה שמתקבלים מהפונקציה
+            LinksPerObject.push(<Link
+                to={{
+                    pathname: '/Rentals',
+                    type: 'form',
+                    object: { PropertyID: object.PropertyID, SubPropertyID: object.SubPropertyID },
+                    formName: 'הוסף',
+                    formType: 'Add'
+                }}
+            >v</Link>)
+
+
+
+        }
         return {
             fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: ButtonsForEveryRow,
@@ -135,6 +160,17 @@ export class SubProperties extends Component {
             />
 
         }
+        else if (this.props.location.type === 'form') {
+
+            return <Form location={{
+                Object: this.props.location.object,
+                name: this.props.location.formName,
+                type: this.props.location.formType,
+                fieldsArray: this.state.fieldsArray,
+                submit: this.submit, setForForm: this.setForForm,
+                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
+            }} />
+        }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
@@ -146,6 +182,7 @@ export class SubProperties extends Component {
     render() {
         return (
             <div>
+                {/* {this.props.location.authorization()} */}
                 {this.rend()}
             </div>
         )
@@ -153,5 +190,5 @@ export class SubProperties extends Component {
 
 }
 
-export default SubProperties;
+export default connect(mapStateToProps)(SubProperties);
 export const SubPropertiesList = [];// GetFunction('SubProperty/GetAllSubProperties');

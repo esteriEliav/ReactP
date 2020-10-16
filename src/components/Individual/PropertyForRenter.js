@@ -4,6 +4,8 @@ import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import { CommonFunctions } from '../General/CommonFunctions';
 import TaskObject from '../../Models-Object/TaskObject';
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 
 export class PropertiesForRenter extends Component {
     state = {
@@ -12,6 +14,12 @@ export class PropertiesForRenter extends Component {
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
         PropertiesArray: [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 },],//
 
+    }
+    authorization = () => {
+        if (this.props.user.RoleID === 3) {
+            return null
+        }
+        return <Redirect to='/a' />
     }
     submit = (type, object) => {
         let path = 'Task/AddTask'
@@ -51,9 +59,14 @@ export class PropertiesForRenter extends Component {
         }
 
     }
-    setForForm = object => []
+    setForForm = object => {
+        const fieldsToAdd = []
+        const LinksPerObject = []
+        return { fieldsToAdd, LinksPerObject }
+    }
     set = object => {
         console.log('object', object)
+
         let LinksPerObject = [
             <Link to={{
                 pathname: '/Tasks',
@@ -71,7 +84,7 @@ export class PropertiesForRenter extends Component {
     render() {
         return (
             <div>
-
+                {this.authorization()}
                 <h1>{this.props.match.params.age}</h1>
                 <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
                     setForTable={this.setForTable} setForForm={this.setForForm}
@@ -81,4 +94,4 @@ export class PropertiesForRenter extends Component {
     }
 }
 
-export default PropertiesForRenter
+export default connect(mapStateToProps)(PropertiesForRenter)

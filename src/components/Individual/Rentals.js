@@ -7,6 +7,9 @@ import { rentersList } from './Renter';
 import { propertyList } from './Properties';
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
 import RentalObject from '../../Models-Object/RentalObject';
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
+import Form from '../General/Form'
 
 
 /*
@@ -33,6 +36,7 @@ export class Rentals extends Component {
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
         ObjectsArray:/*rentalsList */[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
+        isAutho: false//true
 
 
     }
@@ -74,9 +78,12 @@ export class Rentals extends Component {
             if (object.EndDate !== '')
                 newObj.EndDate = object.EndDate
             newObj.ContactRenew = object.ContactRenew
-            if (object.add)
-                newObj.document = object.add
+            if (object.add) {
+                newObj.docName = object.document
+                newObj.Dock = object.add
 
+            }
+            debugger;
             object = newObj
 
         }
@@ -100,16 +107,41 @@ export class Rentals extends Component {
             ButtonsForTable: []
         }
     }
-    setForForm = object => []
+    linkToAddRenter = <Link to={{
+        pathname: '/Properties',
+        type: 'Add',
+        name: 'הוסף',
+        index: 0,
+        object: {}
+    }}>הוסף נכס</Link>
+    linkToAddProperty = <Link to={{
+        pathname: '/Renter',
+        type: 'Add',
+        name: 'הוסף',
+        index: 1,
+        object: {}
+    }}>הוסף שוכר</Link>
+    setForForm = object => {
+        const fieldsToAdd = []
+        const LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
+        return { fieldsToAdd, LinksPerObject }
+    }
     set = (object) => {
         const ownerobject = {}// postFunction('PropertyOwner/GetOwnerByID', object.OwerID) 
         let LinksPerObject = [<Link to={{
+            index: 'end',
             pathname: '/PropertyOwner',
             Object: ownerobject,
             type: 'details'
         }}>{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}:בעלים</Link>];
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
+
+        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 3 })
+        if (docks && docks[0])
+            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+
+
         object.PropertyID = <Link
             to={{
                 pathname: '/Properties',
@@ -121,6 +153,7 @@ export class Rentals extends Component {
         if (object.SubPropertyID !== null)
             LinksPerObject.push(<Link
                 to={{
+                    index: 'end',
                     pathname: '/SubProperties',
                     object: postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID),
                     type: 'details'
@@ -136,9 +169,9 @@ export class Rentals extends Component {
             {userObject.FirstName + ' ' + userObject.LastName}</Link>
 
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: ButtonsForEveryRow, object: object,
-            LinksPerObject: LinksPerObject
+            fieldsToAdd: [], LinksForEveryRow,
+            ButtonsForEveryRow, object,
+            LinksPerObject
         };
 
     }
@@ -156,6 +189,31 @@ export class Rentals extends Component {
             />
 
         }
+        else if (this.props.location.type === 'form') {
+
+            return <Form location={{
+                Object: this.props.location.object,
+                name: this.props.location.formName,
+                type: this.props.location.formType,
+                fieldsArray: this.state.fieldsArray,
+                submit: this.submit, setForForm: this.setForForm,
+                LinksPerObject: [], LinksForEveryRow: [<Link to={{
+                    pathname: '/Properties',
+                    type: 'Add',
+                    name: 'הוסף',
+                    index: 0,
+                    object: {}
+                }}>הוסף נכס</Link>,
+                <Link to={{
+                    pathname: '/Renter',
+                    type: 'Add',
+                    name: 'הוסף',
+                    index: 1,
+                    object: {}
+                }}>הוסף שוכר</Link>],
+                ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
+            }} />
+        }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
@@ -167,6 +225,7 @@ export class Rentals extends Component {
     render() {
         return (
             <div>
+                {/* {this.props.location.authorization()} */}
                 {this.rend()}
             </div>
         )
@@ -176,5 +235,5 @@ export class Rentals extends Component {
     }
 }
 
-export default Rentals
+export default connect(mapStateToProps)(Rentals)
 export const rentalsList = [];// GetFunction('Rental/GetAllRentals');

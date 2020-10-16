@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 
-
-export class authorization extends Component {
+export class NotFound extends Component {
     render() {
         return (
             <div>
-
+                <h1>404</h1>
+                <h1>not found</h1>
             </div>
         )
     }
 }
 
-export default authorization
+export default NotFound
