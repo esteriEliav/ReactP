@@ -74,6 +74,7 @@ export class Properties extends Component {
             erors.ManagmentPayment = 'נא להקיש מספר'
             isErr = true
         }
+        debugger;
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
 

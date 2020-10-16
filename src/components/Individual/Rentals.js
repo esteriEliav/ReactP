@@ -24,8 +24,18 @@ EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
 export class Rentals extends Component {
+    obj=[]
+    componentDidMount=()=>{
+
+        Axios.get('Rental/GetAllRentals').then(res=>{this.obj=res.data
+            debugger;
+            console.log('res.data',res.data)},res=>{console.log('res.data',res)})
+        console.log('obj',this.obj)
+    }
+    
     PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
     renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
+
     state = {
         name: 'השכרות',
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true }, { field: 'UserID', name: 'שוכר', type: 'select', /*selectOptions: this.renters*/ },
@@ -34,7 +44,11 @@ export class Rentals extends Component {
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
-        ObjectsArray:/*rentalsList */[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+
+        /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
+
+        ObjectsArray:/*rentalsList*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
         isAutho: false//true
 

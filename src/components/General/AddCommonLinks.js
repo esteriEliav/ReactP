@@ -64,17 +64,8 @@ export class AddCommonLinks extends Component {
 
 
                         .then(res => console.log('res', res.data))
-                }}>aaa</button>
-                <button onClick={() => {
-                    console.log('user', use1)
-                    Axios.post('User/AddUser', JSON.stringify(use1))
-                        .then(res => console.log('res', res.data))
-                }}>add user</button>
-                <button onClick={() => {
-                    console.log('user', use1)
-                    Axios.post('PropertyOwner/AddPropertyOwner', JSON.stringify(owner))
-                        .then(res => console.log('res', res.data))
-                }}>add owner</button>
+                }}>try of axios</button>
+
                 <Link to={{ pathname: '/PropertyOwner', authorization: this.authorization }}>PropertyOwner</Link>
                 <hr />
                 <Link to={{ pathname: '/Renter', authorization: this.authorization }}>Renters</Link>

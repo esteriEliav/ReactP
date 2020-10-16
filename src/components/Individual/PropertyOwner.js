@@ -15,16 +15,20 @@ import { connect } from 'react-redux'
 
 
 export class PropertyOwner extends Component {
+    obj = []
+    componentDidMount = () => {
+
+        Axios.get('PropertyOwner/getAllOwners').then(res => { this.obj = res.data })
+    }
     state = {
 
         name: 'משכירים',
         fieldsArray: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
-        { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+        { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: ' מסמך', type: 'file', index: 'end' }],
         ObjectsArray: ownersList,
         isAutho: false//true
-
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
@@ -80,6 +84,7 @@ export class PropertyOwner extends Component {
             generalEror = 'חובה להכניס אימייל או טלפון'
             isErr = true
         }
+
         return { isErr: isErr, generalEror: generalEror, erors: erors }
 
     }

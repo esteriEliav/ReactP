@@ -3,6 +3,8 @@ import { CommonFunctions, GetFunction, postFunction } from './General/CommonFunc
 import UserObject from '../Models-Object/UserObject';
 import { connect } from 'react-redux'
 
+import { Link, Redirect } from 'react-router-dom';
+import Axios from "./Axios"
 
 export class Login extends Component {
     state =
@@ -12,20 +14,18 @@ export class Login extends Component {
         }
 
 
-
     onSubmit = (e) => {
         e.preventDefault();
-        let user = postFunction('', { ...this.state })
+        let user = postFunction('User/Ifhaveuse', { ...this.state })
         if (user && user[0]) {
             const userObj = new UserObject({ ...user[0] })
             alert(" ברוכים הבאים" + userObj.FirstName + ' ' + userObj.LastName);
             this.props.setUser(userObj);
-
+            return < Redirect to={{ pathname: "/PropertiesForRenter", object: user }}></Redirect>
         }
         else
             alert("שם משתמש או סיסמה שגויים")
     }
-
     handleChange = input => e => {
         e.preventDefault();
         this.setState({ [input]: e.target.value });
@@ -45,6 +45,8 @@ export class Login extends Component {
                 <div className="login-item">
                     {/* הקישור יפנה לדף של שחזור סיסמה */}
                     <a href="@">שכחת סיסמה?</a>
+                    {/*<a href="@">שכחת סיסמה?</a>*/}
+                    <Link to="/signup" ><a href="@">שכחת סיסמה?</a></Link>
                 </div>
             </form>
         )
@@ -61,6 +63,12 @@ const mapDispatchToProps = dispatch => {
         setUser: (userObject) => dispatch({ type: 'SET_USER', userObj: userObject })
     }
 }
+
+//זו כביכול הפונקציה שתחזור מהשרת
+// function fun(params) {
+//     return true;
+//     //return false;
+// }
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

@@ -63,11 +63,9 @@ export class Form extends Component {
             };
 
         }
-
         let tempObject = { ...this.state.Object };
         console.log('e.target.checked', e.target.checked)
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-
 
         const links = this.props.location.setForForm(tempObject)
         this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject });
@@ -75,7 +73,9 @@ export class Form extends Component {
 
     }
 
+
     render() {
+
 
         let j = 0, i = 0;
 
@@ -106,6 +106,7 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
+            debugger
 
             e.preventDefault();
             let isStop = false
@@ -114,14 +115,13 @@ export class Form extends Component {
                 isStop = val.isErr
                 if (isStop)
                     this.setState({ generalEror: val.generalEror, erors: val.erors })
-
                 if (!isStop) {
 
                     this.setState({ isRedirect: this.props.location.submit(this.props.location.type, this.state.Object) })
-
                 }
             }
         }
+
         const focusHandler = (e) => {//כשמתמקדים על שדה אם אינו ניתן לעריכה, תוצג הודעה
             console.log(e.target.value)
             if (e.target.readOnly) {
@@ -160,7 +160,8 @@ export class Form extends Component {
 
         )
     }
+
 }
 
 
-export default Form
+export default Form;
