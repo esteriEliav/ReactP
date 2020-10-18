@@ -96,7 +96,6 @@ export const CommonFunctions = (type, object, objects, redirect, path) => {
     if (x) {
 
         return <Redirect to={{
-
             pathname: redirect,
             objects: objects
         }} />

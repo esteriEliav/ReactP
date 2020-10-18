@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Item from './Item'
 import Form from './Form'
+import Search from './Search'
 import { Link } from 'react-router-dom'
 import Details, { } from "./Details";
 
@@ -8,7 +9,16 @@ import Details, { } from "./Details";
 
 //קומפוננטה להצגת טבלה
 export class Table extends Component {
+    state = {
+        showForm: false
+    }
+    closeFormModal = () => {
+        this.setState({ showForm: false })
 
+    }
+    showForm = () => {
+
+    }
     render() {
         const some = this.props.setForTable()
         return (
@@ -16,17 +26,19 @@ export class Table extends Component {
 
                 <h1>{this.props.name}</h1>
 
-                {this.props.fieldsToSearch && <Form location={{//פורם לחיפוש
-                    name: 'חיפוש', type: 'Search', fieldsArray: this.props.fieldsToSearch, Object: null,
-                    LinksForEveryRow: [], ButtonsForEveryRow: [],
-                    fieldsToAdd: [], erors: [], submit: this.props.submit, setForForm: () => { return { fieldsToAdd: [], LinksPerObject: [] } }
+                {this.props.fieldsToSearch && <Search
 
-                }}></Form>}
+                    name='חיפוש'
+                    fieldsArray={this.props.fieldsToSearch}
+                    Object={{}}
+                    submit={this.props.submit} />}
 
+                {some.LinksForTable.map((lin, index) => <div key={index}> {lin}
+                    {lin.props.showForm()}
 
+                </div>
+                )}
 
-
-                {some.LinksForTable.map((lin, index) => <div key={index}> {lin}</div>)}
 
 
                 {some.ButtonsForTable.map((but, index) => <button key={index} onClick={but['onclick']}>{but['name']}</button>)}
@@ -42,6 +54,7 @@ export class Table extends Component {
                     )}
 
                 </table>
+
             </div >
         )
     }

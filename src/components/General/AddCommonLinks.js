@@ -38,7 +38,7 @@ export class AddCommonLinks extends Component {
             }*/
         var cron = require('node-cron');
         const i = () => {
-            cron.schedule(' */30 * * * * *', () => {
+            cron.schedule('* */30 * * * * ', () => {
                 console.log('running every minute 1, 2, 4 and 5');
                 this.setState({ showt: true })
 
@@ -101,4 +101,3 @@ const mapDispatchToProps = dispatch => {
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddCommonLinks)
-//export default AddCommonLinks

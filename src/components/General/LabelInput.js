@@ -16,7 +16,7 @@ export class LabelInput extends Component {
                        checked={content === rad.id} onChange={(e) => { this.props.change(e, this.props.field.field) }} />rad.name</div>) */
                     : type === 'checkbox' ? <input dir='rtl' type='checkbox' checked={content} onChange={(e) => { this.props.change(e, this.props.field.field) }} />
                         : type === 'select' ? <Select dir='rtl' placeholder={this.props.field.name} options={this.props.field.selectOptions} labelField='name' valueField='id' onChange={(e) => { this.props.change(e, this.props.field.field) }} direction='rtl' noDataLabel='אין נתונים' />
-                            //<select value={content} onChange={(e) => { this.props.change(e, this.props.field.field) }}>
+                            //<select value={content} onChange={(e) => { this.props.change(e, this.props.field.field) if(this.props.field.field==='CityID') }}>
                             //    {/* {this.props.field.selectOptions.map(opp => <option key={opp.id} value={opp.id}>opp.name</option>)}*/}
                             //</select>
                             : type === 'texterea' ? <textarea dir='rtl' placeholder={this.props.field.name} readOnly={this.props.field.readonly} required={this.props.field.required} value={content} onChange={(e) => { this.props.change(e, this.props.field.field) }} />

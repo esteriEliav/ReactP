@@ -1,9 +1,10 @@
 import React from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import { mapStateToProps } from './Login'
 import { connect } from 'react-redux'
+
 
 class Calendar extends React.Component {
   state = {
@@ -27,7 +28,7 @@ class Calendar extends React.Component {
       weekends={true}
       events={this.state.events}
       eventClick={this.routeChange}
-    /> : null
+    /> : <Redirect to='/n' />
 
 
 

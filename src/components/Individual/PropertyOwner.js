@@ -28,12 +28,23 @@ export class PropertyOwner extends Component {
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: ' מסמך', type: 'file', index: 'end' }],
         ObjectsArray: ownersList,
-        isAutho: false//true
+        showForm: this.props.location.type == 'form' ? true : false,
+        showDetails: this.props.location.type == 'details' ? true : false,
+
+
+        isAutho: true//false
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
     }
+    closeDetailsModal = () => {
 
+        this.setState({ showDetails: false })
+    }
+    closeFormModal = () => {
+
+        this.setState({ showForm: false })
+    }
     submit = (type, object) => {
         debugger;
         let path = 'PropertyOwner/' + type
@@ -89,15 +100,20 @@ export class PropertyOwner extends Component {
 
     }
     setForTable = () => {
+        const LinksForTable = [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+
+            return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                LinksForEveryRow={[]} ButtonsForEveryRow={[]}
+                fieldsToAdd={[]} setForForm={this.setForForm}
+                validate={this.validate} />
+        }}
+
+
+        > הוספת משכיר</button>
+        ]
         return {
-            LinksForTable: [<Link to={{
-                pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: 'הוסף',
-                LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: [], setForForm: this.setForForm,
-                validate: this.validate
-            }}> הוספת משכיר</Link>
-            ],
+            LinksForTable,
             ButtonsForTable: [],
         }
     }
@@ -118,7 +134,7 @@ export class PropertyOwner extends Component {
             דירות</Link>]
         //LinksPerObject.push(<input type="file" name="file" onChange={onChangeHandler} />
 
-        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 2 })
+        const docks = postFunction('User/GetUserDocuments', { id: object.PropertyOwnerID, type: 2 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         return {
@@ -129,27 +145,26 @@ export class PropertyOwner extends Component {
     rend = () => {
         if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details location={{
-                object: this.props.object,
-                fieldsArray: this.state.fieldsArray,
-                LinksPerObject: some.LinksPerObject,
-                LinksForEveryRow: some.LinksForEveryRow,
-                ButtonsForEveryRow: some.ButtonsForEveryRow,
-                fieldsToAdd: some.fieldsToAdd
-            }}
+            return <Details closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
+                object={this.props.object}
+                fieldsArray={this.state.fieldsArray}
+                LinksPerObject={some.LinksPerObject}
+                LinksForEveryRow={some.LinksForEveryRow}
+                ButtonsForEveryRow={some.ButtonsForEveryRow}
+                fieldsToAdd={some.fieldsToAdd}
             />
 
         }
         else if (this.props.location.type === 'form') {
 
-            return <Form location={{
-                Object: this.props.location.object,
-                name: this.props.location.formName,
-                type: this.props.location.formType,
-                fieldsArray: this.state.fieldsArray,
-                submit: this.submit, setForForm: () => { return { fieldsToAdd: [], LinksPerObject: [] } },
-                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
-            }} />
+            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={this.props.location.object}
+                name={this.props.location.formName}
+                type={this.props.location.formType}
+                fieldsArray={this.state.fieldsArray}
+                submit={this.submit} setForForm={this.setForForm}
+                LinksPerObject={[this.linkToAddPropertyOwner]} LinksForEveryRow={[]}
+                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate} />
         }
         else {
 
@@ -164,8 +179,9 @@ export class PropertyOwner extends Component {
         return (
 
             <div>
-                {/* {this.props.location.authorization()} */}
-                {this.rend()}
+                {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
+                    this.rend()
+                    : <Redirect to='/a' />}
 
             </div>
 

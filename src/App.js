@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Login from './components/Login'
@@ -25,7 +25,6 @@ function App() {
 
   return (
 
-
     <div className="App">
 
       <Home></Home>
@@ -46,8 +45,6 @@ function App() {
 
         {/*:type/:name/:submit/:fieldsArray/:Object/:fieldsToAdd/:LinksForEveryRow
         /:ButtonsForEveryRow/:LinksPerObject/:erors' */}
-
-
         <Route path='/Details' component={Details}></Route>
         <Route component={NotFound} />
       </Switch>

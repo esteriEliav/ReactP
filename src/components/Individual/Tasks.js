@@ -44,10 +44,19 @@ export class Tasks extends Component {
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ },
         { field: 'ClassificationID', name: 'סווג', type: 'radio',/* radioOptions: this.ClassificationOptions*/ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
-        isAutho: false
+        isAutho: false,
+        showForm: this.props.location.type === 'report' || this.props.location.type === 'form' ? true : false,
+        showDetails: this.props.location.type === 'details' ? true : false,
 
     }
+    closeDetailsModal = () => {
 
+        this.setState({ showDetails: false })
+    }
+    closeFormModal = () => {
+
+        this.setState({ showForm: false })
+    }
     validate = object => {
         let isErr = false
         let erors = []
@@ -111,12 +120,13 @@ export class Tasks extends Component {
 
     setForTable = () => {
         return {
-            LinksForTable: [<Link to={{
-                pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת משימה',
-                LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: [], setForForm: this.setForForm
-            }}> הוספת משימה</Link>],
+            LinksForTable: [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+
+                return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm} fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
+                    fieldsToAdd={[]} setForForm={this.setForForm}
+                    validate={this.validate} />
+            }}> הוספת משימה</button>],
             ButtonsForTable: []
         }
     }
@@ -149,7 +159,7 @@ export class Tasks extends Component {
     set = (object) => {
 
 
-        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 6 })
+        const docks = postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
@@ -181,51 +191,50 @@ export class Tasks extends Component {
         };
     }
     rend = () => {
-        if (this.props.user.RoleID != 1 && this.props.user.RoleID != 2 && this.props.user.RoleID != 3) {
+        if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2 && this.props.user.RoleID !== 3) {
             return <Redirect to='/a' />
         }
 
         if (this.props.location.type === 'report') {
 
-            return <Form location={{
-                Object: { PropertyID: this.props.location.PropertyID, SubPropertyID: this.props.location.SubPropertyID },
-                name: 'שלח',
-                type: 'Report',
-                fieldsArray: [{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
+            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={{ PropertyID: this.props.location.PropertyID, SubPropertyID: this.props.location.SubPropertyID }}
+                name='שלח'
+                type='Report'
+                fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
                     // { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions }
-                ],
-                submit: this.submit, setForForm: this.setForForm,
-                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
-            }} />
+                ]}
+                submit={this.submit} setForForm={this.setForForm}
+                LinksPerObject={[]} LinksForEveryRow={[]} ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate}
+            />
         }
-        else if (this.props.user.RoleID != 1 && this.props.user.RoleID != 2) {
+        else if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2) {
             return <Redirect to='/a' />
         }
 
         else if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details location={{
-                object: this.props.object,
-                fieldsArray: this.state.fieldsArray,
-                LinksPerObject: some.LinksPerObject,
-                LinksForEveryRow: some.LinksForEveryRow,
-                ButtonsForEveryRow: some.ButtonsForEveryRow,
-                fieldsToAdd: some.fieldsToAdd
-            }}
+            return <Details closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
+                object={this.props.object}
+                fieldsArray={this.state.fieldsArray}
+                LinksPerObject={some.LinksPerObject}
+                LinksForEveryRow={some.LinksForEveryRow}
+                ButtonsForEveryRow={some.ButtonsForEveryRow}
+                fieldsToAdd={some.fieldsToAdd}
             />
 
         }
 
         else if (this.props.location.type === 'form') {
 
-            return <Form location={{
-                Object: this.props.location.object,
-                name: 'עדכן',
-                type: this.props.location.formType,
-                fieldsArray: this.state.fieldsArray,
-                submit: this.submit, setForForm: this.setForForm,
-                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
-            }} />
+            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={this.props.location.object}
+                name={this.props.location.formName}
+                type={this.props.location.formType}
+                fieldsArray={this.state.fieldsArray}
+                submit={this.submit} setForForm={this.setForForm}
+                LinksPerObject={[this.linkToAddPropertyOwner]} LinksForEveryRow={[]}
+                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate} />
         }
         else {
 

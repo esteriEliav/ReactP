@@ -24,15 +24,17 @@ EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
 export class Rentals extends Component {
-    obj=[]
-    componentDidMount=()=>{
+    obj = []
+    componentDidMount = () => {
 
-        Axios.get('Rental/GetAllRentals').then(res=>{this.obj=res.data
+        Axios.get('Rental/GetAllRentals').then(res => {
+            this.obj = res.data
             debugger;
-            console.log('res.data',res.data)},res=>{console.log('res.data',res)})
-        console.log('obj',this.obj)
+            console.log('res.data', res.data)
+        }, res => { console.log('res.data', res) })
+        console.log('obj', this.obj)
     }
-    
+
     PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
     renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
 
@@ -50,11 +52,20 @@ export class Rentals extends Component {
         ObjectsArray:/*rentalsList*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
 
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
-        isAutho: false//true
+        isAutho: true,//false
+        showForm: this.props.location.type == 'form' ? true : false,
+        showDetails: this.props.location.type == 'details' ? true : false,
 
 
     }
+    closeDetailsModal = () => {
 
+        this.setState({ showDetails: false })
+    }
+    closeFormModal = () => {
+
+        this.setState({ showForm: false })
+    }
     validate = object => {
         let isErr = false
         let erors = []
@@ -112,29 +123,32 @@ export class Rentals extends Component {
 
     setForTable = () => {
         return {
-            LinksForTable: [<Link to={{
-                pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, erors: [], submit: this.submit, type: 'Add', name: ' הוספת שכירות',
-                LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: [], setForForm: this.setForForm, validate: this.validate
-            }}> הוספת השכרה</Link>],
+            LinksForTable: [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+
+                return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm} fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
+                    fieldsToAdd={[]} setForForm={this.setForForm}
+                    validate={this.validate} />
+            }}> הוספת השכרה</button>],
             ButtonsForTable: []
         }
     }
     linkToAddRenter = <Link to={{
         pathname: '/Properties',
-        type: 'Add',
-        name: 'הוסף',
+        type: 'form',
+        formType: 'Add',
+        formName: 'הוסף',
         index: 0,
         object: {}
-    }}>הוסף נכס</Link>
+    }}><button>הוסף נכס</button></Link>
     linkToAddProperty = <Link to={{
         pathname: '/Renter',
-        type: 'Add',
-        name: 'הוסף',
+        type: 'form',
+        formType: 'Add',
+        formName: 'הוסף',
         index: 1,
         object: {}
-    }}>הוסף שוכר</Link>
+    }}><button>הוסף שוכר</button></Link>
     setForForm = object => {
         const fieldsToAdd = []
         const LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
@@ -151,7 +165,7 @@ export class Rentals extends Component {
         let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
         let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
 
-        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 3 })
+        const docks = postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
@@ -192,41 +206,43 @@ export class Rentals extends Component {
     rend = () => {
         if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details location={{
-                object: this.props.object,
-                fieldsArray: this.state.fieldsArray,
-                LinksPerObject: some.LinksPerObject,
-                LinksForEveryRow: some.LinksForEveryRow,
-                ButtonsForEveryRow: some.ButtonsForEveryRow,
-                fieldsToAdd: some.fieldsToAdd
-            }}
+            return <Details closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
+                object={this.props.object}
+                fieldsArray={this.state.fieldsArray}
+                LinksPerObject={some.LinksPerObject}
+                LinksForEveryRow={some.LinksForEveryRow}
+                ButtonsForEveryRow={some.ButtonsForEveryRow}
+                fieldsToAdd={some.fieldsToAdd}
             />
 
         }
         else if (this.props.location.type === 'form') {
 
-            return <Form location={{
-                Object: this.props.location.object,
-                name: this.props.location.formName,
-                type: this.props.location.formType,
-                fieldsArray: this.state.fieldsArray,
-                submit: this.submit, setForForm: this.setForForm,
-                LinksPerObject: [], LinksForEveryRow: [<Link to={{
+            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={this.props.location.object}
+                name={this.props.location.formName}
+                type={this.props.location.formType}
+                fieldsArray={this.state.fieldsArray}
+                submit={this.submit} setForForm={this.setForForm}
+                LinksPerObject={[<Link to={{
                     pathname: '/Properties',
-                    type: 'Add',
-                    name: 'הוסף',
+                    type: 'form',
+                    formType: 'Add',
+                    formName: 'הוסף',
                     index: 0,
                     object: {}
-                }}>הוסף נכס</Link>,
+                }}><button>הוסף נכס</button></Link>,
                 <Link to={{
                     pathname: '/Renter',
-                    type: 'Add',
-                    name: 'הוסף',
+                    type: 'form',
+                    formType: 'Add',
+                    formName: 'הוסף',
                     index: 1,
                     object: {}
-                }}>הוסף שוכר</Link>],
-                ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
-            }} />
+                }}><button>הוסף שוכר</button></Link>]}
+                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate}
+                LinksForEveryRow={[]} />
+
         }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
@@ -239,8 +255,10 @@ export class Rentals extends Component {
     render() {
         return (
             <div>
-                {/* {this.props.location.authorization()} */}
-                {this.rend()}
+                {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
+                    this.rend()
+                    : <Redirect to='/a' />}
+
             </div>
         )
 

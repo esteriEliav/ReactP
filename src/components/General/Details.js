@@ -1,39 +1,49 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
+import Popup from 'reactjs-popup';
+import Form from './Form';
+
 /*
 except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,LinksPerObject
 */
 
 //קומפוננטה המציגה פרטים של כל אוביקט
 export class Details extends Component {
+    state = {
+        showForm: false
+    }
+    closeModal = () => {
+        this.setState({ showForm: false })
+    }
     render() {
         let i = 0, j = 0, k = 0, x
         const func = (index) => {//פונקציה שמחזירה את כל הקישורים,הלחצנים והשדות עבור האוביקט בשביל שדה מסוים
             let items = [];
             {
-                //console.log('i', this.props.location.i); console.log('j', this.props.location.j); console.log('k', this.props.location.k); console.log('index', index);
+                //console.log('i', this.props.i); console.log('j', this.props.j); console.log('k', this.props.k); console.log('index', index);
             }//
-            while (i < this.props.location.LinksForEveryRow.length && this.props.location.LinksForEveryRow[i].index === index) {
-                items.push(<div><Link to={{
-                    pathname: this.props.location.LinksForEveryRow[i].link, type: this.props.location.LinksForEveryRow[i].type,
-                    Object: this.props.location.Object,
-                    fieldsArray: this.props.location.fieldsArray, erors: [], submit: this.props.location.submit, type: 'Update', name: 'ערוך',
-                    LinksForEveryRow: this.props.location.LinksForEveryRow, ButtonsForEveryRow: this.props.location.ButtonsForEveryRow,
-                    fieldsToAdd: this.props.location.fieldsToAdd, setForForm: this.props.setForForm
-
+            while (i < this.props.LinksForEveryRow.length && this.props.LinksForEveryRow[i].index === index) {
+                items.push(<button onclick={() => { this.setState({ showForm: true }); debugger; }} showForm={() => {
+                    debugger;
+                    return <Form
+                        type={index === 'end' ? 'end' : this.props.LinksForEveryRow[i - 1].type}
+                        Object={this.props.Object}
+                        fieldsArray={this.props.fieldsArray} erors={[]} submit={this.props.submit} type='Update' name='ערוך'
+                        LinksForEveryRow={this.props.LinksForEveryRow} ButtonsForEveryRow={this.props.ButtonsForEveryRow}
+                        fieldsToAdd={this.props.fieldsToAdd} setForForm={this.props.setForForm} />
                 }}>
-                    {this.props.location.LinksForEveryRow[i].name}</Link><p /></div>)
+                    {this.props.LinksForEveryRow[i].name}</button>)
                 i += 1
 
             }
-            while (j < this.props.location.ButtonsForEveryRow.length && this.props.location.ButtonsForEveryRow[j].index === index) {
-                items.push(<div><button onClick={this.props.location.ButtonsForEveryRow[j].onclick}>{this.props.location.ButtonsForEveryRow[j].name}</button><p /></div>)
+            while (j < this.props.ButtonsForEveryRow.length && this.props.ButtonsForEveryRow[j].index === index) {
+                items.push(<div><button onClick={this.props.ButtonsForEveryRow[j].onclick}>{this.props.ButtonsForEveryRow[j].name}</button><p /></div>)
 
                 j += 1
             }
-            while (k < this.props.location.fieldsToAdd.length && this.props.location.fieldsToAdd[k].index === index) {
-                items.push(<div><label >{this.props.location.fieldsToAdd[k].name}</label><label>{this.props.location.Object[this.props.location.fieldsToAdd[k].field]}</label><p /></div>)
+            while (k < this.props.fieldsToAdd.length && this.props.fieldsToAdd[k].index === index) {
+                items.push(<div><label >{this.props.fieldsToAdd[k].name}</label><label>{this.props.Object[this.props.fieldsToAdd[k].field]}</label><p /></div>)
                 k += 1
             }
 
@@ -42,24 +52,39 @@ export class Details extends Component {
 
         return (
             <div>
+                <Popup open={this.props.isOpen} closeOnDocumentClick={false} contentStyle={{ backgroundColor: "gray" }}>
+                    <a className="close" onClick={this.props.closeModal}>&times; </a>
 
-                {this.props.location.fieldsArray.map((item, index) =>
 
-                    <div key={index}>
 
-                        <label dir='rtl'>{item.name}</label>:
+                    {this.props.fieldsArray.map((item, index) =>
 
-                  <label dir='rtl'>{this.props.location.Object[item.field]}</label>
-                        <span>
-                            {func(index).map(item => { return item })}
-                        </span>
-                        <p /><p />
-                    </div>
+                        <div key={index}>
 
-                )}
-                {func('end').map(item => { return item })}
-                {this.props.location.LinksPerObject.map((link, index) => <span key={index}>{link}<p /> </span>)}
+                            <label dir='rtl'>{item.name}</label>:
 
+                  <label dir='rtl'>{this.props.Object[item.field]}</label>
+                            <span>
+                                {func(index).map(item => {
+                                    return <div>{item}
+                                        {item.props.showForm && item.props.showForm()}
+                                    </div>
+                                })}
+
+
+                            </span>
+                            <p /><p />
+                        </div>
+
+                    )}
+                    {func('end').map(item => {
+                        return <div>{item}
+                            {item.props.showForm && item.props.showForm()}
+
+                        </div>
+                    })}
+                    {this.props.LinksPerObject.map((link, index) => <span key={index}>{link}<p /> </span>)}
+                </Popup>
             </div>
         )
     }

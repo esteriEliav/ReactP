@@ -38,10 +38,19 @@ export class Renter extends Component {
 
         fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
         { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'Phone', name: 'טלפון', type: 'tel' }],
-        isAutho: false//true
+        isAutho: true,//false
+        showForm: this.props.location.type == 'form' ? true : false,
+        showDetails: this.props.location.type == 'details' ? true : false,
 
     }
+    closeDetailsModal = () => {
 
+        this.setState({ showDetails: false })
+    }
+    closeFormModal = () => {
+
+        this.setState({ showForm: false })
+    }
     validate = object => {
         let isErr = false
         let erors = []
@@ -96,13 +105,13 @@ export class Renter extends Component {
 
     setForTable = () => {
         return {
-            LinksForTable: [<Link to={{
-                pathname: '/Form',
-                fieldsArray: this.state.fieldsArray, Object: {}, submit: this.submit, type: 'Add', name: 'הוספת שוכר',
-                LinksForEveryRow: [], ButtonsForEveryRow: [],
-                fieldsToAdd: [], setForForm: this.setForForm,
-                validate: this.validate
-            }}>הוספת שוכר </Link>
+            LinksForTable: [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+
+                return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm} fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
+                    fieldsToAdd={[]} setForForm={this.setForForm}
+                    validate={this.validate} />
+            }}>הוספת שוכר </button>
             ],
             ButtonsForTable: [],
         }
@@ -113,7 +122,7 @@ export class Renter extends Component {
         return { fieldsToAdd, LinksPerObject }
     }
     set = object => {
-        const docks = postFunction('User/GetUserDocuments', { id: object.id, type: 4 })
+        const docks = postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
@@ -127,34 +136,33 @@ export class Renter extends Component {
         }}>
             דירות ששוכר</Link>]
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object,
             ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
         }
     }
     rend = () => {
         if (this.props.location.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details location={{
-                object: this.props.object,
-                fieldsArray: this.state.fieldsArray,
-                LinksPerObject: some.LinksPerObject,
-                LinksForEveryRow: some.LinksForEveryRow,
-                ButtonsForEveryRow: some.ButtonsForEveryRow,
-                fieldsToAdd: some.fieldsToAdd
-            }}
+            return <Details object={this.props.object}
+                fieldsArray={this.state.fieldsArray}
+                LinksPerObject={some.LinksPerObject}
+                LinksForEveryRow={some.LinksForEveryRow}
+                ButtonsForEveryRow={some.ButtonsForEveryRow}
+                fieldsToAdd={some.fieldsToAdd}
             />
 
         }
         else if (this.props.location.type === 'form') {
 
-            return <Form location={{
-                Object: this.props.location.object,
-                name: this.props.location.formName,
-                type: this.props.location.formType,
-                fieldsArray: this.state.fieldsArray,
-                submit: this.submit, setForForm: this.setForForm,
-                LinksPerObject: [], LinksForEveryRow: [], ButtonsForEveryRow: [], fieldsToAdd: [], validate: this.props.location.validate
-            }} />
+            return <Form closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
+                closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={this.props.location.object}
+                name={this.props.location.formName}
+                type={this.props.location.formType}
+                fieldsArray={this.state.fieldsArray}
+                submit={this.submit} setForForm={this.setForForm}
+                LinksPerObject={[]} LinksForEveryRow={[]}
+                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate} />
         }
         else
             return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
@@ -168,8 +176,10 @@ export class Renter extends Component {
         return (
 
             <div>
-                {/* {this.props.location.authorization()} */}
-                {this.rend()}
+                {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
+                    this.rend()
+                    : <Redirect to='/a' />}
+
             </div>
 
         )
