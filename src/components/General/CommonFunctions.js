@@ -5,120 +5,91 @@ import { Link, Redirect } from 'react-router-dom';
 
 
 //פונקציה שמוסיפה/מוחקת/מעדכנת אוביקט וגם מבצעת חיפוש
-const Search = (object, objects, path) => {
-    debugger;
-    Axios.post(path, { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
-        .then(res => {
-            if (res.status === 200) {
-                console.log('בהצלחה')
-                return res.data;
-            }
-            else
-                console.log('תקלה... החיפוש לא הצליח')
-            return objects;
-        }
-            , () => {
-                console.log('תקלה בשליחת הבקשה')
-                return objects;
-            });
-}
+
 const updateObject = (object, path) => {
     debugger;
     Axios.post(path, object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(x => {
-            if (x.status === 200) {
-                console.log('הנכס עודכן בהצלחה', x)
-                return true;
-            }
-            else
-                console.log('תקלה... הנכס לא עודכן')
-            return false;
+            alert('עודכן בהצלחה')
+            return true;
         }
             , () => {
+                alert('תקלה... לא עודכן')
                 console.log('תקלה בשליחת הבקשה')
-                return true;
+                return false;
             });
 }
-const addObject = (object, path) => {
-    let bool = true
-    object.UserID = 1;
-    debugger;
+const addObject = (object, path, redirect) => {
+    let bool;
+
     Axios.post(path, object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(x => {
-            if (x.status === 200) {
-                console.log('הנכס עודכן בהצלחה', x)
-                bool = true;
-            }
-            else {
-                console.log('תקלה... הנכס לא עודכן')
-                bool = false;
-            }
+            alert('נוסף בהצלחה')
+            bool = true
         }
             , () => {
+                alert('תקלה...  לא עודכן')
                 console.log('תקלה בשליחת הבקשה')
-                bool = true;
+                bool = false;
             });
+    debugger;
     return bool
 }
 const deleteObject = (object, path) => {
     let bool = true
     Axios.post(path, object, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
         .then(x => {
-            if (x.status === 200) {
-                console.log('הנכס עודכן בהצלחה', x)
-                bool = true;
-            }
-            else {
-                console.log('תקלה... הנכס לא עודכן')
-                bool = false;
-            }
+            alert('נמחק בהצלחה')
+            bool = true;
         }
             , () => {
+                alert('תקלה...  לא עודכן')
                 console.log('תקלה בשליחת הבקשה')
-                bool = true;
+                bool = false;
             });
     return bool
 
 }
 export const CommonFunctions = (type, object, objects, redirect, path) => {
 
-    debugger
+
     let x = true;
     if (type === 'Add')
-        x = addObject(object, path)
+        x = addObject(object, path, redirect)
     else if (type === 'Update')
-        x = updateObject(object, path)
-    else if (type === 'Search')
-        objects = Search(object, objects, path)
+        x = updateObject(object, path, redirect)
     else if (type === 'Delete')
         x = deleteObject(object, path)
 
-    if (x) {
-
-        return <Redirect to={{
-            pathname: redirect,
-            objects: objects
-        }} />
-    }
-    return false;
+    return x;
 }
+export const Search = (object, path) => {
+    let res
+    Axios.post(path, { ...object }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } })
+        .then(res => {
+            console.log('בהצלחה')
+            res = res.data;
 
+        }
+            , () => {
+                alert('תקלה... החיפוש לא הצליח')
+            });
+    return res
+}
 export const GetFunction = (path) => {// לפונקציות get 
     let list = []
     Axios.get(path).then(res => {
-        if (res.status === 200) {
-            list = res.data
-        }
-    })
+        list = res.data !== null ? res.data : []
+        console.log(res.data)
+    }, res => { console.log(res) })
+
     return list;
 }
 
 export const postFunction = (path, data) => {//לפונקציות ששולחות ערך אחד
     let list = []
     Axios.post(path, data, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => {
-        if (res.status === 200) {
-            list = res.data
-        }
+        list = res.data !== null ? res.data : []
     })
     return list;
 }

@@ -25,7 +25,7 @@ export class Search extends Component {
     submitHandler = (e) => {
         e.preventDefault();
 
-        this.setState({ isRedirect: this.props.submit(this.props.type, this.state.Object) })
+        this.setState({ isRedirect: this.props.submit('Search', this.state.Object) })
     }
 
     render() {

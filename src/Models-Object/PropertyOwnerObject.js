@@ -8,15 +8,17 @@ export default class owner {
     Phone;
     Email;
     Dock;
-    docName
-    constructor(OwnerID = 0, OwnerFirstName = null, OwnerLastName = null, Phone = null, Email = null, document = null, docName = null) {
+    DocName;
+    status
+    constructor(OwnerID = 0, OwnerFirstName = null, OwnerLastName = null, Phone = null, Email = null, document = null, docName = null, status = true) {
         this.OwnerID = OwnerID;
         this.OwnerFirstName = OwnerFirstName;
         this.OwnerLastName = OwnerLastName
         this.Phone = Phone
         this.Email = Email
         this.Dock = document;
-        this.docName = docName
+        this.DocName = docName;
+        this.state = status
     }
 
 }

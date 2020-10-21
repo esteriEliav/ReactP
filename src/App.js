@@ -46,7 +46,7 @@ function App() {
         {/*:type/:name/:submit/:fieldsArray/:Object/:fieldsToAdd/:LinksForEveryRow
         /:ButtonsForEveryRow/:LinksPerObject/:erors' */}
         <Route path='/Details' component={Details}></Route>
-        <Route component={NotFound} />
+        {/* <Route component={NotFound} /> */}
       </Switch>
 
     </div>

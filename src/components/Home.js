@@ -8,7 +8,8 @@ import Axios from 'axios';
 
 export class Home extends Component {
   state = {
-    showt: false
+    showt: false,
+    use1: new UserObject(1, 'aa', 'bb', null, null, null, 3)
   }
   closeModel = () => {
     this.setState({ showt: false })
@@ -25,7 +26,6 @@ export class Home extends Component {
     var cron = require('node-cron');
     const i = () => {
       cron.schedule('* */30 * * * * ', () => {
-        console.log('running every minute 1, 2, 4 and 5');
         this.setState({ showt: true })
 
       });
@@ -34,13 +34,16 @@ export class Home extends Component {
 
     const use1 = new UserObject(1, 'aa', 'bb', null, null, null, 3);
     const use2 = new UserObject(1, 'aa', 'bb', null, null, null, 1);
+    var dataToSend = JSON.stringify({ param1: "value1", param2: "value2" });
+
     return (
 
       <div>
+        <button onClick={() => { Axios.post('https://localhost:44368/api/PropertyOwner/Search', JSON.stringify({ OwnerFirstName: 'a', OwnerLastName: 'b', Phone: 'aaa', Email: 'qwer' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => { console.log(res.data) }) }} >search</button>
         <button onClick={() => { Axios.get('https://localhost:44368/api/Task/GetAllTasks').then(res => { console.log(res.data) }) }}>get function</button>
-        <button onClick={() => { Axios.post('https://localhost:44368/api/User/AddUser', new Object(use1), { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => { console.log(res.data) }) }}>post with object</button>
-        <button onClick={() => { Axios.post('https://localhost:44368/api/Renter/getRentalsbyRenterID', 1).then(res => { console.log(res.data) }) }}>post with int</button>
-        <button onClick={() => { this.props.setUser(use1); }}>set user-renter</button>n
+        <button onClick={() => { Axios.post('https://localhost:44368/api/User/AddUser', JSON.stringify(use1)).then(res => { console.log(res.data) }) }} >post with object</button>
+        <button onClick={() => { Axios.post('https://localhost:44368/api/User/getRentalsbyRenterID', 1, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => { console.log(res.data) }) }}>post with int</button>
+        <button onClick={() => { this.props.setUser(use1); }}>set user-renter</button>
         <button onClick={() => { this.props.setUser(use2); }}>set user-manager</button>
         <Link to={{ pathname: '/PropertyOwner', authorization: this.authorization }}><button >משכירים</button></Link>
         <Link to={{ pathname: '/Properties', authorization: this.authorization }}> <button>נכסים</button></Link>

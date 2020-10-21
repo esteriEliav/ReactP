@@ -11,37 +11,23 @@ except: LinksForEveryRow,ButtonsForEveryRow,fieldsToAdd,fieldsArray,Object,Links
 //קומפוננטה המציגה פרטים של כל אוביקט
 export class Details extends Component {
     state = {
-        showForm: false
+        showForm: false,
+        object: this.props.Object
     }
     closeModal = () => {
         this.setState({ showForm: false })
     }
+
     render() {
         let i = 0, j = 0, k = 0, x
         const func = (index) => {//פונקציה שמחזירה את כל הקישורים,הלחצנים והשדות עבור האוביקט בשביל שדה מסוים
             let items = [];
-            {
-                //console.log('i', this.props.i); console.log('j', this.props.j); console.log('k', this.props.k); console.log('index', index);
-            }//
-            while (i < this.props.LinksForEveryRow.length && this.props.LinksForEveryRow[i].index === index) {
-                items.push(<button onclick={() => { this.setState({ showForm: true }); debugger; }} showForm={() => {
-                    debugger;
-                    return <Form
-                        type={index === 'end' ? 'end' : this.props.LinksForEveryRow[i - 1].type}
-                        Object={this.props.Object}
-                        fieldsArray={this.props.fieldsArray} erors={[]} submit={this.props.submit} type='Update' name='ערוך'
-                        LinksForEveryRow={this.props.LinksForEveryRow} ButtonsForEveryRow={this.props.ButtonsForEveryRow}
-                        fieldsToAdd={this.props.fieldsToAdd} setForForm={this.props.setForForm} />
-                }}>
-                    {this.props.LinksForEveryRow[i].name}</button>)
+            console.log('object-det', this.state.object)
+            while (i < this.props.LinksPerObject.length && this.props.LinksPerObject[i].props.index === index) {
+                items.push(this.props.LinksPerObject[i], this.props.LinksPerObject[i].props.showForm)
                 i += 1
-
             }
-            while (j < this.props.ButtonsForEveryRow.length && this.props.ButtonsForEveryRow[j].index === index) {
-                items.push(<div><button onClick={this.props.ButtonsForEveryRow[j].onclick}>{this.props.ButtonsForEveryRow[j].name}</button><p /></div>)
 
-                j += 1
-            }
             while (k < this.props.fieldsToAdd.length && this.props.fieldsToAdd[k].index === index) {
                 items.push(<div><label >{this.props.fieldsToAdd[k].name}</label><label>{this.props.Object[this.props.fieldsToAdd[k].field]}</label><p /></div>)
                 k += 1
@@ -52,10 +38,9 @@ export class Details extends Component {
 
         return (
             <div>
-                <Popup open={this.props.isOpen} closeOnDocumentClick={false} contentStyle={{ backgroundColor: "gray" }}>
+                <Popup open={this.props.isOpen} closeOnDocumentClick={false}
+                    contentStyle={{ backgroundColor: "gray" }} nested modal>
                     <a className="close" onClick={this.props.closeModal}>&times; </a>
-
-
 
                     {this.props.fieldsArray.map((item, index) =>
 
@@ -65,25 +50,16 @@ export class Details extends Component {
 
                   <label dir='rtl'>{this.props.Object[item.field]}</label>
                             <span>
-                                {func(index).map(item => {
-                                    return <div>{item}
-                                        {item.props.showForm && item.props.showForm()}
-                                    </div>
-                                })}
-
-
+                                {func(index).map(item => <div>{item}</div>)}
                             </span>
                             <p /><p />
                         </div>
 
                     )}
-                    {func('end').map(item => {
-                        return <div>{item}
-                            {item.props.showForm && item.props.showForm()}
-
-                        </div>
-                    })}
-                    {this.props.LinksPerObject.map((link, index) => <span key={index}>{link}<p /> </span>)}
+                    {func('end').map(item =>
+                        <div>{item}</div>)}
+                    {this.props.LinksForEveryRow.map((link, index) => <div key={index}>{link}</div>)}
+                    {this.props.ButtonsForEveryRow.map((link, index) => <div><button onClick={link.onclick}>{link.name}</button><p /></div>)}
                 </Popup>
             </div>
         )

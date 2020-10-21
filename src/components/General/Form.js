@@ -28,14 +28,14 @@ export class Form extends Component {
 
     }
     componentDidMount = () => {
-        let tempObject = { ...this.state.Object };
-        if (Object.keys(tempObject).length === 0) {//אם האוביקט שנשלח, ריק, יש ליצור אוביקט חדש
-            this.state.fieldsArray.map(field => { tempObject[field.field] = "" });
-            //this.props.fieldsToAdd.map(field => { tempObject[field.field] = "" });
-            this.setState({ Object: tempObject });
+        // let tempObject = { ...this.state.Object };
+        // if (Object.keys(tempObject).length === 0) {//אם האוביקט שנשלח, ריק, יש ליצור אוביקט חדש
+        //     // this.state.fieldsArray.map(field => { tempObject[field.field] = "" });
+        //     // //this.props.fieldsToAdd.map(field => { tempObject[field.field] = "" });
+        //     // this.setState({ Object: tempObject });
 
-        }
-        else//אם לא יש להוסיף את השדות הנוספים בהתאם לאוביקט
+        // }
+        // else//אם לא יש להוסיף את השדות הנוספים בהתאם לאוביקט
         {
             const links = this.props.setForForm(this.state.Object)
             this.setState({ fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject });
@@ -67,8 +67,7 @@ export class Form extends Component {
         let tempObject = { ...this.state.Object };
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         const links = this.props.setForForm(tempObject)
-        this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject });
-
+        this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
 
     }
 
@@ -78,11 +77,9 @@ export class Form extends Component {
         const func = (index) => {//פונקציה המרנדרת את השדות הנוספים
             let items = []
             const links = this.state.LinksPerObject
-            while (i < links.length && links[i].props.to.index === index) {
-
-                items.push(<span>{links[i]}<p /></span>)
+            while (i < links.length && links[i].props.index === index) {
+                items.push(<span>{links[i]}<p /> {links[i].props.showForm}</span>)
                 i += 1
-
             }
             let fieldsToAdd = this.state.fieldsToAdd[j]
             while (j < this.state.fieldsToAdd.length && fieldsToAdd.index === index) {
@@ -100,8 +97,6 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
-
-
             e.preventDefault();
             const val = this.props.validate(this.state.Object)
             if (val.isErr)
@@ -122,15 +117,14 @@ export class Form extends Component {
         }
         return (
             <div>
-                <Popup open={this.props.isOpen} closeOnDocumentClick={false} contentStyle={{ backgroundColor: "gray" }}>
+                <Popup open={this.props.isOpen} closeOnDocumentClick={false}
+                    contentStyle={{ backgroundColor: "gray" }} nested modal>
 
                     <a className="close" onClick={this.props.closeModal}>
                         &times;
               </a>
                     <form onSubmit={submitHandler}>
                         <p> <em>{this.state.generalEror}</em><br /></p>
-
-                        {console.log('generalEror', this.state.generalEror)}
                         {this.state.fieldsArray.map((field, index) =>
                             <span key={index}>
                                 <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} focusHandler={focusHandler} />
@@ -144,10 +138,8 @@ export class Form extends Component {
                         <p />
                         {/* באטן של סבמיט */}
                         <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
-
                     </form>
-
-                    {this.state.isRedirect}
+                    {/* {this.state.isRedirect} */}
                 </Popup>
             </div>
         )

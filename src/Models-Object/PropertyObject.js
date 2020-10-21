@@ -21,7 +21,8 @@ const property = () => {
         RoomsNum: null,
         ApartmentNum: null,
         Dock: null,
-        docName: null
+        DocName: null,
+        status: true
     }
 }
 export default property;

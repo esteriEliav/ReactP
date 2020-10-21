@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
-import { propertiesList } from './Properties'
-import { SubPropertiesList } from './SubProperties'
+import Properties, { propertiesList } from './Properties'
+import { SubProperties, SubPropertiesList } from './SubProperties'
 
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
 import Form from '../General/Form';
-import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import TaskObject from '../../Models-Object/TaskObject'
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
@@ -29,33 +29,37 @@ HandlingDate datetime,--תאריך טיפול
 HandlingWay nvarchar(max),--אופן טיפול
  */
 export class Tasks extends Component {
-    ClassificationOptions = GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
-    propertiesOptions = propertiesList.map(item => { return { id: item.PropertyID, name: item.PropertyID + ':' + item.StreetID + ' ' + item.Number + ' ' + item.CityID } })
+    ClassificationOptions = []// GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
+    cities = []// GetFunction('Property/GetAllCities')
+    propertiesOptions = propertiesList.map(item => { const street = {} /*postFunction('Property/GetStreetByID', item.CityID)*/; return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
     TaskTypeOptions = []//GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
     state = {
+
         name: 'משימות',
 
-        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ }, { field: 'Description', name: 'תיאור', type: 'text', required: true },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio', /*radioOptions: this.ClassificationOptions */ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ }, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
+        { field: 'ClassificationID', name: 'סווג', type: 'radio', /*radioOptions: this.ClassificationOptions */ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
+        { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
-        ObjectsArray:/* tasksLists*/[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
 
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ },
         { field: 'ClassificationID', name: 'סווג', type: 'radio',/* radioOptions: this.ClassificationOptions*/ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
         isAutho: false,
-        showForm: this.props.location.type === 'report' || this.props.location.type === 'form' ? true : false,
-        showDetails: this.props.location.type === 'details' ? true : false,
+        showForm: this.props.type === 'report' || this.props.type === 'form' ? true : false,
+        showDetails: this.props.type === 'details' ? true : false,
+        showSomthing: null
 
     }
     closeDetailsModal = () => {
 
-        this.setState({ showDetails: false })
+        this.setState({ showDetails: false, showSomthing: null })
     }
     closeFormModal = () => {
 
-        this.setState({ showForm: false })
+        this.setState({ showForm: false, showSomthing: null })
     }
     validate = object => {
         let isErr = false
@@ -74,9 +78,21 @@ export class Tasks extends Component {
         }
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
+    submitSearch = (object) => {
+        const path = 'Task/Search';
+
+        if (object) {
+            let objects = Search(object, path)
+            let name = 'תוצאות חיפוש'
+            if (objects === null || objects === []) {
+                objects = []
+                name = 'לא נמצאו תוצאות'
+            }
+            this.setState({ objectsArray: objects, name })
+        }
+    }
     submit = (type, object) => {
-        let path = 'Task/' + type
-        path += type !== 'Search' ? 'Task' : ''
+        let path = 'Task/' + type + 'Task';
         if (type === 'Add' || type === 'Update') {
             let newObj = TaskObject();
             if (type === 'Add')
@@ -114,26 +130,40 @@ export class Tasks extends Component {
             CommonFunctions('Delete', object, this.state.ObjectsArray, '/Tasks', '/Tasks/DeleteTask')
             return ret;
         }
-        return CommonFunctions(type, object, this.state.ObjectsArray, '/Tasks', path)
+        const bool = (type, object, this.state.ObjectsArray, '/Tasks', path)
+        if (bool)
+
+            this.closeFormModal();
     }
 
 
     setForTable = () => {
-        return {
-            LinksForTable: [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+        let LinksForTable = [];
 
-                return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm} fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
-                    LinksForEveryRow={[]} ButtonsForEveryRow={[]}
-                    fieldsToAdd={[]} setForForm={this.setForForm}
-                    validate={this.validate} />
-            }}> הוספת משימה</button>],
-            ButtonsForTable: []
+        if (this.state.name !== 'משימות') {
+            LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: tasksLists, name: 'משימות' }) }}>חזרה למשימות</button>]
+
         }
+        else
+            LinksForTable = [<button onClick={() => {
+                this.setState({
+                    showForm: true, showSomthing:
+                        <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                            fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוסף'
+                            setForForm={this.setForForm}
+                            validate={this.validate} />
+                })
+            }} > הוספת משימה</button>,
+            <button onClick={() => { this.setState({ objectsArray: GetFunction('Task/GetAllarchivesTasks'), name: 'ארכיון המשימות' }) }}>לארכיון המשימות</button>]
+
+
+        return { LinksForTable }
     }
     setForForm = object => {
         let fieldsToAdd = [];
         if (object.TaskTypeId === 1 || object.TaskTypeId === 2) {
-            fieldsToAdd.push({ field: 'PropertyID', name: 'סווג לקוח', type: 'select', index: 1,/*selectOptions:this.propertiesOptions*/ });
+            fieldsToAdd.push({ field: 'PropertyID', name: 'נכס', type: 'select', index: 1, selectOptions: this.propertiesOptions },
+                { field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 2 })/*{ field: 'PropertyID', name: 'סווג לקוח', type: 'r', index: 1,selectOptions:this.propertiesOptions }*/
             const property = propertiesList.find((item => item.PropertyID === object.PropertyID))
 
             if (property && property[0] && property[0].IsDivided) {
@@ -141,17 +171,17 @@ export class Tasks extends Component {
                 const subPropertiesOptions = SubProperties.map(item => { return { id: item.SubPropertyID, name: item.num } })
                 fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח', type: 'select', index: 1,/*selectOptions:subPropertiesOptions*/ });
             }
-        }
-
-        if (object.TaskTypeId === 1) {
-            fieldsToAdd.push(/*{ field: 'ClientClassificationID', name: 'סווג לקוח', type: 'radio', index: 2,radioOptions: this.ClassificationOptions  },*///פונקציה שמחזירה שם סווג
-                { field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 2 })
 
         }
+
+
+
 
         if (object.IsHandled)
             fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 4 },
                 { field: 'HandlingWay', name: 'אופן טיפול', type: 'texterea', index: 4 })
+        fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
+        console.log('fields', fieldsToAdd)
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject };
 
@@ -161,14 +191,14 @@ export class Tasks extends Component {
 
         const docks = postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 })
         if (docks && docks[0])
-            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
-        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
+        let LinksForEveryRow = []
+        let ButtonsForEveryRow = []
 
         let tempobject = object;
         let LinksPerObject = [];
-
+        const propertyObject = {}//postFunction('Property/GetPropertyByID', object.PropertyID);
 
         //    // let typeObj = this.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
         //     //object.TaskTypeId = typeObj.Name
@@ -176,18 +206,34 @@ export class Tasks extends Component {
         //    // object.ClassificationID = classifObj.Name;
         //     classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
         //     object.ClientClassificationID = classifObj.Name;
-        if (object.SubPropertyID !== null)
-            LinksPerObject.push(<Link to={{
-                pathname: '/SubProperties',
-                object: postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID),
-                type: 'details'
-            }} >נכס מחולק</Link>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
+        let fieldsToAdd = this.setForForm(object).fieldsToAdd;
+        console.log('fieldsToAdd.length - 1', fieldsToAdd.length - 1);
+        console.log('fieldsToAdd.', fieldsToAdd);
+        console.log('fieldsToAdd[]', fieldsToAdd[fieldsToAdd.length - 1]);
+        fieldsToAdd[fieldsToAdd.length - 1].name = 'מסמכים'
+        if (object.TaskTypeId === 1 || object.TaskTypeId === 4) {
 
+            object.PropertyID = <Link onClick={() => {
+                this.setState({
+                    showDetails: true, showSomthing: <Properties object={propertyObject} type='details'
+                        isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
+                })
+            }}>{object.PropertyID}</Link>
+
+
+            if (object.SubPropertyID !== null)
+                LinksPerObject.push(<button onClick={() => {
+                    this.setState({
+                        showDetails: true, showSomthing:
+                            <SubProperties object={postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID)}
+                                type='details' isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
+                    })
+                }}>פרטי נכס מחולק</button>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
+        }
 
         return {
-            fieldsToAdd: this.setForForm(object).fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
-            ButtonsForEveryRow: ButtonsForEveryRow, object: tempobject,
-            LinksPerObject: LinksPerObject
+            fieldsToAdd, LinksForEveryRow, enable: true,
+            ButtonsForEveryRow, object: tempobject, LinksPerObject
         };
     }
     rend = () => {
@@ -195,27 +241,27 @@ export class Tasks extends Component {
             return <Redirect to='/a' />
         }
 
-        if (this.props.location.type === 'report') {
+        if (this.props.type === 'report') {
 
-            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
-                Object={{ PropertyID: this.props.location.PropertyID, SubPropertyID: this.props.location.SubPropertyID }}
+            return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+                Object={{ PropertyID: this.props.object.PropertyID, SubPropertyID: this.props.object.SubPropertyID }}
                 name='שלח'
                 type='Report'
                 fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
-                    // { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions }
+                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio',/* radioOptions: this.ClassificationOptions */ }
                 ]}
                 submit={this.submit} setForForm={this.setForForm}
-                LinksPerObject={[]} LinksForEveryRow={[]} ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate}
+                validate={this.props.validate}
             />
         }
         else if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2) {
             return <Redirect to='/a' />
         }
 
-        else if (this.props.location.type === 'details') {
+        else if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
-                object={this.props.object}
+            return <Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+                Object={this.props.object}
                 fieldsArray={this.state.fieldsArray}
                 LinksPerObject={some.LinksPerObject}
                 LinksForEveryRow={some.LinksForEveryRow}
@@ -225,27 +271,26 @@ export class Tasks extends Component {
 
         }
 
-        else if (this.props.location.type === 'form') {
+        else if (this.props.type === 'form') {
 
-            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
-                Object={this.props.location.object}
-                name={this.props.location.formName}
-                type={this.props.location.formType}
+            return <div><Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                Object={this.props.object}
+                name={this.props.formName}
+                type={this.props.formType}
                 fieldsArray={this.state.fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
-                LinksPerObject={[this.linkToAddPropertyOwner]} LinksForEveryRow={[]}
-                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate} />
+                validate={this.validate} />{this.state.showSomthing}</div>
         }
         else {
 
-            return <Table name={this.state.name}
+            return <div><Table name={this.state.name}
                 fieldsArray={this.state.fieldsArray}
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable}
                 set={this.set} setForForm={this.setForForm}
                 delObject={this.submit}
-                validate={this.validate} erors={this.state.erors} submit={this.submit}
-                fieldsToSearch={this.state.fieldsToSearch} />
+                validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
+                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}</div>
         }
     }
     render() {

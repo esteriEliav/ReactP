@@ -31,25 +31,20 @@ export class Table extends Component {
                     name='חיפוש'
                     fieldsArray={this.props.fieldsToSearch}
                     Object={{}}
-                    submit={this.props.submit} />}
+                    submit={this.props.submitSearch} />}
 
                 {some.LinksForTable.map((lin, index) => <div key={index}> {lin}
-                    {lin.props.showForm()}
+                    {lin.props.showForm}
 
                 </div>
                 )}
-
-
-
-                {some.ButtonsForTable.map((but, index) => <button key={index} onClick={but['onclick']}>{but['name']}</button>)}
-
                 <table>
                     <tr> {this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
                     {this.props.objectsArray.map(object =>
 
                         <Item key={Object[this.props.fieldsArray[0].field]}
                             fieldsArray={this.props.fieldsArray} Object={object} set={this.props.set} submit={this.props.submit}
-                            setForForm={this.props.setForForm} />
+                            setForForm={this.props.setForForm} validate={this.props.validate} />
 
                     )}
 

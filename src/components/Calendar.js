@@ -22,7 +22,7 @@ class Calendar extends React.Component {
     this.props.history.push(path);
   }
   render() {
-    return (this.props.user.RoleID == 1 || this.props.user.RoleID == 2 ? <FullCalendar
+    return (this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ? <FullCalendar
       plugins={[dayGridPlugin]}
       initialView="dayGridMonth"
       weekends={true}

@@ -7,10 +7,11 @@ import MPropertyForRenterain1 from './PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
+import { Properties } from './Properties'
 
 
 
@@ -27,28 +28,41 @@ export class PropertyOwner extends Component {
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: ' מסמך', type: 'file', index: 'end' }],
-        ObjectsArray: ownersList,
-        showForm: this.props.location.type == 'form' ? true : false,
-        showDetails: this.props.location.type == 'details' ? true : false,
+        ObjectsArray: this.props.location.objects ? this.props.location.objects : ownersList,
+        showForm: false,
+        showDetails: false,
+        showSomthing: null,
 
-
-        isAutho: true//false
+        isRedirct: false//false
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
     }
     closeDetailsModal = () => {
 
-        this.setState({ showDetails: false })
+        this.setState({ showDetails: false, showSomthing: null })
     }
     closeFormModal = () => {
 
-        this.setState({ showForm: false })
+        this.setState({ showForm: false, showSomthing: null })
+    }
+    submitSearch = (object) => {
+        const path = 'PropertyOwner/Search';
+
+        if (object) {
+            let objects = Search(object, path)
+            let name = 'תוצאות חיפוש'
+            if (objects === null || objects === []) {
+                objects = []
+                name = 'לא נמצאו תוצאות'
+            }
+            this.setState({ objectsArray: objects, name })
+        }
     }
     submit = (type, object) => {
-        debugger;
-        let path = 'PropertyOwner/' + type
-        path += type !== 'Search' ? 'PropertyOwner' : ''
+
+        let path = 'PropertyOwner/' + type + 'PropertyOwner';
+
         if (type === 'Add' || type === 'Update') {
             let OwnerID = object.OwnerID, OwnerFirstName = null, OwnerLastName = null, Phone = null, Email = null, Dock = null, docName = null
 
@@ -69,9 +83,6 @@ export class PropertyOwner extends Component {
             }
 
             object = new PropertyOwnerObject(OwnerID, OwnerFirstName, OwnerLastName, Phone, Email, Dock, docName)
-            debugger
-
-            window.open(object.document);
 
 
 
@@ -81,7 +92,10 @@ export class PropertyOwner extends Component {
             let id = new Number(object.OwnerID)
             object = id
         }
-        return CommonFunctions(type, object, this.state.ObjectsArray, '/PropertyOwner', path)
+        const bool = CommonFunctions(type, object, this.state.ObjectsArray, '/PropertyOwner', path)
+        if (bool)
+
+            this.closeFormModal();
     }
 
 
@@ -91,7 +105,7 @@ export class PropertyOwner extends Component {
         let erors = []
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if (object.Phone === '' && object.Email === '') {
+        if (!((object.Phone && object.Phone !== '') || (object.Email !== '' && object.Email))) {
             generalEror = 'חובה להכניס אימייל או טלפון'
             isErr = true
         }
@@ -100,21 +114,22 @@ export class PropertyOwner extends Component {
 
     }
     setForTable = () => {
-        const LinksForTable = [<button onClick={() => { this.setState({ showForm: true }) }} showForm={() => {
+        let LinksForTable = []
 
-            return this.state.showForm && <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
-                fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
-                LinksForEveryRow={[]} ButtonsForEveryRow={[]}
-                fieldsToAdd={[]} setForForm={this.setForForm}
-                validate={this.validate} />
-        }}
-
-
-        > הוספת משכיר</button>
-        ]
+        if (this.state.name !== 'משכירים')
+            LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
+        else
+            LinksForTable = [<button onClick={() => {
+                this.setState({
+                    showForm: true, showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                        fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                        setForForm={this.setForForm}
+                        validate={this.validate} />
+                })
+            }} > הוספת משכיר</button>]
         return {
             LinksForTable,
-            ButtonsForTable: [],
+
         }
     }
     setForForm = object => {
@@ -124,29 +139,28 @@ export class PropertyOwner extends Component {
     }
     set = (object) => {
 
-        let LinksForEveryRow = [{ type: 'Update', name: 'עריכה', link: '/Form', index: 'end' }]
-        let ButtonsForEveryRow = [{ name: 'מחיקה', type: 'Delete', onclick: this.submit, index: 'end' }]
-        let LinksPerObject = [<Link to={{//שולח  רשימת דירות שמתקבלים מהפונקציה
-            pathname: '/Properties',
-            objects: postFunction('PropertyOwner/GetPropertiesbyOwnerID', Number(object.OwnerID)),
-            type: 'table'
-        }}>
-            דירות</Link>]
+        let ButtonsForEveryRow = []
+        let LinksPerObject = []
+        let LinksForEveryRow = [<Link to={{
+            pathname: '/Properties', objects: postFunction('PropertyOwner/GetPropertiesbyOwnerID', Number(object.OwnerID))
+        }} >דירות</Link>]
+
         //LinksPerObject.push(<input type="file" name="file" onChange={onChangeHandler} />
 
         const docks = postFunction('User/GetUserDocuments', { id: object.PropertyOwnerID, type: 2 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object: object,
+            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object: object, enable: true,
             ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
         }
     }
     rend = () => {
-        if (this.props.location.type === 'details') {
+
+        if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details closeModal={this.closeDetailsModal} isOpen={this.state.showDetails}
-                object={this.props.object}
+            return <Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+                Object={this.props.object}
                 fieldsArray={this.state.fieldsArray}
                 LinksPerObject={some.LinksPerObject}
                 LinksForEveryRow={some.LinksForEveryRow}
@@ -155,27 +169,28 @@ export class PropertyOwner extends Component {
             />
 
         }
-        else if (this.props.location.type === 'form') {
+        else if (this.props.type === 'form') {
 
-            return <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
-                Object={this.props.location.object}
-                name={this.props.location.formName}
-                type={this.props.location.formType}
+            return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+                Object={this.props.object}
+                name={this.props.formName}
+                type={this.props.formType}
                 fieldsArray={this.state.fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
-                LinksPerObject={[this.linkToAddPropertyOwner]} LinksForEveryRow={[]}
-                ButtonsForEveryRow={[]} fieldsToAdd={[]} validate={this.props.location.validate} />
+                validate={this.validate} />
         }
         else {
 
-            return <Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
+            return <div><Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
-                validate={this.validate} submit={this.submit}
+                validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
                 fieldsToSearch={this.state.fieldsArray.filter((i, ind) => ind != 4)} />
+                {this.state.showSomthing}{this.state.isRedirct}</div>
         }
     }
     render() {
+        console.log('isred', this.state.isRedirct)
         return (
 
             <div>

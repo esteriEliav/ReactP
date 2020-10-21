@@ -10,7 +10,8 @@ const rental = () => {
         EndDate: null,
         ContactRenew: null,
         Dock: null,
-        docName: null
+        DocName: null,
+        status: true
     }
 }
 export default rental

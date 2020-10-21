@@ -13,7 +13,8 @@ const task = () => {
         HandlingDate: null,
         HandlingWay: null,
         Dock: null,
-        docName: null
+        DocName: null,
+        status: true
     }
 }
 export default task
