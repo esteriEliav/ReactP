@@ -33,7 +33,7 @@ export class SubProperties extends Component {
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true },
         { field: 'num', name: 'מספר', type: 'text', required: true }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'מושכר?', type: 'checkbox' }],
-        ObjectsArray:/*this.props.location.objects*/[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+        ObjectsArray:this.props.location.objects[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
@@ -138,7 +138,7 @@ export class SubProperties extends Component {
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let tempobject = object;
-        const propertyObject = {}//postFunction('Propety/GetPropertyByID', object.PropertyID)
+        const propertyObject = postFunction('Propety/GetPropertyByID', object.PropertyID)
         object.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -231,4 +231,4 @@ export class SubProperties extends Component {
 }
 
 export default connect(mapStateToProps)(SubProperties);
-export const SubPropertiesList = [];// GetFunction('SubProperty/GetAllSubProperties');
+export const SubPropertiesList =[]//GetFunction('SubProperty/GetAllSubProperties');

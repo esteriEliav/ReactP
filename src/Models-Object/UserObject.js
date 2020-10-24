@@ -1,4 +1,4 @@
-class user {
+class userDTO{
     UserID
     FirstName
     LastName
@@ -28,4 +28,4 @@ class user {
     }
 
 }
-export default user
+export default userDTO

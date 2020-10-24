@@ -29,23 +29,23 @@ HandlingDate datetime,--תאריך טיפול
 HandlingWay nvarchar(max),--אופן טיפול
  */
 export class Tasks extends Component {
-    ClassificationOptions = []// GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
-    cities = []// GetFunction('Property/GetAllCities')
-    propertiesOptions = propertiesList.map(item => { const street = {} /*postFunction('Property/GetStreetByID', item.CityID)*/; return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
-    TaskTypeOptions = []//GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
+    ClassificationOptions =  GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
+    cities = GetFunction('Property/GetAllCities')
+    propertiesOptions = propertiesList.map(item => { const street = postFunction('Property/GetStreetByID', item.CityID); return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
+    TaskTypeOptions = GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
     state = {
 
         name: 'משימות',
 
-        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ }, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio', /*radioOptions: this.ClassificationOptions */ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
+        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: this.TaskTypeOptions}, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
+        { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: this.ClassificationOptions  }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
         ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
 
-        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio',/* radioOptions: this.TaskTypeOptions*/ },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio',/* radioOptions: this.ClassificationOptions*/ }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
+        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: this.TaskTypeOptions },
+        { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: this.ClassificationOptions }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
         isAutho: false,
         showForm: this.props.type === 'report' || this.props.type === 'form' ? true : false,
@@ -169,7 +169,7 @@ export class Tasks extends Component {
             if (property && property[0] && property[0].IsDivided) {
                 const SubProperties = SubPropertiesList.filter(item => item.PropertyID === object.PropertyID)
                 const subPropertiesOptions = SubProperties.map(item => { return { id: item.SubPropertyID, name: item.num } })
-                fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח', type: 'select', index: 1,/*selectOptions:subPropertiesOptions*/ });
+                fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח', type: 'select', index: 1,selectOptions:subPropertiesOptions });
             }
 
         }
@@ -198,14 +198,14 @@ export class Tasks extends Component {
 
         let tempobject = object;
         let LinksPerObject = [];
-        const propertyObject = {}//postFunction('Property/GetPropertyByID', object.PropertyID);
+        const propertyObject = postFunction('Property/GetPropertyByID', object.PropertyID);
 
-        //    // let typeObj = this.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
-        //     //object.TaskTypeId = typeObj.Name
-        //    // let classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClassificationID))
-        //    // object.ClassificationID = classifObj.Name;
-        //     classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
-        //     object.ClientClassificationID = classifObj.Name;
+         let typeObj = this.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
+        object.TaskTypeId = typeObj.Name
+        let classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClassificationID))
+        object.ClassificationID = classifObj.Name;
+       classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
+           object.ClientClassificationID = classifObj.Name;
         let fieldsToAdd = this.setForForm(object).fieldsToAdd;
         console.log('fieldsToAdd.length - 1', fieldsToAdd.length - 1);
         console.log('fieldsToAdd.', fieldsToAdd);
@@ -248,7 +248,7 @@ export class Tasks extends Component {
                 name='שלח'
                 type='Report'
                 fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
-                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio',/* radioOptions: this.ClassificationOptions */ }
+                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.ClassificationOptions  }
                 ]}
                 submit={this.submit} setForForm={this.setForForm}
                 validate={this.props.validate}
@@ -305,4 +305,4 @@ export class Tasks extends Component {
 }
 
 export default connect(mapStateToProps)(Tasks)
-export const tasksLists = [];/* GetFunction('Task/GetAllTasks');*/
+export const tasksLists = []// GetFunction('Task/GetAllTasks');

@@ -39,12 +39,7 @@ export class Home extends Component {
     return (
 
       <div>
-        <button onClick={() => { Axios.post('https://localhost:44368/api/PropertyOwner/Search', JSON.stringify({ OwnerFirstName: 'a', OwnerLastName: 'b', Phone: 'aaa', Email: 'qwer' }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => { console.log(res.data) }) }} >search</button>
-        <button onClick={() => { Axios.get('https://localhost:44368/api/Task/GetAllTasks').then(res => { console.log(res.data) }) }}>get function</button>
-        <button onClick={() => { Axios.post('https://localhost:44368/api/User/AddUser', JSON.stringify(use1)).then(res => { console.log(res.data) }) }} >post with object</button>
-        <button onClick={() => { Axios.post('https://localhost:44368/api/User/getRentalsbyRenterID', 1, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => { console.log(res.data) }) }}>post with int</button>
-        <button onClick={() => { this.props.setUser(use1); }}>set user-renter</button>
-        <button onClick={() => { this.props.setUser(use2); }}>set user-manager</button>
+        
         <Link to={{ pathname: '/PropertyOwner', authorization: this.authorization }}><button >משכירים</button></Link>
         <Link to={{ pathname: '/Properties', authorization: this.authorization }}> <button>נכסים</button></Link>
         <Link to={{ pathname: '/Renter', authorization: this.authorization }}> <button >שוכרים</button></Link>

@@ -40,11 +40,11 @@ export class Rentals extends Component {
     PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
     renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
     cities = GetFunction('Property/GetAllCities')
-    propertiesOptions = propertiesList.map(item => { const street = {} /*postFunction('Property/GetStreetByID', item.CityID)*/; return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
+    propertiesOptions = propertiesList.map(item => { const street = postFunction('Property/GetStreetByID', item.CityID); return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
     state = {
         name: 'השכרות',
-        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: this.propertiesOptions }, { field: 'UserID', name: 'שוכר', type: 'select', /*selectOptions: this.renters*/ },
-        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', /*radioOptions: this.PaymentTypeOptions,*/ required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: this.propertiesOptions }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: this.renters },
+        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: this.PaymentTypeOptions, required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }, , { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
@@ -52,14 +52,13 @@ export class Rentals extends Component {
 
         /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
 
-        ObjectsArray: this.props.location.objects ? this.props.location.objects :/*rentalsList*/[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+        ObjectsArray: this.props.location.objects ? this.props.location.objects :rentalsList[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
 
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
         isAutho: true,//false
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
         showSomthing: null
-        //  whatElse: null
 
 
     }
@@ -194,9 +193,9 @@ export class Rentals extends Component {
         const docks = postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-        const ownerobject = {}// postFunction('PropertyOwner/GetOwnerByID', object.OwerID) 
-        const propertyObject = {}//postFunction('Property/GetPropertyByID', object.PropertyID)
-        const userObject = {}// postFunction('Renter/GetRenterByID', object.PropertyID)
+        const ownerobject =  postFunction('PropertyOwner/GetOwnerByID', object.OwerID) 
+        const propertyObject = postFunction('Property/GetPropertyByID', object.PropertyID)
+        const userObject = postFunction('Renter/GetRenterByID', object.PropertyID)
         object.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -309,4 +308,4 @@ export class Rentals extends Component {
 }
 
 export default connect(mapStateToProps)(Rentals)
-export const rentalsList = [];// GetFunction('Rental/GetAllRentals');
+export const rentalsList =[]// GetFunction('Rental/GetAllRentals');

@@ -13,17 +13,17 @@ export class PropertiesForRenter extends Component {
         name: 'הדירות שלך',
         fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
-        PropertiesArray:/*this.props.location.objects*/[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 },],//
+        PropertiesArray:this.props.location.objects[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 }],
         show: false,
         showSomthing: null
     }
     componentDidMount = () => {
         console.log(this.state)
     }
-    // closeFormModal = () => {
+     closeFormModal = () => {
 
-    //     this.setState({ showForm: false })
-    // }
+         this.setState({ showForm: false ,show:null})
+    }
     authorization = () => {
         if (this.props.user.RoleID === 3) {
             return null
@@ -34,7 +34,6 @@ export class PropertiesForRenter extends Component {
         let path = 'Task/AddTask'
         let newObj = TaskObject()
         newObj.TaskID = 1
-        // newObj.TaskTypeId = תקלה
         newObj.Description = object.Description
         newObj.PropertyID = object.PropertyID
         newObj.SubPropertyID = object.SubPropertyID

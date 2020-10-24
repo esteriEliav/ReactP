@@ -205,6 +205,8 @@ export class PropertyOwner extends Component {
 }
 
 export default connect(mapStateToProps)(PropertyOwner);
-export const ownersList =/*GetFunction('PropertyOwner/getAllOwners')*/[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+export const ownersList =
+//GetFunction('PropertyOwner/getAllOwners')
+[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
 { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
 { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];
