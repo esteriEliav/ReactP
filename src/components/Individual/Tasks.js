@@ -32,7 +32,7 @@ export class Tasks extends Component {
     ClassificationOptions =  GetFunction('Task/GetAllClassificationTypes').map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
     cities = GetFunction('Property/GetAllCities')
     propertiesOptions = propertiesList.map(item => { const street = postFunction('Property/GetStreetByID', item.CityID); return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
-    TaskTypeOptions = GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
+    TaskTypeOptions =[] //GetFunction('Task/GetAllTaskTypes').map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
     state = {
 
         name: 'משימות',
@@ -201,12 +201,12 @@ export class Tasks extends Component {
         let LinksPerObject = [];
         const propertyObject = postFunction('Property/GetPropertyByID', object.PropertyID);
 
-         let typeObj = this.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
-        object.TaskTypeId = typeObj.Name
-        let classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClassificationID))
-        object.ClassificationID = classifObj.Name;
-       classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
-           object.ClientClassificationID = classifObj.Name;
+    //      let typeObj = this.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
+    //     object.TaskTypeId = typeObj.Name
+    //     let classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClassificationID))
+    //     object.ClassificationID = classifObj.Name;
+    //    classifObj = this.ClassificationOptions.then(res => res.find(obj => obj.ID === object.ClientClassificationID))
+    //        object.ClientClassificationID = classifObj.Name;
         let fieldsToAdd = this.setForForm(object).fieldsToAdd;
         console.log('fieldsToAdd.length - 1', fieldsToAdd.length - 1);
         console.log('fieldsToAdd.', fieldsToAdd);
