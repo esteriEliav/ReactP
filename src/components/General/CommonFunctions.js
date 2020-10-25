@@ -78,17 +78,17 @@ export const Search = (object, path) => {
 }
 export const GetFunction = (path) => {// לפונקציות get 
     let list = []
-    Axios.get(path).then(res => {
+   console.log("rrrr",Axios.get(path).then(res => {
         list = res.data !== null ? res.data : []
         console.log(res.data)
-    }, res => { console.log(res) })
+    }, res => { console.log(res) }))
 
     return list;
 }
 
 export const postFunction = (path, data) => {//לפונקציות ששולחות ערך אחד
     let list = []
-    Axios.post(path, data, { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } }).then(res => {
+    Axios.post(path, data).then(res => {
         list = res.data !== null ? res.data : []
     })
     return list;

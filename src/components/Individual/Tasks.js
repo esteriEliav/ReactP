@@ -41,7 +41,8 @@ export class Tasks extends Component {
         { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: this.ClassificationOptions  }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
-        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/[{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+        ObjectsArray: //this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/
+        [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
 
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: this.TaskTypeOptions },

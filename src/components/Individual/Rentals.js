@@ -52,7 +52,8 @@ export class Rentals extends Component {
 
         /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
 
-        ObjectsArray: this.props.location.objects ? this.props.location.objects :rentalsList[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+        ObjectsArray: //this.props.location.objects ? this.props.location.objects :rentalsList
+        [{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
 
         { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
         isAutho: true,//false
@@ -308,4 +309,4 @@ export class Rentals extends Component {
 }
 
 export default connect(mapStateToProps)(Rentals)
-export const rentalsList =[]// GetFunction('Rental/GetAllRentals');
+export const rentalsList = GetFunction('Rental/GetAllRentals');

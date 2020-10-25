@@ -22,10 +22,10 @@ use2 = new UserDTO(1, 'aa', 'bb', null, null, null, 1);
 
     onSubmit = (e) => {
         e.preventDefault();
-        let user = postFunction('User/Ifhaveuse', { ...this.state })
+        let user = postFunction('User/Ifhaveuse', {...this.state })
         if (user && user[0]) {
             const userObj = new UserDTO({ ...user[0] })
-            alert(" ברוכים הבאים" + userObj.FirstName + ' ' + userObj.LastName);
+            alert(" ברוכים הבאים" + userObj.FirstName +' '+ userObj.LastName);
             this.props.setUser(userObj);
 this.setState({returnred:true})
         }
@@ -54,17 +54,19 @@ this.setState({returnred:true})
                     {/*<a href="@">שכחת סיסמה?</a>*/}
                     <Link to="/signup" >שכחת סיסמה?</Link>
                     
-                    </div></form>  <Link to="/Home" onClick={() => { this.props.setUser(this.use1);this.setState({returnred:true});debugger;
+                    {/* </div> <Link to="/Home" onClick={() => { this.props.setUser(this.use1);this.setState({returnred:true});debugger;
  }}>set user-renter</Link>
         <Link to="/Home" onClick={() => { this.props.setUser(this.use2);this.setState({returnred:true});debugger;
- }}>set user-manager</Link>
+ }}>set user-manager</Link> */}
  {/* {this.state.returnred?<Redirect to="/Home"></Redirect>:null} */}
-<button onClick ={() => {debugger; Axios.post("https://localhost:44368/api/user/adduser",(this.use1)).then(x=>{console.log("yestt");})}}>tttttttt</button>
+{/* <button onClick ={() => {debugger; Axios.post("https://localhost:44368/api/user/adduser",(this.use1)).then(x=>{console.log("yestt");})}}>tttttttt</button>
 <button onClick ={() => { Axios.post("https://localhost:44368/api/task/gettypename",1).then(x=>{console.log("yes11");})}}>1111111</button>
-<button onClick ={() => {debugger; Axios.get("https://localhost:44368/api/Rental/GetAllRentals").then(x=>{console.log(x.data);})}}>uuuu</button>
+<button onClick ={() => {debugger; Axios.get("https://localhost:44368/api/Rental/GetAllRentals").then(x=>{console.log(x.data);})}}>uuuu</button> */}
 
         </div>
-            
+        </form>    
+
+        </div>
 
         )
     }

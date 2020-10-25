@@ -189,7 +189,7 @@ export class PropertyOwner extends Component {
                 {this.state.showSomthing}{this.state.isRedirct}</div>
         }
     }
-    render() {
+    render() {debugger;
         console.log('isred', this.state.isRedirct)
         return (
 
@@ -206,7 +206,7 @@ export class PropertyOwner extends Component {
 
 export default connect(mapStateToProps)(PropertyOwner);
 export const ownersList =
-//GetFunction('PropertyOwner/getAllOwners')
-[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
-{ OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
-{ OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];
+GetFunction('PropertyOwner/getAllOwners')
+// [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+// { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
+// { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];
