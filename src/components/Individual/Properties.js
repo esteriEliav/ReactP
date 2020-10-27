@@ -230,7 +230,8 @@ export class Properties extends Component {
                 V</Link>
         }
         else
-            tempobject.IsDivided = 'X'//ושולח פרטי השכרה שמתקבלים מהפונקציה
+        {
+            tempobject.IsRented = 'X'//ושולח פרטי השכרה שמתקבלים מהפונקציה
         LinksPerObject.push(<button index={7} onClick={() => {
             this.setState({
                 showForm: true,
@@ -239,7 +240,7 @@ export class Properties extends Component {
                     formName='הוסף השכרה'
                     object={{ propertyID: tempobject.propertyID }} />
             })
-        }}>הוסף השכרה</button>)
+        }}>הוסף השכרה</button>)}
 
 
 
