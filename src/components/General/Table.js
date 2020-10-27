@@ -5,6 +5,9 @@ import Search from './Search'
 import { Link } from 'react-router-dom'
 import Details, { } from "./Details";
 import ReactExport from "react-export-excel";
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
+
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
@@ -45,14 +48,14 @@ export class Table extends Component {
                 </div>
                 )}
                 <table>
-                <ExcelFile filename={this.props.name} element= {<button> יצוא לאקסל </button>}>
+               {(this.props.user.RoleID===1 ||this.props.user.RoleID===2) && <ExcelFile filename={this.props.name} element= {<button> יצוא לאקסל </button>}>
         <ExcelSheet data={this.props.objectsArray} name={this.props.name}>
         {this.props.fieldsArray.map((item, index) =>{
             debugger;
            return <ExcelColumn key={index} label={item.name} value={item.field}/>}
         )}
         </ExcelSheet>
-    </ExcelFile>
+    </ExcelFile>}
 
                     
                     <tr> {this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
@@ -71,4 +74,4 @@ export class Table extends Component {
     }
 }
 
-export default Table
+export default connect(mapStateToProps)(Table)
