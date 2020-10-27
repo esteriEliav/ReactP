@@ -18,16 +18,36 @@ import ReportForm from "./components/Individual/ReportForm";
 import Renter from './components/Individual/Renter';
 import NotFound from './components/General/NotFound';
 import Router from './components/Router';
-import {BrowserRouter, Switch, withRouter} from 'react-router-dom';
-
+import { Route, Switch, withRouter } from 'react-router-dom';
+import TasksPopUp from './components/Individual/TasksPopUp';
+import Search from './components/General/Search';
+import PopUpForProperties from './components/Individual/PopUpForProperties';
 
 function App() {
 
 
-  return(
+  return (
     <div className="App">
-<Router/>
 
+      <Home />
+      <Switch>
+        <Route path="/Home" component={Home}></Route>
+        <Route path="/Calendar" component={Calendar} />
+        <Route path='/EventDetails/:id' exact strict component={EventDetails} />
+        <Route path="/login" component={Login} />
+        <Route path='/Properties' component={Properties} />
+        <Route path='/PropertyOwner' component={PropertyOwner} />
+        <Route path='/Rentals' component={Rentals} />
+        <Route path='/Tasks' component={Tasks} />
+        <Route path='/SubProperties' component={SubProperties} />
+        <Route path='/Form' component={Form} />
+        <Route path='/Renter' component={Renter} />
+        <Route path='/Details' component={Details}></Route>
+        <Route path='/TasksPopUp' component={TasksPopUp}></Route>
+        <Route path='/Search' component={Search}></Route>
+        <Route path='/PopUpForProperties' component={PopUpForProperties}></Route>
+        <Route path="/PropertyForRenter" component={PropertyForRenter}></Route>
+      </Switch>
     </div>
 
   );

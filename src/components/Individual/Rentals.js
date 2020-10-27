@@ -25,41 +25,59 @@ EnteryDate datetime,--תאריך תחילת חוזה
 EndDate datetime,--תאריך סיום
 ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש חוזה
 */
+
+
 export class Rentals extends Component {
-    obj = []
-    componentDidMount = () => {
 
-        Axios.get('Rental/GetAllRentals').then(res => {
-            this.obj = res.data
-
-            console.log('res.data', res.data)
-        }, res => { console.log('res.data', res) })
-        console.log('obj', this.obj)
-    }
-
-    PaymentTypeOptions = GetFunction('Rental/GetAllPaymentTypes')
-    renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
-    cities = GetFunction('Property/GetAllCities')
-    propertiesOptions = propertiesList.map(item => { const street = postFunction('Property/GetStreetByID', item.CityID); return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + this.cities.find(city => city.CityID === item.CityID).cityName } })
     state = {
         name: 'השכרות',
-        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: this.propertiesOptions }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: this.renters },
-        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: this.PaymentTypeOptions, required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: [] }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: [] },
+        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: [], required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }, , { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
 
-        fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'UserID', name: 'שם שוכר ', type: 'text' }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
-        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }],
-
+        fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'Owner', name: 'שם משכיר', type: 'text' }, { field: 'User', name: 'שם שוכר ', type: 'text' },
+        { field: 'EnteryDate', name: 'מתאריך כניסה לדירה', type: 'date' },
+        { field: 'EndDate', name: 'עד תאריך סיום חוזה', type: 'date' }],
         /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
 
-        ObjectsArray: this.props.location.objects ? this.props.location.objects :rentalsList[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
-
-        { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
+        ObjectsArray:// this.props.location.objects ? this.props.location.objects :rentalsList
+            [{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-01-02', EndDate: '2019-12-02', ContactRenew: false },
+            { RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
         isAutho: true,//false
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
-        showSomthing: null
+        showSomthing: null,
 
+    }
+    componentDidMount = async () => {
+        const PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes')
+        const renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
+        const cities = await GetFunction('Property/GetAllCities')
+        const propertiesOptions = propertiesList.map(async item => {
+            const street = await postFunction('Property/GetStreetByID', item.CityID);
+            if (street !== null)
+                return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
+        })
+        let fieldsArray = [...this.state.fieldsArray];
+        fieldsArray[0].selectOptions = propertiesOptions;
+        fieldsArray[1].selectOptions = renters;
+        fieldsArray[3].radioOptions = PaymentTypeOptions;
+        this.setState({ fieldsArray })
+
+    }
+    // obj = []
+    // componentDidMount = () => {
+
+    //     Axios.get('Rental/GetAllRentals').then(res => {
+    //         this.obj = res.data
+
+    //         console.log('res.data', res.data)
+    //     }, res => { console.log('res.data', res) })
+    //     console.log('obj', this.obj)
+    // }
+
+
+    state = {
 
     }
     closeDetailsModal = () => {
@@ -103,7 +121,7 @@ export class Rentals extends Component {
             this.setState({ objectsArray: objects, name })
         }
     }
-    submit = (type, object) => {
+    submit = async (type, object) => {
         let path = 'Rental/' + type + 'Rental'
         if (type === 'Add' || type === 'Update') {
             let newObj = RentalObject()
@@ -111,16 +129,16 @@ export class Rentals extends Component {
                 newObj.RentalID = 1
             else
                 newObj.RentalID = object.RentalID
-            newObj.PropertyID = object.PropertyID
-            newObj.SubPropertyID = object.SubPropertyID
-            if (object.Phone !== '')
+            // newObj.PropertyID = object.PropertyID
+            //newObj.SubPropertyID = object.SubPropertyID
+            if (object.Phone && object.Phone !== '')
                 newObj.UserID = object.UserID
-            if (object.RentPayment !== '')
+            if (object.RentPayment && object.RentPayment !== '')
                 newObj.RentPayment = parseFloat(object.RentPayment)
             newObj.PaymentTypeID = object.PaymentTypeID
-            if (object.EnteryDate !== '')
+            if (object.EnteryDate && object.EnteryDate !== '')
                 newObj.EnteryDate = object.EnteryDate
-            if (object.EndDate !== '')
+            if (object.EndDate && object.EndDate !== '')
                 newObj.EndDate = object.EndDate
             newObj.ContactRenew = object.ContactRenew
             if (object.add) {
@@ -128,7 +146,7 @@ export class Rentals extends Component {
                 newObj.Dock = object.add
 
             }
-
+            ;
             object = newObj
 
         }
@@ -136,9 +154,15 @@ export class Rentals extends Component {
             let id = new Number(object.RentalID)
             object = id
         }
-        const bool = CommonFunctions(type, object, this.state.ObjectsArray, '/Rentals', path)
-        if (bool)
+        //return <CommonFunctions type={type} object={object} redirect='/Rentals' path={path} />
+        // const bool = CommonFunctions(type, object, this.state.ObjectsArray, , path)
+        // if (bool)
+        //     this.closeFormModal();
+        const res = await CommonFunctions(type, object, path)
+            ;
+        if (res && res !== null) {
             this.closeFormModal();
+        }
     }
 
     //אמורה להיות פונקציה שממפה עבור כל איידי את השם
@@ -183,19 +207,21 @@ export class Rentals extends Component {
         const LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
         return { fieldsToAdd, LinksPerObject }
     }
-    set = (object) => {
+    set = async (object) => {
         console.log(this.props.type)
         console.log('state', this.state)
         let LinksPerObject = []
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
 
-        const docks = postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 })
+        const docks = await postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-        const ownerobject =  postFunction('PropertyOwner/GetOwnerByID', object.OwerID) 
-        const propertyObject = postFunction('Property/GetPropertyByID', object.PropertyID)
-        const userObject = postFunction('Renter/GetRenterByID', object.PropertyID)
+        const owner = await postFunction('PropertyOwner/GetOwnerByID', { id: object.OwerID })
+        const ownerobject = owner();
+        const property = await postFunction('Property/GetPropertyByID', { id: object.PropertyID })
+        const propertyObject = property()
+        const userObject = await postFunction('Renter/GetRenterByID', { id: object.PropertyID })
         object.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -214,17 +240,18 @@ export class Rentals extends Component {
         }}>
             ערוך נכס</button>)
 
-        if (object.SubPropertyID !== null)
+        if (object.SubPropertyID !== null) {
+            const spobject = await postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID })
             LinksPerObject.push(<button index='end' onClick={() => {
                 this.setState({
                     showDetails: true, showSomthing:
                         <SubProperties isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
-                            object={postFunction('SubProperty/GetSubPropertyByID', object.SubPropertyID)}
+                            object={spobject}
                             type='details' />
                 })
             }} >פרטי נכס מחולק </button>)
 
-
+        }
         object.UserID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -233,6 +260,8 @@ export class Rentals extends Component {
         }}>
             {userObject.FirstName + ' ' + userObject.LastName}</Link>
 
+        object.EnteryDate = new Date(object.EnteryDate).toLocaleDateString();
+        object.EndDate = new Date(object.EndDate).toLocaleDateString();
         LinksPerObject.push(<button index='end' onClick={() => {
             this.setState({
                 showDetails: true, showSomthing: <PropertyOwner Object={ownerobject}
@@ -249,6 +278,7 @@ export class Rentals extends Component {
                 })
             }}>
                 ערוך משכיר </button>)
+
         return {
             fieldsToAdd: [], LinksForEveryRow,
             ButtonsForEveryRow, object, enable: true,
@@ -294,7 +324,7 @@ export class Rentals extends Component {
     render() {
         return (
             <div>
-                {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
+                {this.props.user && (this.props.user.RoleID === 1 || this.props.user.RoleID === 2) ?
 
                     this.rend() : <Redirect to='/a' />}
 
@@ -308,4 +338,9 @@ export class Rentals extends Component {
 }
 
 export default connect(mapStateToProps)(Rentals)
-export const rentalsList =[]// GetFunction('Rental/GetAllRentals');
+
+
+
+export const rentalsList = [{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+{ RentalID: 3, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }];
+//res = await GetFunction('Rental/GetAllRentals') ;

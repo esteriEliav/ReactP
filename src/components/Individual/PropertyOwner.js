@@ -7,7 +7,7 @@ import MPropertyForRenterain1 from './PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
+import { CommonFunction, CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
@@ -32,7 +32,7 @@ export class PropertyOwner extends Component {
         showForm: false,
         showDetails: false,
         showSomthing: null,
-
+        aaa: null,
         isRedirct: false//false
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
@@ -59,7 +59,7 @@ export class PropertyOwner extends Component {
             this.setState({ objectsArray: objects, name })
         }
     }
-    submit = (type, object) => {
+    submit = async (type, object) => {
 
         let path = 'PropertyOwner/' + type + 'PropertyOwner';
 
@@ -92,10 +92,24 @@ export class PropertyOwner extends Component {
             let id = new Number(object.OwnerID)
             object = id
         }
-        const bool = CommonFunctions(type, object, this.state.ObjectsArray, '/PropertyOwner', path)
-        if (bool)
+        // ;
+        // const a = <CommonFunctions type={type} object={object} redirect='/PropertyOwner' path={path} />
+        // ;
+        // if (a.props != null) {
+        //     this.closeFormModal();
 
+
+        //return <CommonFunctions type={type} object={object} redirect='/PropertyOwner' path={path} />
+        // const bool = CommonFunctions(type, object, this.state.ObjectsArray, , path)
+        // if (bool)
+
+        //     this.closeFormModal();
+        const res = await CommonFunctions(type, object, path)
+            ;
+        if (res && res !== null) {
             this.closeFormModal();
+        }
+        //return false;
     }
 
 
@@ -139,20 +153,30 @@ export class PropertyOwner extends Component {
     }
     set = (object) => {
 
+        let properties = null
+
         let ButtonsForEveryRow = []
         let LinksPerObject = []
-        let LinksForEveryRow = [<Link to={{
-            pathname: '/Properties', objects: postFunction('PropertyOwner/GetPropertiesbyOwnerID', Number(object.OwnerID))
-        }} >דירות</Link>]
+        let LinksForEveryRow = [<Link onClick={async () => {
+            const res = await postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: this.props.user.UserID })
+                ;
+            properties = res !== null ? res : [];
+            ;
+        }}
+            to={{
+                pathname: '/Properties', objects: properties
+            }} >דירות</Link>]
 
         //LinksPerObject.push(<input type="file" name="file" onChange={onChangeHandler} />
-
-        const docks = postFunction('User/GetUserDocuments', { id: object.PropertyOwnerID, type: 2 })
+        const dock = async () => await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })
+        let docks = null;
+        dock().then(res => { docks = res });
+        console.log(docks)
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object: object, enable: true,
-            ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
+            fieldsToAdd: [], LinksForEveryRow, object, enable: true,
+            ButtonsForEveryRow, LinksPerObject
         }
     }
     rend = () => {
@@ -206,7 +230,7 @@ export class PropertyOwner extends Component {
 
 export default connect(mapStateToProps)(PropertyOwner);
 export const ownersList =
-//GetFunction('PropertyOwner/getAllOwners')
-[{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
-{ OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
-{ OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];
+    //GetFunction('PropertyOwner/getAllOwners')
+    [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+    { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
+    { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];

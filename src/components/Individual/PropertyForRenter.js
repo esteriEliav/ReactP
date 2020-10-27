@@ -13,16 +13,17 @@ export class PropertiesForRenter extends Component {
         name: 'הדירות שלך',
         fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
-        PropertiesArray:this.props.location.objects[{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 }],
+        PropertiesArray://this.props.location.objects,
+            [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 }],
         show: false,
         showSomthing: null
     }
     componentDidMount = () => {
         console.log(this.state)
     }
-     closeFormModal = () => {
+    closeFormModal = () => {
 
-         this.setState({ showForm: false ,show:null})
+        this.setState({ showForm: false, show: null })
     }
     authorization = () => {
         if (this.props.user.RoleID === 3) {
@@ -30,7 +31,7 @@ export class PropertiesForRenter extends Component {
         }
         return <Redirect to='/a' />
     }
-    submit = (type, object) => {
+    submit = async (type, object) => {
         let path = 'Task/AddTask'
         let newObj = TaskObject()
         newObj.TaskID = 1
@@ -44,8 +45,13 @@ export class PropertiesForRenter extends Component {
 
         object = newObj
 
+        // return <CommonFunctions type='Add' object={object} redirect='/PropertiesForRenter' path={path} />
+        const res = await CommonFunctions(type, object, path);
+        ;
+        if (res && res !== null) {
+            this.closeFormModal();
+        }
 
-        return CommonFunctions(type, object, this.state.ObjectsArray, '/PropertiesForRenter', path)
     }
     validate = object => {
         let isErr = false
@@ -78,7 +84,7 @@ export class PropertiesForRenter extends Component {
             show: true, showSomthing:
                 <Tasks type='report'
                     object={object}
-                    validate={this.validate} />
+                    validate={this.validate} submit={this.submit} />
         }, console.log('this.state.showwww', this.state.show))}>דווח על תקלה</button>]
 
 
@@ -92,11 +98,12 @@ export class PropertiesForRenter extends Component {
     render() {
         return (
             <div>
-                {this.authorization()}
-                <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                    setForTable={this.setForTable} setForForm={this.setForForm}
-                    set={this.set} />
-                {this.state.showSomthing}
+                {this.props.user.RoleID === 3 &&
+                    (<Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
+                        setForTable={this.setForTable} setForForm={this.setForForm}
+                        set={this.set} /> ||
+                        this.state.showSomthing)
+                }
             </div>
         )
     }

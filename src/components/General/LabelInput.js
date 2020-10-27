@@ -8,6 +8,12 @@ export class LabelInput extends Component {
     render() {
         const type = this.props.field.type
         let content = this.props.content
+        if (type === 'date') {
+            content = new Date(content).toLocaleDateString()
+                .split('.').reverse()
+                .map(i => i > 9 ? i : '0' + i)
+                .join('-');
+        }
         return (
             <span>
 

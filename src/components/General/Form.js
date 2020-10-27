@@ -20,7 +20,7 @@ export class Form extends Component {
         fieldsToAdd: this.setForForm.fieldsToAdd,
         fieldsArray: this.props.fieldsArray,
         LinksPerObject: this.setForForm.LinksPerObject,
-        isRedirect: false,
+        Redirect: null,
         generalEror: '',
         erors: {},
 
@@ -73,6 +73,11 @@ export class Form extends Component {
 
 
     render() {
+
+        if (this.state.Redirect !== null) {
+            //this.setState({ Redirect: null })
+            this.props.closeModal();
+        }
         let j = 0, i = 0;
         const func = (index) => {//פונקציה המרנדרת את השדות הנוספים
             let items = []
@@ -101,9 +106,10 @@ export class Form extends Component {
             const val = this.props.validate(this.state.Object)
             if (val.isErr)
                 this.setState({ generalEror: val.generalEror, erors: val.erors })
-            else
-                this.setState({ isRedirect: this.props.submit(this.props.type, this.state.Object) })
-
+            else {
+                //this.setState({ Redirect: this.props.submit(this.props.type, this.state.Object) })
+                this.props.submit(this.props.type, this.state.Object)
+            }
         }
 
         const focusHandler = (e) => {//כשמתמקדים על שדה אם אינו ניתן לעריכה, תוצג הודעה
@@ -118,7 +124,7 @@ export class Form extends Component {
         return (
             <div>
                 <Popup open={this.props.isOpen} closeOnDocumentClick={false}
-                    contentStyle={{ backgroundColor: "gray" }} nested modal>
+                    contentStyle={{ backgroundColor: "gray", height: '80%', width: '50%' }} nested modal>
 
                     <a className="close" onClick={this.props.closeModal}>
                         &times;
@@ -139,7 +145,7 @@ export class Form extends Component {
                         {/* באטן של סבמיט */}
                         <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
                     </form>
-                    {/* {this.state.isRedirect} */}
+                    {this.state.Redirect}
                 </Popup>
             </div>
         )

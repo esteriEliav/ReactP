@@ -33,7 +33,8 @@ export class SubProperties extends Component {
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text', readonly: true },
         { field: 'num', name: 'מספר', type: 'text', required: true }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'מושכר?', type: 'checkbox' }],
-        ObjectsArray:this.props.location.objects[{ SubPropertyID: 1, PropertyID: 3, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+        ObjectsArray: //this.props.location.objects
+            [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
@@ -80,7 +81,7 @@ export class SubProperties extends Component {
             this.setState({ objectsArray: objects, name })
         }
     }
-    submit = (type, object) => {
+    submit = async (type, object) => {
         let path = 'SubProperty/' + type + 'SubProperty'
         if (type === 'Add' || type === 'Update') {
             let newObj = SubPropertyObject()
@@ -107,10 +108,16 @@ export class SubProperties extends Component {
             let id = new Number(object.SubPropertyID)
             object = id
         }
-        const bool = (type, object, this.state.ObjectsArray, '/SubProperties', path)
-        if (bool)
+        //return <CommonFunctions type={type} object={object} redirect='/SubProperties' path={path} />
+        // const bool = (type, object, this.state.ObjectsArray, , path)
+        // if (bool)
 
+        //     this.closeFormModal();
+        const res = await CommonFunctions(type, object, path)
+            ;
+        if (res && res !== null) {
             this.closeFormModal();
+        }
     }
 
 
@@ -129,16 +136,16 @@ export class SubProperties extends Component {
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
-    set = (object) => {
+    set = async (object) => {
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
-        const docks = postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 })
+        const docks = await postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let tempobject = object;
-        const propertyObject = postFunction('Propety/GetPropertyByID', object.PropertyID)
+        const propertyObject = await postFunction('Propety/GetPropertyByID', { id: object.PropertyID })
         object.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -157,7 +164,7 @@ export class SubProperties extends Component {
 
 
         if (object.IsRented) {
-            const rental = postFunction('Property/GetRentalBySubPropertyID', object.SubPropertyID)
+            const rental = await postFunction('Property/GetRentalBySubPropertyID', { id: object.SubPropertyID })
             tempobject.IsRented = <Link onClick={() => {
                 this.setState({
                     showDetails: true, showSomthing:
@@ -231,4 +238,5 @@ export class SubProperties extends Component {
 }
 
 export default connect(mapStateToProps)(SubProperties);
-export const SubPropertiesList =[]//GetFunction('SubProperty/GetAllSubProperties');
+export const SubPropertiesList = [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }]
+//GetFunction('SubProperty/GetAllSubProperties');
