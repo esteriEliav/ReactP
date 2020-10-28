@@ -174,8 +174,9 @@ export class SubProperties extends Component {
 
 
             LinksPerObject.push(<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing:
+                    showSomthing:
                         <Rentals type='form'
                             object={rental !== null ? rental : { PropertyID: object.PropertyID, SubPropertyID: object.SubPropertyID }}
                             formName={rental !== null ? 'הוסף' : 'עדכן'}

@@ -134,8 +134,9 @@ export class PropertyOwner extends Component {
             LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
         else
             LinksForTable = [<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                    showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
                         fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
                         setForForm={this.setForForm}
                         validate={this.validate} />
@@ -214,6 +215,7 @@ export class PropertyOwner extends Component {
         }
     }
     render() {
+        debugger;
         console.log('isred', this.state.isRedirct)
         return (
 

@@ -29,7 +29,6 @@ HandlingDate datetime,--תאריך טיפול
 HandlingWay nvarchar(max),--אופן טיפול
  */
 export class Tasks extends Component {
-
     state = {
 
         name: 'משימות',
@@ -179,8 +178,9 @@ export class Tasks extends Component {
         }
         else
             LinksForTable = [<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing:
+                    showSomthing:
                         <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
                             fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוסף'
                             setForForm={this.setForForm}
@@ -243,8 +243,9 @@ export class Tasks extends Component {
             if (object.TaskTypeId === 1)
                 object.ReportDate = new Date(object.ReportDate).toLocaleDateString();
             object.PropertyID = <Link onClick={() => {
+                this.setState({ showDetails: true })
                 this.setState({
-                    showDetails: true, showSomthing: <Properties object={propertyObject} type='details'
+                    showSomthing: <Properties object={propertyObject} type='details'
                         isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
                 })
             }}>{object.PropertyID}</Link>
@@ -273,7 +274,7 @@ export class Tasks extends Component {
         if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2 && this.props.user.RoleID !== 3) {
             return <Redirect to='/a' />
         }
-
+        debugger;
         if (this.props.type === 'report') {
 
             return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
@@ -281,7 +282,7 @@ export class Tasks extends Component {
                 name='שלח'
                 type='Report'
                 fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
-                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.this.state.ClassificationOptions }
+                { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.state.ClassificationOptions }
                 ]}
                 submit={this.submit} setForForm={this.setForForm}
                 validate={this.props.validate}
@@ -305,10 +306,11 @@ export class Tasks extends Component {
         }
 
         else if (this.props.type === 'form') {
-
-            return <div><Form closeModal={this.props.closeFormModal} isOpen={this.props.showForm}
+            debugger;
+            //{this.props.formName}
+            return <div><Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
-                name={this.props.formName}
+                name='הוסף'
                 type={this.props.formType}
                 fieldsArray={this.state.fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}

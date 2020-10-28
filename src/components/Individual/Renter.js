@@ -139,8 +139,9 @@ export class Renter extends Component {
             LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: rentersList, name: 'שוכרים' }) }}>חזרה לשוכרים</button>]
         else
             LinksForTable = [<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing:
+                    showSomthing:
                         <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
                             fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
                             setForForm={this.setForForm}
@@ -169,8 +170,9 @@ export class Renter extends Component {
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let LinksForEveryRow = [<Link onClick={() => {
+            this.setState({ showForm: true })
             this.setState({
-                showForm: true, showDetails:
+                showDetails:
                     <Properties type='table' objects={objects} />
             })
         }}>

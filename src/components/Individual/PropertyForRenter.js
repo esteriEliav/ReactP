@@ -15,15 +15,15 @@ export class PropertiesForRenter extends Component {
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
         PropertiesArray://this.props.location.objects,
             [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 }],
-        show: false,
-        showSomthing: null
+        showSomthing: null,
+        showForm: false
     }
     componentDidMount = () => {
         console.log(this.state)
     }
     closeFormModal = () => {
 
-        this.setState({ showForm: false, show: null })
+        this.setState({ showForm: false, showSomthing: null })
     }
     authorization = () => {
         if (this.props.user.RoleID === 3) {
@@ -80,12 +80,17 @@ export class PropertiesForRenter extends Component {
     }
     set = object => {
 
-        let ButtonsForEveryRow = [<button onClick={this.setState({
-            show: true, showSomthing:
-                <Tasks type='report'
-                    object={object}
-                    validate={this.validate} submit={this.submit} />
-        }, console.log('this.state.showwww', this.state.show))}>דווח על תקלה</button>]
+        let ButtonsForEveryRow = [<button onClick={() => {
+            this.setState({ showForm: true })
+            console.log('showForm', this.state.showForm)
+            alert('aaa')
+            this.setState({
+                showSomthing:
+                    <Tasks type='report' isOpen={this.state.showForm} closeModal={this.closeFormModal}
+                        object={object}
+                        validate={this.validate} submit={this.submit} />
+            })
+        }}>דווח על תקלה</button>]
 
 
 
@@ -98,12 +103,12 @@ export class PropertiesForRenter extends Component {
     render() {
         return (
             <div>
-                {this.props.user.RoleID === 3 &&
-                    (<Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
-                        setForTable={this.setForTable} setForForm={this.setForForm}
-                        set={this.set} /> ||
-                        this.state.showSomthing)
-                }
+                {this.props.user.RoleID !== 3 && <Redirect to='/Home' />}
+                <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
+                    setForTable={this.setForTable} setForForm={this.setForForm}
+                    set={this.set} />
+                {this.state.showSomthing}
+
             </div>
         )
     }

@@ -173,8 +173,9 @@ export class Rentals extends Component {
             LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: rentalsList, name: 'השכרות' }) }}>חזרה להשכרות</button>]
         else
             LinksForTable = [<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                    showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
                         fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
                         setForForm={this.setForForm}
                         validate={this.validate} />
@@ -185,16 +186,18 @@ export class Rentals extends Component {
         }
     }
     linkToAddRenter = <button index={0} onClick={() => {
+        this.setState({ showForm: true })
         this.setState({
-            showForm: true, showSomthing: <Properties type='form'
+            showSomthing: <Properties type='form'
                 formType='Add'
                 formName='הוסף'
                 object={{}} />
         })
     }}  >הוסף נכס</button>
     linkToAddProperty = <button index={1} onClick={() => {
+        this.setState({ showForm: true })
         this.setState({
-            showForm: true, showSomthing:
+            showSomthing:
                 <Renter type='form'
                     formType='Add'
                     formName='הוסף'
@@ -243,8 +246,9 @@ export class Rentals extends Component {
         if (object.SubPropertyID !== null) {
             const spobject = await postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID })
             LinksPerObject.push(<button index='end' onClick={() => {
+                this.setState({ showDetails: true })
                 this.setState({
-                    showDetails: true, showSomthing:
+                    showSomthing:
                         <SubProperties isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
                             object={spobject}
                             type='details' />
@@ -271,8 +275,9 @@ export class Rentals extends Component {
         >{ownerobject.OwnerFirstName + ' ' + ownerobject.OwnerLastName}:משכיר</button>,
 
             <button index='end' onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing:
+                    showSomthing:
                         <PropertyOwner type='form' formType='Update' formName='עריכה'
                             object={ownerobject} isOpen={this.state.showForm} closeModal={this.closeFormModal} />
                 })
