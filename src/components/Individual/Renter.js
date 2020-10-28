@@ -9,7 +9,7 @@ import MPropertyForRenterain1 from './PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
+import { CommonFunctions, CommonFunction, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import RenterObject from '../../Models-Object/UserObject'
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
@@ -32,10 +32,10 @@ export class Renter extends Component {
         { field: 'LastName', name: 'שם משפחה', type: 'text' }, { field: 'SMS', name: 'SMS', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, , { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g }
             , { field: 'UserName', name: 'שם משתמש', type: 'text' }, { field: 'Password', name: 'סיסמא', type: 'text' }, , { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
-        ObjectsArray:// this.props.location.objects ? this.props.location.objects : rentersList
-        [{ OwnerID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
-        { OwnerID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
-        { OwnerID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
+        ObjectsArray: //this.props.location.objects ? this.props.location.objects : rentersList
+            [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
+            { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
+            { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
 
         fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
         { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'Phone', name: 'טלפון', type: 'tel' }],
@@ -82,8 +82,9 @@ export class Renter extends Component {
             this.setState({ objectsArray: objects, name })
         }
     }
-    submit = (type, object) => {
-        let path = 'Renter/' + type + 'Renter';
+    submit = async (type, object) => {
+        ;
+        let path = 'User/' + type + 'User';
         if (type === 'Add' || type === 'Update') {
 
             let UserID = null, FirstName = null, LastName = null, SMS = null, Email = null, Phone = null, UserName = null, Password = null, Dock = null, docName = null
@@ -117,10 +118,19 @@ export class Renter extends Component {
             let id = new Number(object.UserID)
             object = id
         }
-        const bool = (type, object, this.state.ObjectsArray, '/Renter', path)
-        if (bool)
-
+        // ;
+        // const a = <CommonFunctions type={type} object={object} redirect='/Renter' path={path} />
+        // 
+        // if (a.props != null) {
+        //     this.closeFormModal();
+        // }
+        // const bool = ()
+        // if (bool)
+        const res = await CommonFunctions(type, object, path)
+            ;
+        if (res && res !== null) {
             this.closeFormModal();
+        }
     }
 
     setForTable = () => {
@@ -129,8 +139,9 @@ export class Renter extends Component {
             LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: rentersList, name: 'שוכרים' }) }}>חזרה לשוכרים</button>]
         else
             LinksForTable = [<button onClick={() => {
+                this.setState({ showForm: true })
                 this.setState({
-                    showForm: true, showSomthing:
+                    showSomthing:
                         <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
                             fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
                             setForForm={this.setForForm}
@@ -149,19 +160,20 @@ export class Renter extends Component {
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
-    set = object => {
+    set = async (object) => {
         console.log('renter-showdetails', this.state.showDetails)
-        const docks = postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 })
+        const docks = await postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 })
         if (docks && docks[0])
             object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
-
+        const objects = await postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID })
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let LinksForEveryRow = [<Link onClick={() => {
+            this.setState({ showForm: true })
             this.setState({
-                showForm: true, showDetails:
-                    <Properties type='table' objects={postFunction('Renter/getPropertiesbyRenterID', object.OwnerID)} />
+                showDetails:
+                    <Properties type='table' objects={objects} />
             })
         }}>
             דירות ששוכר</Link>]
@@ -219,4 +231,7 @@ export class Renter extends Component {
 }
 
 export default connect(mapStateToProps)(Renter);
-export const rentersList =[]// GetFunction('Renter/GetAllRenters');
+export const rentersList = [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
+{ UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
+{ UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }]
+// GetFunction('Renter/GetAllRenters');

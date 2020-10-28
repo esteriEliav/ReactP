@@ -5,7 +5,7 @@ import Details from "./Details";
 
 //קומפוננטה להצגת שורה בטבלה
 export class Item extends Component {
-    gen = this.props.set(this.props.Object)
+    gen = this.props.set(this.props.Object);
     state = {
         LinksForEveryRow: this.gen.LinksForEveryRow,
         ButtonsForEveryRow: this.gen.ButtonsForEveryRow,
@@ -17,6 +17,7 @@ export class Item extends Component {
         form: false
 
     }
+
     closeDetailsModal = () => {
 
         this.setState({ details: false })

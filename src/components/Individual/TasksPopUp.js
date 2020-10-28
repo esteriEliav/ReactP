@@ -26,7 +26,7 @@ export class TasksPopUp extends Component {
     }
     render() {
         return (
-            (this.state.timepassed.length > 5 || this.state.urgent.length > 5)
+            (this.state.timepassed.length > 0 || this.state.urgent.length > 0)
             && <Popup open={this.props.isOpen} closeOnDocumentClick={true}
                 className="modal" contentStyle={{ backgroundColor: "greenyellow" }}>
 
@@ -34,8 +34,8 @@ export class TasksPopUp extends Component {
                     &times;
               </a>
 
-                {this.state.timepassed.length > 5 && <h3 dir='rtl'> {this.state.timepassed.length} משימות שעבר זמנם <Link to={{ pathname: '/Tasks', objectArray: this.state.timepassed, type: 'table' }}>לפרטים</Link>  </h3>}
-                {this.state.urgent.length > 5 && <h3 dir='rtl'>{this.state.urgent.length}  משימות דחופות <Link to={{ pathname: '/Tasks', objectArray: this.state.urgent, type: 'table' }}>לפרטים</Link></h3>}
+                {this.state.timepassed.length > 0 && <h3 dir='rtl'> {this.state.timepassed.length} משימות שעבר זמנם <Link to={{ pathname: '/Tasks', objectArray: this.state.timepassed, type: 'table' }}>לפרטים</Link>  </h3>}
+                {this.state.urgent.length > 0 && <h3 dir='rtl'>{this.state.urgent.length}  משימות דחופות <Link to={{ pathname: '/Tasks', objectArray: this.state.urgent, type: 'table' }}>לפרטים</Link></h3>}
                 <button onClick={this.props.closeModal}>לא עכשיו</button>
             </Popup>
 
