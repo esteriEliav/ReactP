@@ -22,9 +22,9 @@ import subProperty from '../../Models-Object/SubPropertyObject';
 /*PropertyID int  not null identity,
 OwnerID int not null,
 CityID int not null,
-CityName nvarchar(max) not null,
-StreetID int not null,
-StreetName nvarchar(max) not null,
+CityID nvarchar(max) not null,
+CityID int not null,
+StreetID nvarchar(max) not null,
 Number nvarchar(5) not null,
 
 "Floor" int,
@@ -44,7 +44,7 @@ export class Properties extends Component {
         const owners = ownersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
         const res = await GetFunction('Property/GetAllCities');
         const cities = res !== null ?
-            res.map(item => { return { id: item.CityID, name: item.CityName } }) : [];
+            res.map(item => { return { id: item.CityID, name: item.CityID } }) : [];
         let fieldsArray = [...this.state.fieldsArray];
         fieldsArray[0].selectOptions = owners;
         fieldsArray[1].selectOptions = cities;
@@ -63,12 +63,12 @@ export class Properties extends Component {
         { field: 'IsRented', name: 'מושכר', type: 'checkbox' }, { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' },
         { field: 'document', name: 'מסמך', type: 'file', index: 'end' }],
 
-        fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
+        fieldsToSearch: [{ field: 'CityID', name: 'עיר', type: 'text' }, { field: 'StreetID', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
 
         ObjectsArray:// this.props.location.objects ? this.props.location.objects :propertiesList
-            [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-            { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }],//
+            [{ PropertyID: 1, CityID: 300, StreetID: 50, Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+            { PropertyID: 2, CityID: 300, StreetID: 50, Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }],//
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
         showsomthing: null,
@@ -136,7 +136,7 @@ export class Properties extends Component {
             else
                 newObj.PropertyID = object.PropertyID;
             newObj.CityID = object.CityID
-            newObj.StreetID = object.StreetID
+            newObj.CityID = object.CityID
             newObj.Number = object.Number
             if (object.Floor !== '')
                 newObj.ApartmentNum = object.Floor
@@ -297,8 +297,8 @@ export class Properties extends Component {
     setForForm = async (object) => {
         const res = await postFunction('Property/GetStreetsByCityID', { id: object.CityID })
         const selectOptions = res !== null ?
-            res.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []
-        let fieldsToAdd = [{ field: 'StreetID', name: 'רחוב', type: 'select', selectOptions, required: true, index: 1 }]
+            res.map(item => { return { id: item.CityID, name: item.StreetID } }) : []
+        let fieldsToAdd = [{ field: 'CityID', name: 'רחוב', type: 'select', selectOptions, required: true, index: 1 }]
         const linkToAddCity = <button index={1} onClick={() => {
             this.setState({ showForm: true })
             this.setState({
@@ -370,7 +370,7 @@ export class Properties extends Component {
         else {
 
             let fieldsArray = [...this.state.fieldsArray]
-            fieldsArray.splice(3, 0, { field: 'StreetID', name: 'רחוב', type: 'select', selectOptions: [], required: true })
+            fieldsArray.splice(3, 0, { field: 'CityID', name: 'רחוב', type: 'select', selectOptions: [], required: true })
             return <div><Table name={this.state.name} fieldsArray={fieldsArray}
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
@@ -396,7 +396,7 @@ export class Properties extends Component {
 export default connect(mapStateToProps)(Properties)
 
 
-export const propertiesList = [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-{ PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }]
+export const propertiesList = [{ PropertyID: 1, CityID: 300, StreetID: 50, Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+{ PropertyID: 2, CityID: 300, StreetID: 50, Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }]
 //GetFunction('Property/GetAllProperties');
 
