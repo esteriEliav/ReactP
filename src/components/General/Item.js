@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import Form from './Form';
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 import Details from "./Details";
 
 //קומפוננטה להצגת שורה בטבלה
@@ -49,14 +51,17 @@ export class Item extends Component {
 
     }
     render() {
-        { console.log('itemmm-details', this.state.details) }
         return (
             <React.Fragment>
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.props.Object[item.field]}</td> })}
-                    {this.gen.enable && <div><td><button onClick={() => { this.setState({ details: true }) }} >
-                        לפרטים נוספים</button>{this.showdet()}</td><td><button onClick={() => { this.setState({ form: true }) }} >
-                            עריכה</button>{this.showForm("Update", 'ערוך')} </td>
-                        <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>מחיקה</button></td></div>
+                    {(this.props.user.RoleID == 1 || this.props.user.RoleID == 2) &&
+                        <div>
+                            <td><button onClick={() => { this.setState({ details: true }) }} > לפרטים נוספים</button>{this.showdet()}</td>
+
+                            <td><button onClick={() => { this.setState({ form: true }) }} > עריכה</button>{this.showForm("Update", 'ערוך')} </td>
+
+                            <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>מחיקה</button></td>
+                        </div>
                     }
                     {this.state.ButtonsForEveryRow.map((but, index) => <td index={index}> {but}</td>)}
                 </tr>
@@ -67,4 +72,4 @@ export class Item extends Component {
         )
     }
 }
-export default Item
+export default connect(mapStateToProps)(Item)

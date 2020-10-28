@@ -48,16 +48,17 @@ export class Table extends Component {
                 </div>
                 )}
                 <table>
-               {(this.props.user.RoleID===1 ||this.props.user.RoleID===2) && <ExcelFile filename={this.props.name} element= {<button> יצוא לאקסל </button>}>
-        <ExcelSheet data={this.props.objectsArray} name={this.props.name}>
-        {this.props.fieldsArray.map((item, index) =>{
-            debugger;
-           return <ExcelColumn key={index} label={item.name} value={item.field}/>}
-        )}
-        </ExcelSheet>
-    </ExcelFile>}
+                    {(this.props.user.RoleID === 1 || this.props.user.RoleID === 2) && <ExcelFile filename={this.props.name} element={<button> יצוא לאקסל </button>}>
+                        <ExcelSheet data={this.props.objectsArray} name={this.props.name}>
+                            {this.props.fieldsArray.map((item, index) => {
 
-                    
+                                return <ExcelColumn key={index} label={item.name} value={item.field} />
+                            }
+                            )}
+                        </ExcelSheet>
+                    </ExcelFile>}
+
+
                     <tr> {this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
                     {this.props.objectsArray.map(object =>
 

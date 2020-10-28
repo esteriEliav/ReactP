@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import Popup from 'reactjs-popup';
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 
 export class Search extends Component {
 
@@ -48,4 +50,4 @@ export class Search extends Component {
     }
 
 }
-export default Search;
+export default connect(mapStateToProps)(Search);

@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import Select from "react-dropdown-select";
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 //field,content,change
 
 //קומפוננטה להצגת תווית ואינפוט מתאים
@@ -36,4 +38,4 @@ export class LabelInput extends Component {
     }
 }
 
-export default LabelInput
+export default connect(mapStateToProps)(LabelInput)

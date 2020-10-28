@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 import Popup from 'reactjs-popup';
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 import Form from './Form';
 
 /*
@@ -24,7 +26,7 @@ export class Details extends Component {
             let items = [];
             console.log('object-det', this.state.object)
             while (i < this.props.LinksPerObject.length && this.props.LinksPerObject[i].props.index === index) {
-                items.push(this.props.LinksPerObject[i], this.props.LinksPerObject[i].props.showForm)
+                items.push(this.props.LinksPerObject[i])
                 i += 1
             }
 
@@ -52,7 +54,7 @@ export class Details extends Component {
                             <span>
                                 {func(index).map(item => <div>{item}</div>)}
                             </span>
-                            <p /><p />
+
                         </div>
 
                     )}
@@ -66,4 +68,4 @@ export class Details extends Component {
     }
 }
 
-export default Details
+export default connect(mapStateToProps)(Details)

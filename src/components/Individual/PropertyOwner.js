@@ -28,12 +28,13 @@ export class PropertyOwner extends Component {
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: ' מסמך', type: 'file', index: 'end' }],
-        ObjectsArray: this.props.location.objects ? this.props.location.objects : ownersList,
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : ownersList,
         showForm: false,
         showDetails: false,
         showSomthing: null,
-        aaa: null,
-        isRedirct: false//false
+
+        docks: null,
+        properties: null
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
@@ -88,28 +89,14 @@ export class PropertyOwner extends Component {
 
         }
         else if (type === 'Delete') {
-            object.OwnerID = 1
-            let id = new Number(object.OwnerID)
-            object = id
+            object = { id: object.OwnerID }
         }
-        // ;
-        // const a = <CommonFunctions type={type} object={object} redirect='/PropertyOwner' path={path} />
-        // ;
-        // if (a.props != null) {
-        //     this.closeFormModal();
-
-
-        //return <CommonFunctions type={type} object={object} redirect='/PropertyOwner' path={path} />
-        // const bool = CommonFunctions(type, object, this.state.ObjectsArray, , path)
-        // if (bool)
-
-        //     this.closeFormModal();
         const res = await CommonFunctions(type, object, path)
             ;
         if (res && res !== null) {
             this.closeFormModal();
         }
-        //return false;
+
     }
 
 
@@ -131,9 +118,9 @@ export class PropertyOwner extends Component {
         let LinksForTable = []
 
         if (this.state.name !== 'משכירים')
-            LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
+            LinksForTable = [<button type='button' type='button' onClick={() => { this.setState({ ObjectsArray: ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
         else
-            LinksForTable = [<button onClick={() => {
+            LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
                 this.setState({
                     showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
@@ -158,23 +145,21 @@ export class PropertyOwner extends Component {
 
         let ButtonsForEveryRow = []
         let LinksPerObject = []
+        postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: this.props.user.UserID }).then(res => this.setState({ properties: res }))
+        let res = this.state.properties
+        res = res !== null ? res : [];
         let LinksForEveryRow = [<Link onClick={async () => {
-            const res = await postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: this.props.user.UserID })
-                ;
-            properties = res !== null ? res : [];
-            ;
         }}
             to={{
-                pathname: '/Properties', objects: properties
+                pathname: '/Properties', objects: res
             }} >דירות</Link>]
 
-        //LinksPerObject.push(<input type="file" name="file" onChange={onChangeHandler} />
-        const dock = async () => await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })
-        let docks = null;
-        dock().then(res => { docks = res });
-        console.log(docks)
-        if (docks && docks[0])
-            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+
+            ;
+        postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => this.setState({ dock: res }))
+        console.log('this.state.docks', this.state.docks)
+        if (this.state.docks && this.state.docks[0])
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         return {
             fieldsToAdd: [], LinksForEveryRow, object, enable: true,
             ButtonsForEveryRow, LinksPerObject
@@ -211,12 +196,11 @@ export class PropertyOwner extends Component {
                 set={this.set} delObject={this.submit}
                 validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
                 fieldsToSearch={this.state.fieldsArray.filter((i, ind) => ind != 4)} />
-                {this.state.showSomthing}{this.state.isRedirct}</div>
+                {this.state.showSomthing}</div>
         }
     }
     render() {
-        debugger;
-        console.log('isred', this.state.isRedirct)
+        ;
         return (
 
             <div>

@@ -80,10 +80,8 @@ export class PropertiesForRenter extends Component {
     }
     set = object => {
 
-        let ButtonsForEveryRow = [<button onClick={() => {
+        let ButtonsForEveryRow = [<button type='button' onClick={() => {
             this.setState({ showForm: true })
-            console.log('showForm', this.state.showForm)
-            alert('aaa')
             this.setState({
                 showSomthing:
                     <Tasks type='report' isOpen={this.state.showForm} closeModal={this.closeFormModal}
@@ -103,7 +101,7 @@ export class PropertiesForRenter extends Component {
     render() {
         return (
             <div>
-                {this.props.user.RoleID !== 3 && <Redirect to='/Home' />}
+                {this.props.user.RoleID !== 3 && <Redirect to='/a' />}
                 <Table name={this.state.name} fieldsArray={this.state.fieldsPropertyArray} objectsArray={this.state.PropertiesArray}
                     setForTable={this.setForTable} setForForm={this.setForForm}
                     set={this.set} />

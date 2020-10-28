@@ -55,7 +55,7 @@ export class Properties extends Component {
     }
     state = {
         name: 'נכסים',
-        fieldsArray: [{ field: 'OwnerID', name: 'בעלים', type: 'select', selectOptions: [], required: true },
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד דירה', type: 'text' }, { field: 'OwnerID', name: 'בעלים', type: 'select', selectOptions: [], required: true },
         { field: 'CityID', name: 'עיר', type: 'select', selectOptions: [], required: true },
         { field: 'Number', name: 'מספר', type: 'text', required: true, pattern: '[1-9][0-9]*[A-Ca-cא-ג]?' }, { field: 'Floor', name: 'קומה', type: 'number', required: true },
         { field: 'ApartmentNum', name: 'מספר דירה', type: 'number' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
@@ -72,7 +72,15 @@ export class Properties extends Component {
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
         showsomthing: null,
-        cities: []
+        isEx: false,
+        showExtention: null,
+        cities: [],
+        docks: [],
+        ownerobject: null,
+        spobjects: null,
+        rentalObject: null,
+        streets: [],
+        exclusivityPersons: null
     }
 
     closeDetailsModal = () => {
@@ -82,6 +90,10 @@ export class Properties extends Component {
     closeFormModal = () => {
 
         this.setState({ showForm: false, showsomthing: null })
+    }
+    closeExtentionModal = () => {
+
+        this.setState({ isEx: false, showExtention: null })
     }
     changeStreetOptions = () => {
 
@@ -163,7 +175,6 @@ export class Properties extends Component {
         }
 
         else if (type === 'Delete') {
-            // let id = new Number(object.propertyID)
             object = { id: object.propertyID }
         }
         //return <CommonFunctions type={type} object={object} redirect='/Properties' path={path} />
@@ -182,13 +193,15 @@ export class Properties extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'נכסים')
-            LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: propertiesList, name: 'נכסים' }) }}>חזרה לנכסים</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: propertiesList, name: 'נכסים' }) }}>חזרה לנכסים</button>]
         else
-            LinksForTable = [<button onClick={() => {
+            LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
+                let fieldsArray = [...this.state.fieldsArray]
+                fieldsArray.splice(0, 1)
                 this.setState({
                     showsomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
-                        fieldsArray={this.state.fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
+                        fieldsArray={fieldsArray} Object={{}} submit={this.submit} type='Add' name=' הוספת'
                         setForForm={this.setForForm}
                         validate={this.validate} />
                 })
@@ -198,11 +211,12 @@ export class Properties extends Component {
 
 
     }
-    linkToAddPropertyOwner = <button index={0} onClick={() => {
+    linkToAddPropertyOwner = <button type='button' index={0} onClick={() => {
         this.setState({ showForm: true })
         this.setState({
             showsomthing:
-                <PropertyOwner type='form' formType='Add' closeModal={this.closeFormModal} isOpen={this.state.showForm}
+                <PropertyOwner type='form' formType='Add'
+                    closeModal={this.closeFormModal} isOpen={this.state.showForm}
                     formName='הוסף'
                     object={{}} />
         })
@@ -210,82 +224,143 @@ export class Properties extends Component {
 
 
 
+    setForForm = (object) => {
 
-    set = async (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
+        postFunction('Property/GetStreetsByCityID', { id: object.CityID }).then(res => this.setState({ streets: res }))
+        const selectOptions = this.state.streets !== null ?
+            this.state.streets.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []
+        let fieldsToAdd = [{ field: 'StreetID', name: 'רחוב', type: 'select', selectOptions, required: true, index: 1 }]
+        const linkToAddCity = <button type='button' index={1} onClick={() => {
+            ;
+            this.setState({ isEx: true })
+            this.setState({
+                showExtention:
+                    <PopUpForProperties submit={this.submitForExtentions}
+                        fieldsArray={[{ field: 'name', name: 'שם עיר', type: 'text', required: true }]}
+                        type='AddCity' isOpen={this.state.isEx} closeModal={this.closeExtentionModal} />
+            })
+        }} >הוסף עיר</button>
+        const linkToAddStreet = <button type='button' index={1} onClick={() => {
+            this.setState({ isEx: true })
+            this.setState({
+                showExtention:
+                    <PopUpForProperties submit={this.submitForExtentions}
+                        fieldsArray={[{ field: 'CityID', name: 'עיר', type: 'select', selectOptions: this.state.cities, required: true }, { field: 'name', name: 'שם רחוב', type: 'text' }]}
+                        type='AddStreetByCityId' isOpen={this.state.isEx} closeModal={this.closeExtentionModal} />
+            })
+        }}
+        >הוסף רחוב</button>
+
+        let LinksPerObject = [this.linkToAddPropertyOwner, linkToAddCity, linkToAddStreet]
+        if (object.IsExclusivity) {
+            GetFunction('Property/GetAllexclusivityPersons').then(res => this.setState({ exclusivityPersons: res }))
+            const res = this.state.exclusivityPersons !== null ?
+                this.state.exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) :
+                [];
+            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: res, index: 12 })
+            LinksPerObject.push(
+                <button index={12} type='button' onClick={() => {
+                    this.setState({ isEx: true })
+                    this.setState({
+                        showExtention: <PopUpForProperties submit={this.submitForExtentions}
+                            fieldsArray={[{ field: 'name', name: 'שם', type: 'text', required: true }]}
+                            type='AddExclusivityPerson' isOpen={this.state.isEx} closeModal={this.closeExtentionModal} />
+                    })
+                }}
+                >הוסף אחראי בלעדיות</button>)
+        }
+        return { fieldsToAdd, LinksPerObject }
+
+    }
+    set = (object) => {    //פונקציה שממפה את כל הרשומות והופכת איידי לשם ואת המפתחות זרים לקישורים
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let tempobject = { ...object };
         let LinksForEveryRow = []
-        const fieldsToAdd = [{ field: 'PropertyID', name: 'קוד דירה', type: 'text', index: 0 },
-        ...((await (this.setForForm(object))).fieldsToAdd)]
+        const fieldsToAdd = [...(this.setForForm(object)).fieldsToAdd]
+
+
         //const docks=postFunction('')
-        const ownerobject = await postFunction('PropertyOwner/GetOwnerByID', { id: object.OwnerID })
-
-        if (object.IsDivided) {
-            tempobject.IsDivided = <Link onClick={this.setState({ showTable: true })}>
-                {<SubProperties
-                    objects={await postFunction('SubProperty/GetSubPropertiesOfParentProperty', { id: object.PropertyID })} type='table' />}
-
-            V</Link>//ששולח פרטי נכסי בן של הדירה
-            LinksPerObject.push(<button index={12} onClick={() => {
-                this.setState({ showForm: true })
-                this.setState({
-                    showsomthing: <SubProperties type='form'
-                        formType='Add'
-                        formName='הוסף נכס מחולק'
-                        object={{ propertyID: tempobject.propertyID }} />
-                })
-            }} >הוסף נכס מחולק</button>)
-
-
-
-        }
-
-        else
-            tempobject.IsDivided = 'X'
-
-        const rentalObject = await postFunction('Property/GetRentalByPropertyID', { id: object.propertyID })
+        postFunction('PropertyOwner/GetOwnerByID', { id: object.OwnerID }).then(res => this.setState({ ownerobject: res }))
         if (object.IsRented) {
+
             tempobject.IsRented = <Link onClick={() => {
+
                 this.setState({ showDetails: true })
                 this.setState({
                     showsomthing: <Rentals
-                        isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
-                        object={rentalObject}
+                        isOpen={this.state.showDetails}
+                        closeModal={this.closeDetailsModal}
+                        object={this.state.rentalObject}
                         type='details'
                     />
                 })
             }}>
                 V</Link>
+            LinksPerObject.push(<button index={7} onClick={() => {
+                this.setState({ showForm: true })
+                this.setState({
+                    showsomthing: <Rentals type='form'
+                        formType='Update'
+                        formName='שנה השכרה'
+                        isOpen={this.state.showForm}
+                        closeModal={this.closeFormModal}
+                        object={this.state.rentalObject} />
+                })
+            }}>שנה השכרה</button>)
         }
         else {
             tempobject.IsRented = 'X'//ושולח פרטי השכרה שמתקבלים מהפונקציה
             LinksPerObject.push(<button index={7} onClick={() => {
+                debugger;
                 this.setState({ showForm: true })
                 this.setState({
                     showsomthing: <Rentals type='form'
                         formType='Add'
                         formName='הוסף השכרה'
-                        object={{ propertyID: tempobject.propertyID }} />
+                        isOpen={this.state.showForm}
+                        closeModal={this.closeFormModal}
+                        object={{ propertyID: object.propertyID }} />
                 })
             }}>הוסף השכרה</button>)
         }
+        if (object.IsDivided) {
+            postFunction('SubProperty/GetSubPropertiesOfParentProperty', { id: object.PropertyID }).then(res => this.setState({ spobjects: res }))
+            tempobject.IsDivided = <Link
+                to={{ pathname: '/SubProperties', objects: this.state.spobjects }}>V</Link>
+            //ששולח פרטי נכסי בן של הדירה
+            LinksPerObject.push(<button type='button' index={12} onClick={() => {
+                this.setState({ showForm: true })
+                this.setState({
+                    showsomthing: <SubProperties type='form'
+                        isOpen={this.state.showForm}
+                        closeModal={this.closeFormModal}
+                        formType='Add'
+                        formName='הוסף נכס מחולק'
+                        object={{ propertyID: tempobject.propertyID }} />
+                })
+            }} >הוסף נכס מחולק</button>)
+        }
+
+        else
+            tempobject.IsDivided = 'X'
+        postFunction('Property/GetRentalByPropertyID', { id: object.propertyID }).then(res => this.setState({ rentalObject: res }))
 
 
 
-        const docks = await postFunction('User/GetUserDocuments', { id: object.PropertyID, type: 1 })
-        if (docks && docks[0])
-            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        postFunction('User/GetUserDocuments', { id: object.PropertyID, type: 1 }).then(res => this.setState({ docks: res }))
+        if (this.state.docks && this.state.docks[0])
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         tempobject.OwnerID = <Link onClick={() => {
             this.setState({
                 showDetails: true,
                 showsomthing: <Rentals
                     isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
-                    object={ownerobject}
+                    object={this.state.ownerobject}
                     type='details'
                 />
             })
-        }}>{ownerobject.firstName + ' ' + ownerobject.lastName} </Link>
+        }}>{this.state.ownerobject && this.state.ownerobject.firstName + ' ' + this.state.ownerobject.lastName} </Link>
 
         return {
             fieldsToAdd, LinksForEveryRow, enable: true,
@@ -294,51 +369,7 @@ export class Properties extends Component {
         };
 
     }
-    setForForm = async (object) => {
-        const res = await postFunction('Property/GetStreetsByCityID', { id: object.CityID })
-        const selectOptions = res !== null ?
-            res.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []
-        let fieldsToAdd = [{ field: 'StreetID', name: 'רחוב', type: 'select', selectOptions, required: true, index: 1 }]
-        const linkToAddCity = <button index={1} onClick={() => {
-            this.setState({ showForm: true })
-            this.setState({
-                showsomthing:
-                    <PopUpForProperties submit={this.submitForExtentions}
-                        fieldsArray={[{ field: 'name', name: 'שם עיר', type: 'text', required: true }]}
-                        type='AddCity' isOpen={this.state.open} closeModal={this.closeFormModal} />
-            })
-        }} >הוסף עיר</button>
-        const linkToAddStreet = <button index={1} onClick={() => {
-            this.setState({ showForm: true })
-            this.setState({
-                showsomthing:
-                    <PopUpForProperties submit={this.submitForExtentions}
-                        fieldsArray={[{ field: 'CityID', name: 'עיר', type: 'select', selectOptions: this.state.cities, required: true }, { field: 'name', name: 'שם רחוב', type: 'text' }]}
-                        type='AddStreetByCityId' isOpen={this.state.open} closeModal={this.closeFormModal} />
-            })
-        }}
-        >הוסף רחוב</button>
 
-        let LinksPerObject = [this.linkToAddPropertyOwner, linkToAddCity, linkToAddStreet]
-        if (object.IsExclusivity) {
-            const res = await GetFunction('Property/GetAllexclusivityPersons');
-            const exclusivityPersons = res !== null ?
-                res.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) : [];
-            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: exclusivityPersons, index: 12 })
-            LinksPerObject.push(
-                <button index={12} onClick={() => {
-                    this.setState({ showForm: true })
-                    this.setState({
-                        showsomthing: <PopUpForProperties submit={this.submitForExtentions}
-                            fieldsArray={[{ field: 'name', name: 'שם', type: 'text', required: true }]}
-                            type='AddExclusivityPerson' isOpen={this.state.open} closeModal={this.closeFormModal} />
-                    })
-                }}
-                >הוסף אחראי בלעדיות</button>)
-        }
-        return { fieldsToAdd, LinksPerObject }
-
-    }
 
     rend = () => {
         if (this.props.type === 'details') {
@@ -357,12 +388,13 @@ export class Properties extends Component {
         }
 
         else if (this.props.type === 'form') {
-
+            let fieldsArray = [...this.state.fieldsArray];
+            fieldsArray.splice(0, 1)
             return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
                 name={this.props.name}
                 type={this.props.type}
-                fieldsArray={this.state.fieldsArray}
+                fieldsArray={fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
                 validate={this.validate}
             />
@@ -370,16 +402,18 @@ export class Properties extends Component {
         else {
 
             let fieldsArray = [...this.state.fieldsArray]
-            fieldsArray.splice(3, 0, { field: 'StreetID', name: 'רחוב', type: 'select', selectOptions: [], required: true })
+            fieldsArray.splice(0, 1)
             return <div><Table name={this.state.name} fieldsArray={fieldsArray}
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showsomthing}</div>
+                fieldsToSearch={this.state.fieldsToSearch} />
+                {this.state.showsomthing} {this.state.showExtention}</div>
         }
     }
     render() {
+
         console.log('this.props.user', this.props.user)
         return (
 
