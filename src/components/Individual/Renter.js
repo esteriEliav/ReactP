@@ -31,11 +31,11 @@ export class Renter extends Component {
         fieldsArray: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' },
         { field: 'LastName', name: 'שם משפחה', type: 'text' }, { field: 'SMS', name: 'SMS', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g }
-            , { field: 'UserName', name: 'שם משתמש', type: 'text' }, { field: 'Password', name: 'סיסמא', type: 'text' }, { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
-        ObjectsArray: //this.props.location.objects ? this.props.location.objects : rentersList
-            [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
-            { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
-            { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
+            , { field: 'UserName', name: 'שם משתמש', type: 'text' }, { field: 'Password', name: 'סיסמא', type: 'text' }],
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.rentersList,
+        // [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
+        // { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
+        // { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
 
         fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
         { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'Phone', name: 'טלפון', type: 'tel' }],
@@ -129,7 +129,7 @@ export class Renter extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'שוכרים')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: rentersList, name: 'שוכרים' }) }}>חזרה לשוכרים</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.rentersList, name: 'שוכרים' }) }}>חזרה לשוכרים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -149,22 +149,25 @@ export class Renter extends Component {
 
     }
     setForForm = object => {
-        const fieldsToAdd = []
+        const fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
-        postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0])
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+
         postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID }).then(res => this.setState({ properties: res }))
         let LinksPerObject = []
         let ButtonsForEveryRow = []
+        let fieldsToAdd = [];
         let LinksForEveryRow = [<Link
             to={{ pathname: '/Properties', objects: this.state.properties }}>דירות ששוכר</Link>]
-
+        postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd.push({ field: 'document', name: 'מסמכים', type: 'file', index: 'end' })
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow, object, enable: true,
+            fieldsToAdd, LinksForEveryRow: LinksForEveryRow, object, enable: true,
             ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
         }
     }
@@ -217,7 +220,7 @@ export class Renter extends Component {
 }
 
 export default connect(mapStateToProps)(Renter);
-export const rentersList = [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
-{ UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
-{ UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }]
+// export const rentersList = [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
+// { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
+// { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }]
 // GetFunction('Renter/GetAllRenters');

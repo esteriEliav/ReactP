@@ -27,8 +27,8 @@ export class PropertyOwner extends Component {
         fieldsArray: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
-        { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'document', name: ' מסמך', type: 'file', index: 'end' }],
-        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : ownersList,
+        { field: 'Email', name: 'אימייל', type: 'email' }],
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.ownersList,
         showForm: false,
         showDetails: false,
         showSomthing: null,
@@ -117,7 +117,7 @@ export class PropertyOwner extends Component {
         let LinksForTable = []
 
         if (this.state.name !== 'משכירים')
-            LinksForTable = [<button type='button' type='button' onClick={() => { this.setState({ ObjectsArray: ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
+            LinksForTable = [<button type='button' type='button' onClick={() => { this.setState({ ObjectsArray: this.props.ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -134,14 +134,14 @@ export class PropertyOwner extends Component {
         }
     }
     setForForm = object => {
-        const fieldsToAdd = []
+        const fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
 
         let properties = null
-
+        let fieldsToAdd = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
         postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: this.props.user.UserID }).then(res => this.setState({ properties: res }))
@@ -153,13 +153,14 @@ export class PropertyOwner extends Component {
             }} >דירות</Link>]
 
 
-            ;
+
         postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => this.setState({ dock: res }))
-        console.log('this.state.docks', this.state.docks)
-        if (this.state.docks && this.state.docks[0])
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
             object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
         return {
-            fieldsToAdd: [], LinksForEveryRow, object, enable: true,
+            fieldsToAdd, LinksForEveryRow, object, enable: true,
             ButtonsForEveryRow, LinksPerObject
         }
     }
@@ -198,7 +199,6 @@ export class PropertyOwner extends Component {
         }
     }
     render() {
-        ;
         return (
 
             <div>
@@ -213,8 +213,8 @@ export class PropertyOwner extends Component {
 }
 
 export default connect(mapStateToProps)(PropertyOwner);
-export const ownersList =
+//export const ownersList =
     //GetFunction('PropertyOwner/getAllOwners')
-    [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
-    { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
-    { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];
+    // [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },
+    // { OwnerID: 2, OwnerFirstName: 'aaa', OwnerLastName: 'aaz', Phone: '000', Email: 'acd' },
+    // { OwnerID: 3, OwnerFirstName: 'aaa', OwnerLastName: 'ard', Phone: '000', Email: 'acd' }];

@@ -25,6 +25,8 @@ class EventDetails extends React.Component {
       <React.Fragment>
       <h1> {this.state.ev.name} Details </h1>
       <p> {this.state.ev.email}</p>
+      <p> {this.state.ev.date}</p>
+      
       <a href={this.state.ev.link}></a>
       </React.Fragment>
     )

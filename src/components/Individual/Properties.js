@@ -5,7 +5,7 @@ import Form from '../General/Form'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from '../Axios'
 import Details from '../General/Details';
-import { ownersList, PropertyOwner } from './PropertyOwner'
+import { PropertyOwner } from './PropertyOwner'
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyObject from '../../Models-Object/PropertyObject';
 import DocumentObject from '../../Models-Object/DocumentObject'
@@ -41,8 +41,8 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 */
 export class Properties extends Component {
     componentDidMount = async () => {
-        const owners = ownersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
-        const res = await GetFunction('Property/GetAllCities');
+        const owners = this.props.ownersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
+        const res = this.props.cities;
         const cities = res !== null ?
             res.map(item => { return { id: item.CityID, name: item.CityName } }) : [];
         let fieldsArray = [...this.state.fieldsArray];
@@ -60,15 +60,15 @@ export class Properties extends Component {
         { field: 'Number', name: 'מספר', type: 'text', required: true, pattern: '[1-9][0-9]*[A-Ca-cא-ג]?' }, { field: 'Floor', name: 'קומה', type: 'number', required: true },
         { field: 'ApartmentNum', name: 'מספר דירה', type: 'number' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsDivided', name: 'מחולק?', type: 'checkbox' }, { field: 'ManagmentPayment', name: 'דמי ניהול', type: 'text' }, { field: 'IsPaid', name: 'שולם?', type: 'checkbox' },
-        { field: 'IsRented', name: 'מושכר', type: 'checkbox' }, { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' },
-        { field: 'document', name: 'מסמך', type: 'file', index: 'end' }],
+        { field: 'IsRented', name: 'מושכר', type: 'checkbox' }, { field: 'IsExclusivity', name: 'בלעדי?', type: 'checkbox' }, { field: 'IsWarranty', name: 'באחריות?', type: 'checkbox' }
+        ],
 
         fieldsToSearch: [{ field: 'CityID', name: 'עיר', type: 'text' }, { field: 'StreetID', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
 
-        ObjectsArray:// this.props.location.objects ? this.props.location.objects :propertiesList
-            [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-            { PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }],//
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.propertiesList,
+        // [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+        //{ PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }],//
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
         showsomthing: null,
@@ -103,16 +103,16 @@ export class Properties extends Component {
         let erors = []
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if (object.RoomsNum && object.RoomsNum !== '' && !(parseFloat(object.RoomsNum).toString() === object.RoomsNum)) {
+        if (object.RoomsNum && object.RoomsNum !== '' && (parseFloat(object.RoomsNum).toString() !== object.RoomsNum.toString())) {
 
             erors.RoomsNum = 'נא להקיש מספר'
             isErr = true
         }
-        if (object.Size && object.Size !== '' && !(parseFloat(object.Size).toString() === object.Size)) {
+        if (object.Size && object.Size !== '' && (parseFloat(object.Size).toString() !== object.Size.toString())) {
             erors.Size = 'נא להקיש מספר'
             isErr = true
         }
-        if (object.ManagmentPayment && object.ManagmentPayment !== '' && !(parseFloat(object.ManagmentPayment).toString() === object.ManagmentPayment)) {
+        if (object.ManagmentPayment && object.ManagmentPayment !== '' && (parseFloat(object.ManagmentPayment).toString() !== object.ManagmentPayment.toString())) {
             erors.ManagmentPayment = 'נא להקיש מספר'
             isErr = true
         }
@@ -151,15 +151,15 @@ export class Properties extends Component {
             newObj.CityID = object.CityID
             newObj.Number = object.Number
             if (object.Floor !== '')
-                newObj.ApartmentNum = object.Floor
+                newObj.Floor = object.Floor
             if (object.Floor !== '')
-                newObj.ApartmentNum = object.ApartmentNum
+                newObj.ApartmentNum = parseFloat(object.ApartmentNum)
             if (object.Size !== '')
-                newObj.Size = object.Size
+                newObj.Size = parseFloat(object.Size)
             if (object.IsDivided !== '')
                 newObj.IsDivided = object.IsDivided
             if (object.ManagmentPayment !== '')
-                newObj.ManagmentPayment = object.ManagmentPayment
+                newObj.ManagmentPayment = parseFloat(object.ManagmentPayment)
             newObj.IsPaid = object.IsPaid
             newObj.IsRented = object.IsRented
             newObj.IsExclusivity = object.IsExclusivity
@@ -193,7 +193,7 @@ export class Properties extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'נכסים')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: propertiesList, name: 'נכסים' }) }}>חזרה לנכסים</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.propertiesList, name: 'נכסים' }) }}>חזרה לנכסים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -268,7 +268,9 @@ export class Properties extends Component {
                     })
                 }}
                 >הוסף אחראי בלעדיות</button>)
+
         }
+        fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
         return { fieldsToAdd, LinksPerObject }
 
     }
@@ -277,7 +279,9 @@ export class Properties extends Component {
         let ButtonsForEveryRow = []
         let tempobject = { ...object };
         let LinksForEveryRow = []
-        const fieldsToAdd = [...(this.setForForm(object)).fieldsToAdd]
+        const selectOptions = this.state.streets !== null ?
+            this.state.streets.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []
+        const fieldsToAdd = [{ field: 'StreetID', name: 'רחוב', type: 'select', selectOptions, required: true, index: 1 }]
 
 
         //const docks=postFunction('')
@@ -311,7 +315,7 @@ export class Properties extends Component {
         else {
             tempobject.IsRented = 'X'//ושולח פרטי השכרה שמתקבלים מהפונקציה
             LinksPerObject.push(<button index={7} onClick={() => {
-                debugger;
+
                 this.setState({ showForm: true })
                 this.setState({
                     showsomthing: <Rentals type='form'
@@ -345,11 +349,18 @@ export class Properties extends Component {
             tempobject.IsDivided = 'X'
         postFunction('Property/GetRentalByPropertyID', { id: object.propertyID }).then(res => this.setState({ rentalObject: res }))
 
-
+        if (object.IsExclusivity) {
+            const res = this.state.exclusivityPersons !== null ?
+                this.state.exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) :
+                [];
+            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: res, index: 12 })
+        }
 
         postFunction('User/GetUserDocuments', { id: object.PropertyID, type: 1 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0])
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd.push({ field: 'document', name: 'מסמכים', type: 'file', index: 'end' })
             object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
         tempobject.OwnerID = <Link onClick={() => {
             this.setState({
                 showDetails: true,
@@ -429,7 +440,7 @@ export class Properties extends Component {
 export default connect(mapStateToProps)(Properties)
 
 
-export const propertiesList = [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
-{ PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }]
+//export const propertiesList = [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
+//{ PropertyID: 2, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 5, IsDivided: true, IsRented: false, IsExclusivity: false }]
 //GetFunction('Property/GetAllProperties');
 

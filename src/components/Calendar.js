@@ -14,10 +14,10 @@ import Tasks from './Individual/Tasks';
 class Calendar extends React.Component {
   state = {
     events: [
-      // { id: 1, title: 'event 1', date: '2020-10-01' },
-      // { id: 2, title: 'event 2', date: '2020-10-28' }
+       { id: 1, title: 'event 1', date: '2020-10-01' },
+      { id: 2, title: 'event 2', date: '2020-10-29' }
     ],
-    showAddTask: null
+  showAddTask: null
   }
   componentDidMount() {
 
@@ -26,12 +26,12 @@ class Calendar extends React.Component {
         const events = response.data;
         //const property = propertiesList.find((item => item.typeTaskID === this.state.event.typeTaskID)) 
 
-        const updatedevents = events.map(event => {
+        const updatedevents = events.map(event2 => {
           return {
-            id: event.typeTaskID,
+            id:event2.typeTaskID,
             // id:property.taskTypeName,
-            title: event.name,
-            date: event.arg.event.DateForHandling
+            title: event2.name,
+            date: event2.DateForHandling
           }
         });
 

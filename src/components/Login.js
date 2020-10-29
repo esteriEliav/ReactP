@@ -16,17 +16,49 @@ export class Login extends Component {
         {
             userName: '',
             password: '',
+            redirect: null,
+
 
         }
+    componentDidMount = async () => {
+        
+       let list = await GetFunction('PropertyOwner/getAllOwners')
+        this.props.setOwners(list !== null ? list : [])
+         list = await GetFunction('Property/GetAllProperties')
+        this.props.setProperties(list !== null ? list : [])
+        list = await GetFunction('Rental/GetAllRentals')
+        this.props.setRentals(list !== null ? list : [])
+        list = await GetFunction('Renter/GetAllRenters')
+        this.props.setRenters(list !== null ? list : [])
+        list = await GetFunction('SubProperty/GetAllSubProperties')
+        this.props.setSubProperties(list !== null ? list : [])
+        list = await GetFunction('Task/GetAllTasks')
+        this.props.setTasks(list !== null ? list : [])
+        list = await GetFunction('Property/GetAllCities')
+        this.props.setCities(list !== null ? list : [])
 
+    }
 
-    onSubmit = (e) => {
+    onSubmit = async (e) => {
         e.preventDefault();
-        let user = postFunction('User/Ifhaveuse', this.state)
+        let user = await postFunction('User/Ifhaveuse', this.state)
         if (user && user != null) {
             const userObj = new UserDTO({ ...user })
             alert(" ברוכים הבאים" + userObj.FirstName + ' ' + userObj.LastName);
             this.props.setUser(userObj);
+            if (userObj.RoleID === 3) {
+                const objects = await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID })
+                this.setState({ redirect: <Redirect to={{ pathname: '/PropertiesForRenter', objects: objects !== null ? objects : [] }} /> })
+            }
+            else {
+                this.props.setProperties(await GetFunction('Property/GetAllProperties'))
+                this.props.setOwners(await GetFunction('PropertyOwner/getAllOwners'))
+                this.props.setRentals(await GetFunction('Rental/GetAllRentals'))
+                this.props.setRenters(await GetFunction('Renter/GetAllRenters'))
+                this.props.setSubProperties(await GetFunction('SubProperty/GetAllSubProperties'))
+                this.props.setTasks(await GetFunction('Task/GetAllTasks'))
+                this.props.setCities(await GetFunction('Property/GetAllCities'))
+            }
         }
         else
             alert("שם משתמש או סיסמה שגויים")
@@ -52,7 +84,7 @@ export class Login extends Component {
                     {/* <a href="@">שכחת סיסמה?</a> */}
                     {/*<a href="@">שכחת סיסמה?</a>*/}
                     <Link to="/signup" >שכחת סיסמה?</Link>
-
+                    {this.state.redirect}
                 </div></form>
 
 
@@ -67,20 +99,20 @@ export class Login extends Component {
 export const mapStateToProps = state => {
     return {
         ...state
-        //     user: state.user,
-        //     propertiesList:spropertiesList,
-        // ownersList :GetFunction('PropertyOwner/getAllOwners'),
-        // rentalsList :GetFunction('Rental/GetAllRentals'),
-        // rentersList =GetFunction('Renter/GetAllRenters'),
-        // SubPropertiesList :GetFunction('SubProperty/GetAllSubProperties'),
-        // tasksLists :GetFunction('Task/GetAllTasks'),
-        // cities:GetFunction('Property/GetAllCities')
 
     }
 };
 export const mapDispatchToProps = dispatch => {
     return {
-        setUser: (userObject) => dispatch({ type: 'SET_USER', userObj: userObject })
+        setUser: (userObject) => dispatch({ type: 'SET_USER', userObj: userObject }),
+        setProperties: (propertiesList) => dispatch({ type: 'SET_PROPERTIES', propertiesList: propertiesList }),
+        setOwners: (ownersList) => dispatch({ type: 'SET_OWNERS', ownersList: ownersList }),
+        setRentals: (rentalsList) => dispatch({ type: 'SET_RENTALS', rentalsList }),
+        setRenters: (rentersList) => dispatch({ type: 'SET_RENTERS', rentersList }),
+        setSubProperties: (SubPropertiesList) => dispatch({ type: 'SET_SUBPROPERTIES', SubPropertiesList }),
+        setTasks: (tasksList) => dispatch({ type: 'SET_TASKS', tasksList }),
+        setCities: (cities) => dispatch({ type: 'SET_CITIES', cities }),
+
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

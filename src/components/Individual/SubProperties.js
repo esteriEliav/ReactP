@@ -10,7 +10,7 @@ import SubPropertyObject from '../../Models-Object/SubPropertyObject'
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
 import Rentals from './Rentals';
-import { propertiesList } from './Properties';
+//import { propertiesList } from './Properties';
 
 /*
 SubPropertyID int  not null identity,--קוד נכס בן
@@ -49,9 +49,9 @@ export class SubProperties extends Component {
     }
     componentDidMount = async () => {
 
-        const cities = await GetFunction('Property/GetAllCities')
-        const propertiesOptions = propertiesList.map(async item => {
-            const street = await postFunction('Property/GetStreetByID',{id:item.CityID});
+        const cities = this.props.cities
+        const propertiesOptions = this.props.propertiesList.map(async item => {
+            const street = await postFunction('Property/GetStreetByID', item.CityID);
             if (street !== null)
                 return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
         })
@@ -73,12 +73,12 @@ export class SubProperties extends Component {
         let erors = []
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if (object.RoomsNum && object.RoomsNum !== '' && !(parseFloat(object.RoomsNum).toString() === object.RoomsNum)) {
+        if (object.RoomsNum && object.RoomsNum !== '' && !(parseFloat(object.RoomsNum).toString() === object.RoomsNum.toString())) {
 
             erors.RoomsNum = 'נא להקיש מספר'
             isErr = true
         }
-        if (object.Size && object.Size !== '' && !(parseFloat(object.Size).toString() === object.Size)) {
+        if (object.Size && object.Size !== '' && !(parseFloat(object.Size).toString() === object.Size.toString())) {
             erors.Size = 'נא להקיש מספר'
             isErr = true
         }
@@ -134,14 +134,14 @@ export class SubProperties extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'תת נכסים')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: SubPropertiesList, name: 'תת נכסים' }) }}>חזרה לתת נכסים</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.SubPropertiesList, name: 'תת נכסים' }) }}>חזרה לתת נכסים</button>]
         return {
             LinksForTable
 
         }
     }
     setForForm = object => {
-        const fieldsToAdd = []
+        let fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
@@ -150,10 +150,7 @@ export class SubProperties extends Component {
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
-        postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0])
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-
+        let fieldsToAdd = []
         let tempobject = object;
         postFunction('Propety/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ propertyObject: res }))
         object.PropertyID = <Link onClick={() => {
@@ -196,11 +193,14 @@ export class SubProperties extends Component {
                 })
             }} >שנה השכרה</button>)
 
-
-
+        }
+        postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 }).then(res => this.setState({ docks: res }))
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         }
         return {
-            fieldsToAdd: [], LinksForEveryRow: LinksForEveryRow,
+            fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
             ButtonsForEveryRow: ButtonsForEveryRow, enable: true,
             object: tempobject, LinksPerObject: []
         };
@@ -250,5 +250,5 @@ export class SubProperties extends Component {
 }
 
 export default connect(mapStateToProps)(SubProperties);
-export const SubPropertiesList = [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }]
+//export const SubPropertiesList = [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }]
 //GetFunction('SubProperty/GetAllSubProperties');

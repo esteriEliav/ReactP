@@ -3,15 +3,15 @@ import Table from '../General/Table'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
-import Renter, { rentersList } from './Renter';
-import Properties, { propertiesList } from './Properties';
+import Renter from './Renter';
+import Properties from './Properties';
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import RentalObject from '../../Models-Object/RentalObject';
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
 import Form from '../General/Form'
-import { PropertyOwner } from './PropertyOwner';
-import { SubProperties } from './SubProperties';
+import PropertyOwner from './PropertyOwner';
+import SubProperties from './SubProperties';
 
 
 /*
@@ -33,15 +33,15 @@ export class Rentals extends Component {
         name: 'השכרות',
         fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: [] }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: [] },
         { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: [], required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
-        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }, { field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }],
+        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'Owner', name: 'שם משכיר', type: 'text' }, { field: 'User', name: 'שם שוכר ', type: 'text' },
         { field: 'EnteryDate', name: 'מתאריך כניסה לדירה', type: 'date' },
         { field: 'EndDate', name: 'עד תאריך סיום חוזה', type: 'date' }],
-        /*[{ RentalID: 1, PropertyID: 4, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },*/
-        ObjectsArray:// this.props.location.objects ? this.props.location.objects :rentalsList
-            [{ RentalID: 1, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-01-02', EndDate: '2019-12-02', ContactRenew: false },
-            { RentalID: 3, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
+
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.rentalsList,
+        // [{ RentalID: 1, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-01-02', EndDate: '2019-12-02', ContactRenew: false },
+        // { RentalID: 3, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }],//
         isAutho: true,//false
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
@@ -57,10 +57,10 @@ export class Rentals extends Component {
     }
     componentDidMount = async () => {
         const PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes')
-        const renters = rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
-        const cities = await GetFunction('Property/GetAllCities')
-        const propertiesOptions = propertiesList.map(async item => {
-            const street = await postFunction('Property/GetStreetByID', {id:item.CityID});
+        const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
+        const cities = this.props.cities
+        const propertiesOptions = this.props.propertiesList.map(async item => {
+            const street = await postFunction('Property/GetStreetByID', item.CityID);
             if (street !== null)
                 return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
         })
@@ -89,7 +89,7 @@ export class Rentals extends Component {
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
 
-        if (object.RentPayment && object.RentPayment !== '' && !(parseFloat(object.RentPayment).toString() === object.RentPayment)) {
+        if (object.RentPayment && object.RentPayment !== '' && (parseFloat(object.RentPayment).toString() !== object.RentPayment.toString())) {
             erors.RentPayment = 'נא להקיש סכום'
             isErr = true
         }
@@ -156,9 +156,10 @@ export class Rentals extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'השכרות')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: rentalsList, name: 'השכרות' }) }}>חזרה להשכרות</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.rentalsList, name: 'השכרות' }) }}>חזרה להשכרות</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
+                debugger;
                 this.setState({ showForm: true })
                 this.setState({
                     showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
@@ -167,6 +168,7 @@ export class Rentals extends Component {
                         validate={this.validate} />
                 })
             }}> הוספת השכרה</button>]
+
         return {
             LinksForTable: LinksForTable
         }
@@ -197,7 +199,7 @@ export class Rentals extends Component {
     }}
     >הוסף שוכר</button>
     setForForm = object => {
-        const fieldsToAdd = []
+        const fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
         const LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
         return { fieldsToAdd, LinksPerObject }
     }
@@ -208,13 +210,11 @@ export class Rentals extends Component {
         let LinksPerObject = []
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
-        postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 }).then(res => this.setState({ docks: res }))
-
-        if (this.state.docks && this.state.docks[0])
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-
+        let fieldsToAdd = []
         postFunction('Property/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ property: res }))
+
         postFunction('PropertyOwner/GetOwnerByID', { id: this.state.property.OwnerID }).then(res => this.setState({ owner: res }))
+
 
         postFunction('Renter/GetRenterByID', { id: object.UserID }).then(res => this.setState({ userObject: res }))
 
@@ -277,9 +277,14 @@ export class Rentals extends Component {
                 })
             }}>
                 ערוך משכיר </button>)
+        postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 }).then(res => this.setState({ docks: res }))
 
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd.push({ field: 'document', name: 'מסמכים', type: 'file', index: 'end' })
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
         return {
-            fieldsToAdd: [], LinksForEveryRow,
+            fieldsToAdd, LinksForEveryRow,
             ButtonsForEveryRow, object, enable: true,
             LinksPerObject
         };
@@ -340,6 +345,6 @@ export default connect(mapStateToProps)(Rentals)
 
 
 
-export const rentalsList = [{ RentalID: 1, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
-{ RentalID: 3, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }];
+//export const rentalsList = [{ RentalID: 1, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '1/02/2018', EndDate: '1/02/2019', ContactRenew: false },
+//{ RentalID: 3, PropertyID: 1, UserID: 5, RentPayment: 2500, PaymentTypeID: 2, EnteryDate: '2018-02-01', EndDate: '2019-05-03', ContactRenew: true }];
 //res = await GetFunction('Rental/GetAllRentals') ;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
+//import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 import Popup from 'reactjs-popup';
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
