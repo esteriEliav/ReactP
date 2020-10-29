@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
-import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
+//import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import { mapStateToProps } from '../Login'
 import { connect } from 'react-redux'
 import Popup from 'reactjs-popup';
@@ -22,7 +22,6 @@ export class Form extends Component {
         fieldsToAdd: this.setForForm.fieldsToAdd,
         fieldsArray: this.props.fieldsArray,
         LinksPerObject: this.setForForm.LinksPerObject,
-        Redirect: null,
         generalEror: '',
         erors: {},
 
@@ -76,10 +75,6 @@ export class Form extends Component {
 
     render() {
 
-        if (this.state.Redirect !== null) {
-            //this.setState({ Redirect: null })
-            this.props.closeModal();
-        }
         let j = 0, i = 0;
         const func = (index) => {//פונקציה המרנדרת את השדות הנוספים
             let items = []
@@ -104,7 +99,7 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
-            debugger;
+
             e.preventDefault();
             const val = this.props.validate(this.state.Object)
             if (val.isErr)

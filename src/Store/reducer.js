@@ -1,15 +1,16 @@
 import UserObject from '../Models-Object/UserObject'
 import { GetFunction } from '../components/General/CommonFunctions';
 
+
 const initialState = {
     user: new UserObject(),
-    propertiesList: GetFunction('Property/GetAllProperties'),
-    ownersList: GetFunction('PropertyOwner/getAllOwners'),
-    rentalsList: GetFunction('Rental/GetAllRentals'),
-    rentersList: GetFunction('Renter/GetAllRenters'),
-    SubPropertiesList: GetFunction('SubProperty/GetAllSubProperties'),
-    tasksLists: GetFunction('Task/GetAllTasks'),
-    cities: GetFunction('Property/GetAllCities')
+    propertiesList: [],
+    ownersList: [],
+    rentalsList: [],
+    rentersList: [],
+    SubPropertiesList: [],
+    tasksList: [],
+    cities: []
 
 
 };
@@ -19,6 +20,41 @@ const reducer = (state = initialState, action) => {
         return {
             ...state,
             user: action.userObj
+        }
+    if (action.type === 'SET_PROPERTIES')
+        return {
+            ...state,
+            propertiesList: action.propertiesList
+        }
+    if (action.type === 'SET_OWNERS')
+        return {
+            ...state,
+            ownersList: action.ownersList
+        }
+    if (action.type === 'SET_RENTALS')
+        return {
+            ...state,
+            rentalsList: action.rentalsList
+        }
+    if (action.type === 'SET_RENRERS')
+        return {
+            ...state,
+            rentersList: action.rentersList
+        }
+    if (action.type === 'SET_SUBPROPERTIES')
+        return {
+            ...state,
+            SubPropertiesList: action.SubPropertiesList
+        }
+    if (action.type === 'SET_TASKS')
+        return {
+            ...state,
+            tasksList: action.tasksList
+        }
+    if (action.type === 'SET_CITIES')
+        return {
+            ...state,
+            cities: action.cities
         }
     return state
 };

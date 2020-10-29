@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
-import Properties, { propertiesList } from './Properties'
-import { SubProperties, SubPropertiesList } from './SubProperties'
+import Properties from './Properties'
+import { SubProperties } from './SubProperties'
 
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
@@ -37,9 +37,9 @@ export class Tasks extends Component {
         { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
-        ObjectsArray: //this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/
-            [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
-            { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '2/08/2018', IsHandled: true }],//
+        ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.tasksList,
+        // [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+        // { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '2/08/2018', IsHandled: true }],//
 
         fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] },
         { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
@@ -64,8 +64,8 @@ export class Tasks extends Component {
         const y = await GetFunction('Task/GetAllTaskTypes');
         const TaskTypeOptions = y !== null ?
             y.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }) : []
-        const cities = await GetFunction('Property/GetAllCities')
-        const propertiesOptions = propertiesList.map(async item => {
+        const cities = this.props.cities
+        const propertiesOptions = this.props.propertiesList.map(async item => {
             const street = await postFunction('Property/GetStreetByID', item.CityID);
             if (street !== null)
                 return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
@@ -162,7 +162,7 @@ export class Tasks extends Component {
         let LinksForTable = [];
 
         if (this.state.name !== 'משימות') {
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: tasksLists, name: 'משימות' }) }}>חזרה למשימות</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.tasksList, name: 'משימות' }) }}>חזרה למשימות</button>]
 
         }
         else
@@ -187,10 +187,10 @@ export class Tasks extends Component {
             fieldsToAdd.push({ field: 'PropertyID', name: 'נכס', type: 'select', index: 1, selectOptions: this.state.propertiesOptions })
             if (object.TaskTypeId === 1)
                 fieldsToAdd.push({ field: 'ReportDate', name: 'תאריך פניה', type: 'date', index: 2 })/*{ field: 'PropertyID', name: 'סווג לקוח', type: 'r', index: 1,selectOptions:this.state.propertiesOptions }*/
-            const property = propertiesList.find((item => item.PropertyID === object.PropertyID))
+            const property = this.props.propertiesList.find((item => item.PropertyID === object.PropertyID))
 
             if (property && property[0] && property[0].IsDivided) {
-                const SubProperties = SubPropertiesList.filter(item => item.PropertyID === object.PropertyID)
+                const SubProperties = this.props.SubPropertiesList.filter(item => item.PropertyID === object.PropertyID)
                 const subPropertiesOptions = SubProperties.map(item => { return { id: item.SubPropertyID, name: item.num } })
                 fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח', type: 'select', index: 1, selectOptions: subPropertiesOptions });
             }
@@ -207,9 +207,6 @@ export class Tasks extends Component {
     }
     set = (object) => {
 
-        postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0])
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
@@ -231,7 +228,7 @@ export class Tasks extends Component {
         object.ClientClassificationID = classifObj.Name;
 
         let fieldsToAdd = this.setForForm(object).fieldsToAdd;
-        fieldsToAdd[fieldsToAdd.length - 1].name = 'מסמכים'
+        fieldsToAdd.pop();
 
         object.DateForHandling = new Date(object.DateForHandling).toLocaleDateString();
 
@@ -260,6 +257,11 @@ export class Tasks extends Component {
         }
         if (object.IsHandled)
             object.HandlingDate = new Date(object.HandlingDate).toLocaleDateString();
+        postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
+        if (this.state.docks && this.state.docks[0]) {
+            fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
         return {
             fieldsToAdd, LinksForEveryRow, enable: true,
             ButtonsForEveryRow, object: tempobject, LinksPerObject
@@ -335,6 +337,6 @@ export class Tasks extends Component {
 }
 
 export default connect(mapStateToProps)(Tasks)
-export const tasksLists = [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
-{ TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }];//
+//export const tasksLists = [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
+//{ TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }];//
 // GetFunction('Task/GetAllTasks');
