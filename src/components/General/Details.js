@@ -44,9 +44,9 @@ export class Details extends Component {
                     contentStyle={{ backgroundColor: "gray" }} nested modal>
                     <a className="close" onClick={this.props.closeModal}>&times; </a>
 
-                    {this.props.fieldsArray.map((item, index) =>
+                    {this.props.fieldsArray.map((item, index) => {
 
-                        <div key={index}>
+                        return this.props.Object[item.field] && <div key={index}>
 
                             <label dir='rtl'>{item.name}</label>:
 
@@ -56,6 +56,7 @@ export class Details extends Component {
                             </span>
 
                         </div>
+                    }
 
                     )}
                     {func('end').map(item =>

@@ -149,6 +149,9 @@ export class Tasks extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק משימה?')
+            if (con === false)
+                return;
             object = { id: object.TaskID }
         }
         const res = await CommonFunctions(type, object, path)
@@ -213,6 +216,7 @@ export class Tasks extends Component {
 
         let tempobject = object;
         let LinksPerObject = [];
+
         postFunction('Property/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ propertyObject: res }))
 
         let typeObj = this.state.TaskTypeOptions.length > 0 ?

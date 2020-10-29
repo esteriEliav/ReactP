@@ -117,6 +117,9 @@ export class Renter extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק שוכר?')
+            if (con === false)
+                return;
             object = { id: object.UserID }
         }
         const res = await CommonFunctions(type, object, path)

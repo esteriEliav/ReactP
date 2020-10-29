@@ -89,6 +89,9 @@ export class PropertyOwner extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק משכיר?')
+            if (con === false)
+                return;
             object = { id: object.OwnerID }
         }
         const res = await CommonFunctions(type, object, path)
@@ -153,9 +156,6 @@ export class PropertyOwner extends Component {
             to={{
                 pathname: '/Properties', objects: res
             }} >דירות</Link>]
-
-
-
         postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => this.setState({ dock: res }))
         if (this.state.docks && this.state.docks[0]) {
             fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]

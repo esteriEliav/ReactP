@@ -32,7 +32,6 @@ export class Table extends Component {
         const some = this.props.setForTable()
         return (
             <div>
-
                 <h1>{this.props.name}</h1>
 
                 {this.props.fieldsToSearch && <Search
@@ -44,7 +43,6 @@ export class Table extends Component {
 
                 {some.LinksForTable.map((lin, index) => <div key={index}> {lin}
                     {lin.props.showForm}
-
                 </div>
                 )}
                 <table>
@@ -59,7 +57,7 @@ export class Table extends Component {
                     </ExcelFile>}
 
 
-                    <tr> {this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
+                    <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
                     {this.props.objectsArray.map(object =>
 
                         <Item key={Object[this.props.fieldsArray[0].field]}
