@@ -45,18 +45,20 @@ export class Rentals extends Component {
         isAutho: true,//false
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
-
         showSomthing: null,
         spobject: {},
         docks: [],
         owner: {},
         property: {},
-        userObject: {}
+        userObject: {},
+        PaymentTypeOptions: []
 
 
     }
     componentDidMount = async () => {
-        const PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes')
+        const PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes');
+        PaymentTypeOptions = PaymentTypeOptions !== null ?
+            PaymentTypeOptions.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
         const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
         const cities = this.props.cities
         const propertiesOptions = this.props.propertiesList.map(async item => {
@@ -68,7 +70,7 @@ export class Rentals extends Component {
         fieldsArray[0].selectOptions = propertiesOptions;
         fieldsArray[1].selectOptions = renters;
         fieldsArray[3].radioOptions = PaymentTypeOptions;
-        this.setState({ fieldsArray })
+        this.setState({ fieldsArray, PaymentTypeOptions: PaymentTypeOptions })
 
     }
 
@@ -142,10 +144,13 @@ export class Rentals extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק השכרה?')
+            if (con === false)
+                return;
             object = { id: object.RentalID }
+
         }
         const res = await CommonFunctions(type, object, path)
-            ;
         if (res && res !== null) {
             this.closeFormModal();
         }
@@ -204,9 +209,6 @@ export class Rentals extends Component {
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
-        debugger;
-        console.log(this.props.type)
-        console.log('state', this.state)
         let LinksPerObject = []
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
@@ -217,7 +219,6 @@ export class Rentals extends Component {
 
 
         postFunction('Renter/GetRenterByID', { id: object.UserID }).then(res => this.setState({ userObject: res }))
-
         object.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -277,6 +278,8 @@ export class Rentals extends Component {
                 })
             }}>
                 ערוך משכיר </button>)
+        const PaymentType = this.state.PaymentTypeOptions.find(i => i.id === object.PaymentTypeID);
+        object.PaymentTypeID = PaymentType.name
         postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 }).then(res => this.setState({ docks: res }))
 
         if (this.state.docks && this.state.docks[0]) {

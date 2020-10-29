@@ -14,8 +14,8 @@ import Tasks from './Individual/Tasks';
 class Calendar extends React.Component {
   state = {
     events: [
-       { id: 1, title: 'event 1', date: '2020-10-01' },
-      { id: 2, title: 'event 2', date: '2020-10-29' }
+     {/*  { id: 1, title: 'event 1', date: '2020-10-01' },
+    { id: 2, title: 'event 2', date: '2020-10-29' }*/}
     ],
   showAddTask: null
   }
@@ -25,7 +25,6 @@ class Calendar extends React.Component {
       .then(response => {
         const events = response.data;
         //const property = propertiesList.find((item => item.typeTaskID === this.state.event.typeTaskID)) 
-
         const updatedevents = events.map(event2 => {
           return {
             id:event2.typeTaskID,

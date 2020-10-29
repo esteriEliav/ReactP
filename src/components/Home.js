@@ -28,8 +28,7 @@ import Select from "react-dropdown-select";
 export class Home extends Component {
   state = {
     showt: false,
-    use1: new UserObject(1, 'aa', 'bb', null, null, null, 3),
-    a: null
+    use1: new UserObject(1, 'aa', 'bb', null, null, null, 3)
   }
   closeModel = () => {
     this.setState({ showt: false })

@@ -121,6 +121,9 @@ export class SubProperties extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק תת נכס?')
+            if (con === false)
+                return;
             object = { id: object.SubPropertyID }
         }
         const res = await CommonFunctions(type, object, path)

@@ -37,6 +37,7 @@ export class Login extends Component {
         list = await GetFunction('Property/GetAllCities')
         this.props.setCities(list !== null ? list : [])
 
+
     }
 
     onSubmit = async (e) => {
@@ -51,13 +52,20 @@ export class Login extends Component {
                 this.setState({ redirect: <Redirect to={{ pathname: '/PropertiesForRenter', objects: objects !== null ? objects : [] }} /> })
             }
             else {
-                this.props.setProperties(await GetFunction('Property/GetAllProperties'))
-                this.props.setOwners(await GetFunction('PropertyOwner/getAllOwners'))
-                this.props.setRentals(await GetFunction('Rental/GetAllRentals'))
-                this.props.setRenters(await GetFunction('Renter/GetAllRenters'))
-                this.props.setSubProperties(await GetFunction('SubProperty/GetAllSubProperties'))
-                this.props.setTasks(await GetFunction('Task/GetAllTasks'))
-                this.props.setCities(await GetFunction('Property/GetAllCities'))
+                let list = await GetFunction('Property/GetAllProperties')
+                this.props.setProperties(list !== null ? list : [])
+                list = await GetFunction('PropertyOwner/getAllOwners')
+                this.props.setRentals(list !== null ? list : [])
+                list = await GetFunction('Rental/GetAllRentals')
+                this.props.setRentals(list !== null ? list : [])
+                list = await GetFunction('Renter/GetAllRenters')
+                this.props.setRenters(list !== null ? list : [])
+                list = await GetFunction('SubProperty/GetAllSubProperties')
+                this.props.setSubProperties(list !== null ? list : [])
+                list = await GetFunction('Task/GetAllTasks')
+                this.props.setTasks(list !== null ? list : [])
+                list = await GetFunction('Property/GetAllCities')
+                this.props.setCities(list !== null ? list : [])
             }
         }
         else

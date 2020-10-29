@@ -15,12 +15,13 @@ export class PopUpForProperties extends Component {
     render() {
         return (
             <Popup open={this.props.isOpen} closeOnDocumentClick={false}
-                contentStyle={{ backgroundColor: "gray" }} >
+                contentStyle={{ backgroundColor: "red" }} >
                 <a className="close" onClick={this.props.closeModal}>
                     &times;</a>
 
                 <form onSubmit={() => { this.props.submit(this.props.type, this.state.object) }}>
                     {this.props.fieldsArray.map((item, index) => <LabelInput key={index} field={item} contant='' change={this.change} />)}
+                    <p />
                     <button type='submit'>הוסף</button>
                 </form>
             </Popup>

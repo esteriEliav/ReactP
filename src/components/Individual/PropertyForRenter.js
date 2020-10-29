@@ -47,7 +47,6 @@ export class PropertiesForRenter extends Component {
 
         // return <CommonFunctions type='Add' object={object} redirect='/PropertiesForRenter' path={path} />
         const res = await CommonFunctions(type, object, path);
-        ;
         if (res && res !== null) {
             this.closeFormModal();
         }

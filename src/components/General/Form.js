@@ -23,7 +23,7 @@ export class Form extends Component {
         fieldsArray: this.props.fieldsArray,
         LinksPerObject: this.setForForm.LinksPerObject,
         generalEror: '',
-        erors: {},
+        erors: [],
 
 
 
@@ -47,22 +47,23 @@ export class Form extends Component {
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
 
         if (e.target.type === 'file') {
-            debugger
-            let reader = new FileReader();
-            reader.readAsDataURL(e.target.files[0]);
-            reader.onload = (fr) => {
-                console.log('data', reader.result)
-                let obj = { ...this.state.Object }
-                obj.add = new String(reader.result)
+            if (e.target.files[0]) {
+                let reader = new FileReader();
+                reader.readAsDataURL(e.target.files[0]);
+                reader.onload = (fr) => {
+                    console.log('data', reader.result)
+                    let obj = { ...this.state.Object }
+                    obj.add = new String(reader.result)
 
-                this.setState({ Object: obj })
-                debugger
+                    this.setState({ Object: obj })
 
-            };
-            reader.onerror = function (error) {
-                console.log('Error: ', error);
-            };
+                };
 
+                reader.onerror = function (error) {
+                    console.log('Error: ', error);
+                };
+
+            }
         }
 
         let tempObject = { ...this.state.Object };
@@ -80,7 +81,7 @@ export class Form extends Component {
             let items = []
             const links = this.state.LinksPerObject
             while (i < links.length && links[i].props.index === index) {
-                items.push(<span>{links[i]}<p /> {links[i].props.showForm}</span>)
+                items.push(<span key={i}>{links[i]}<p /> {links[i].props.showForm}</span>)
                 i += 1
             }
             let fieldsToAdd = this.state.fieldsToAdd[j]
@@ -88,8 +89,7 @@ export class Form extends Component {
                 fieldsToAdd = this.state.fieldsToAdd[j]
                 items.push(<span>
                     <p />
-                    <LabelInput field={fieldsToAdd} content={this.state.Object[fieldsToAdd.field]} change={this.change} />
-
+                    <LabelInput key={j} field={fieldsToAdd} content={this.state.Object[fieldsToAdd.field]} change={this.change} />
                 </span>)
                 j += 1
             }
@@ -119,10 +119,11 @@ export class Form extends Component {
                 this.setState({ erors })
             }
         }
+
         return (
             <div>
                 <Popup open={this.props.isOpen} closeOnDocumentClick={false}
-                    contentStyle={{ backgroundColor: "gray", height: '80%', width: '50%' }} nested modal>
+                    contentStyle={{ backgroundColor: "gray", width: '50%' }} nested modal>
 
                     <a className="close" onClick={this.props.closeModal}>
                         &times;
@@ -143,7 +144,6 @@ export class Form extends Component {
                         {/* באטן של סבמיט */}
                         <button type='submit' name={this.props.name} >{this.props.name}</button>
                     </form>
-                    {this.state.Redirect}
                 </Popup>
             </div>
         )

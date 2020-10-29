@@ -117,6 +117,9 @@ export class Renter extends Component {
 
         }
         else if (type === 'Delete') {
+            const con = window.confirm('למחוק שוכר?')
+            if (con === false)
+                return;
             object = { id: object.UserID }
         }
         const res = await CommonFunctions(type, object, path)
@@ -140,7 +143,18 @@ export class Renter extends Component {
                             setForForm={this.setForForm}
                             validate={this.validate} />
                 })
-            }} >הוספת שוכר </button>]
+            }} >הוספת שוכר </button>,
+            <button onClick={() => {
+                const con = window.confirm('לשלוח?')
+                if (con === true) {
+                    let res;
+                    GetFunction('מה שם הפונקציה?').then(r => res = r);
+                    if (res)
+                        alert("נשלח")
+                    else
+                        alert("תקלה... לא נשלח")
+                }
+            }}>שליחת שם משתמש וסיסמא לכל השוכרים</button>]
         return { LinksForTable }
 
 
