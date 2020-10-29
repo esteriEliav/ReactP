@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Table from '../General/Table'
 import Properties from './Properties'
-import { SubProperties } from './SubProperties'
+import SubProperties from './SubProperties'
+import PopUpForProperties from './PopUpForProperties'
 
 import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
@@ -45,9 +46,11 @@ export class Tasks extends Component {
         { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
         isAutho: false,
-        showForm: this.props.type === 'report' || this.props.type === 'form' ? true : false,
-        showDetails: this.props.type === 'details' ? true : false,
+        showForm: false,
+        showDetails: false,
+        showEx: false,
         showSomthing: null,
+        showExtention: null,
         ClassificationOptions: [],
         TaskTypeOptions: [],
         propertiesOptions: [],
@@ -87,6 +90,10 @@ export class Tasks extends Component {
 
         this.setState({ showForm: false, showSomthing: null })
     }
+    closeExtentionModal = () => {
+
+        this.setState({ showEx: false, showExtention: null })
+    }
     validate = object => {
         let isErr = false
         let erors = []
@@ -103,6 +110,12 @@ export class Tasks extends Component {
             isErr = true
         }
         return { isErr: isErr, generalEror: generalEror, erors: erors }
+    }
+    submitForExtentions = async (type, object) => {
+        const res = await CommonFunctions('Add', object, 'Task/AddTaskType');
+        if (res) {
+            this.closeExtentionModal()
+        }
     }
     submitSearch = (object) => {
         const path = 'Task/Search';
@@ -185,6 +198,7 @@ export class Tasks extends Component {
         return { LinksForTable }
     }
     setForForm = object => {
+        let LinksPerObject = []
         let fieldsToAdd = [];
         if (object.TaskTypeId === 1 || object.TaskTypeId === 2) {
             fieldsToAdd.push({ field: 'PropertyID', name: 'נכס', type: 'select', index: 1, selectOptions: this.state.propertiesOptions })
@@ -199,12 +213,23 @@ export class Tasks extends Component {
             }
 
         }
+        LinksPerObject.push(<button type='button' index={0} onClick={() => {
+            this.setState({ showEx: true })
+            this.setState({
+                showExtention: <PopUpForProperties submit={this.submitForExtentions}
+                    fieldsArray={[{ field: 'name', name: 'סוג', type: 'text', required: true }]}
+                    type='AddCity' isOpen={this.state.showEx} closeModal={this.closeExtentionModal} />
+            })
+
+        }}>הוסף סוג משימה</button>)
+
+
         if (object.IsHandled)
             fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 4 },
                 { field: 'HandlingWay', name: 'אופן טיפול', type: 'texterea', index: 4 })
         fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
         console.log('fields', fieldsToAdd)
-        const LinksPerObject = []
+
         return { fieldsToAdd, LinksPerObject };
 
     }
@@ -326,7 +351,7 @@ export class Tasks extends Component {
                 set={this.set} setForForm={this.setForForm}
                 delObject={this.submit}
                 validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}</div>
+                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}{this.state.showExtention}</div>
         }
     }
     render() {

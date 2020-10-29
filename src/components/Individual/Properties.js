@@ -122,9 +122,10 @@ export class Properties extends Component {
     }
     submitForExtentions = async (type, object) => {
         let path = '/Property/' + type;
-        if (type === 'AddCity' || type === 'AddExclusivityPerson')
-            object = object.name
-        return await postFunction(path, object);
+        const res = await CommonFunctions('Add', object, path);
+        if (res) {
+            this.closeExtentionModal()
+        }
     }
     //סבמיט לחיפוש
     submitSearch = (object) => {
