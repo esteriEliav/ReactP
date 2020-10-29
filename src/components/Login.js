@@ -20,7 +20,23 @@ export class Login extends Component {
 
 
         }
+    componentDidMount = async () => {
+        let list = await GetFunction('Property/GetAllProperties')
+        this.props.setProperties(list !== null ? list : [])
+        list = await GetFunction('PropertyOwner/getAllOwners')
+        this.props.setRentals(list !== null ? list : [])
+        list = await GetFunction('Rental/GetAllRentals')
+        this.props.setRentals(list !== null ? list : [])
+        list = await GetFunction('Renter/GetAllRenters')
+        this.props.setRenters(list !== null ? list : [])
+        list = await GetFunction('SubProperty/GetAllSubProperties')
+        this.props.setSubProperties(list !== null ? list : [])
+        list = await GetFunction('Task/GetAllTasks')
+        this.props.setTasks(list !== null ? list : [])
+        list = await GetFunction('Property/GetAllCities')
+        this.props.setCities(list !== null ? list : [])
 
+    }
 
     onSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +46,8 @@ export class Login extends Component {
             alert(" ברוכים הבאים" + userObj.FirstName + ' ' + userObj.LastName);
             this.props.setUser(userObj);
             if (userObj.RoleID === 3) {
-                this.setState({ redirect: <Redirect to={{ pathname: '/PropertiesForRenter', objects: await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID }) }} /> })
+                const objects = await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID })
+                this.setState({ redirect: <Redirect to={{ pathname: '/PropertiesForRenter', objects: objects !== null ? objects : [] }} /> })
             }
             else {
                 this.props.setProperties(await GetFunction('Property/GetAllProperties'))

@@ -201,7 +201,6 @@ export class PropertyOwner extends Component {
         }
     }
     render() {
-        ;
         return (
 
             <div>
