@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
+import { mapStateToProps } from '../Login'
+import { connect } from 'react-redux'
 import Popup from 'reactjs-popup';
 
 
@@ -102,6 +104,7 @@ export class Form extends Component {
         }
 
         const submitHandler = (e) => {
+            debugger;
             e.preventDefault();
             const val = this.props.validate(this.state.Object)
             if (val.isErr)
@@ -143,7 +146,7 @@ export class Form extends Component {
                         {func('end')}
                         <p />
                         {/* באטן של סבמיט */}
-                        <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
+                        <button type='submit' name={this.props.name} >{this.props.name}</button>
                     </form>
                     {this.state.Redirect}
                 </Popup>
@@ -154,4 +157,4 @@ export class Form extends Component {
 }
 
 
-export default Form;
+export default connect(mapStateToProps)(Form);

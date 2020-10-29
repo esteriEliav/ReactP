@@ -33,25 +33,27 @@ export class Tasks extends Component {
 
         name: 'משימות',
 
-        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] },
-        { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
+        fieldsArray: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
         { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
         ObjectsArray: //this.props.location && this.props.location.objects ? this.props.location.objects :/* tasksLists*/
             [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
-            { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '31/08/2018', IsHandled: true }],//
+            { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '2/08/2018', IsHandled: true }],//
 
-        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' },
-        { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] },
+        { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+
         isAutho: false,
         showForm: this.props.type === 'report' || this.props.type === 'form' ? true : false,
         showDetails: this.props.type === 'details' ? true : false,
         showSomthing: null,
         ClassificationOptions: [],
         TaskTypeOptions: [],
-        propertiesOptions: []
+        propertiesOptions: [],
+        docks: [],
+        propertyObject: {},
+        spobject: {}
 
     }
     componentDidMount = async () => {
@@ -64,7 +66,7 @@ export class Tasks extends Component {
             y.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }) : []
         const cities = await GetFunction('Property/GetAllCities')
         const propertiesOptions = propertiesList.map(async item => {
-            const street = await postFunction('Property/GetStreetByID', item.CityID);
+            const street = await postFunction('Property/GetStreetByID', {id:item.CityID});
             if (street !== null)
                 return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
         })
@@ -147,22 +149,9 @@ export class Tasks extends Component {
 
         }
         else if (type === 'Delete') {
-            let id = new Number(object.TaskID)
-            object = id
+            object = { id: object.TaskID }
         }
-
-        if (type === 'Update' && object.IsHandled === true) {
-            const ret = CommonFunctions(type, object, this.state.ObjectsArray, '/Tasks', path)
-            CommonFunctions('Delete', object, this.state.ObjectsArray, '/Tasks', '/Tasks/DeleteTask')
-            return ret;
-        }
-        //return <CommonFunctions type={type} object={object} redirect='/Tasks' path={path} />
-        // const bool = (type, object, this.state.ObjectsArray, , path)
-        // if (bool)
-
-        //     this.closeFormModal();
         const res = await CommonFunctions(type, object, path)
-            ;
         if (res && res !== null) {
             this.closeFormModal();
         }
@@ -173,11 +162,11 @@ export class Tasks extends Component {
         let LinksForTable = [];
 
         if (this.state.name !== 'משימות') {
-            LinksForTable = [<button onClick={() => { this.setState({ ObjectsArray: tasksLists, name: 'משימות' }) }}>חזרה למשימות</button>]
+            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: tasksLists, name: 'משימות' }) }}>חזרה למשימות</button>]
 
         }
         else
-            LinksForTable = [<button onClick={() => {
+            LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
                 this.setState({
                     showSomthing:
@@ -187,7 +176,7 @@ export class Tasks extends Component {
                             validate={this.validate} />
                 })
             }} > הוספת משימה</button>,
-            <button onClick={() => { this.setState({ objectsArray: GetFunction('Task/GetAllarchivesTasks'), name: 'ארכיון המשימות' }); }}>לארכיון המשימות</button>]
+            <button type='button' onClick={() => { GetFunction('Task/GetAllarchivesTasks').then(res => this.setState({ objectsArray: res })); this.setState({ name: 'ארכיון המשימות' }); }}>לארכיון המשימות</button>]
 
 
         return { LinksForTable }
@@ -216,47 +205,54 @@ export class Tasks extends Component {
         return { fieldsToAdd, LinksPerObject };
 
     }
-    set = async (object) => {
+    set =  (object) => {
 
-
-        const docks = await postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 })
-        if (docks && docks[0])
-            object.document = docks.map((dock, index) => <button key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
+        if (this.state.docks && this.state.docks[0])
+            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
 
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
 
         let tempobject = object;
         let LinksPerObject = [];
-        const propertyObject = await postFunction('Property/GetPropertyByID', { id: object.PropertyID });
+        postFunction('Property/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ propertyObject: res }))
 
-        // let typeObj = this.state.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId)
-        // object.TaskTypeId = typeObj.Name
-        // let classifObj = this.this.state.ClassificationOptions.find(obj => obj.ID === object.ClassificationID)
-        // object.ClassificationID = classifObj.Name;
-        // classifObj = this.state.ClassificationOptions.find(obj => obj.ID === object.ClientClassificationID)
-        // object.ClientClassificationID = classifObj.Name;
+        let typeObj = this.state.TaskTypeOptions.length > 0 ?
+            this.state.TaskTypeOptions.find(obj => obj.Id === object.TaskTypeId) : {}
+        object.TaskTypeId = typeObj.Name
+
+        let classifObj = this.state.ClassificationOptions.length > 0 ?
+            this.state.ClassificationOptions.find(obj => obj.ID === object.ClassificationID) : {}
+        object.ClassificationID = classifObj.Name;
+
+        classifObj = this.state.ClassificationOptions.length > 0 ?
+            this.state.ClassificationOptions.find(obj => obj.ID === object.ClientClassificationID) : {}
+        object.ClientClassificationID = classifObj.Name;
+
         let fieldsToAdd = this.setForForm(object).fieldsToAdd;
         fieldsToAdd[fieldsToAdd.length - 1].name = 'מסמכים'
+
         object.DateForHandling = new Date(object.DateForHandling).toLocaleDateString();
+
         if (object.TaskTypeId === 1 || object.TaskTypeId === 4) {
             if (object.TaskTypeId === 1)
                 object.ReportDate = new Date(object.ReportDate).toLocaleDateString();
             object.PropertyID = <Link onClick={() => {
                 this.setState({ showDetails: true })
                 this.setState({
-                    showSomthing: <Properties object={propertyObject} type='details'
+                    showSomthing: <Properties object={this.state.propertyObject} type='details'
                         isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
                 })
             }}>{object.PropertyID}</Link>
 
 
             if (object.SubPropertyID !== null) {
-                const spobject = await postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID })
-                LinksPerObject.push(<button onClick={() => {
+                postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID }).then(res => this.setState({ spobjectres: res }))
+                LinksPerObject.push(<button type='button' onClick={() => {
                     this.setState({
                         showDetails: true, showSomthing:
-                            <SubProperties object={spobject}
+                            <SubProperties object={this.state.spobject}
                                 type='details' isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
                     })
                 }}>פרטי נכס מחולק</button>)//קישור לקומפוננטת נכסים והאוביקט הוא מה שיתקבל מהפונקציה של תת נכסים של נכס מסוים
@@ -274,7 +270,7 @@ export class Tasks extends Component {
         if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2 && this.props.user.RoleID !== 3) {
             return <Redirect to='/a' />
         }
-        debugger;
+        
         if (this.props.type === 'report') {
 
             return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
@@ -306,8 +302,6 @@ export class Tasks extends Component {
         }
 
         else if (this.props.type === 'form') {
-            debugger;
-            //{this.props.formName}
             return <div><Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
                 name='הוסף'
@@ -324,7 +318,7 @@ export class Tasks extends Component {
                 setForTable={this.setForTable}
                 set={this.set} setForForm={this.setForForm}
                 delObject={this.submit}
-                validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
+                validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
                 fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}</div>
         }
     }

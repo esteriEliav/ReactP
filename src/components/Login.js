@@ -66,7 +66,16 @@ export class Login extends Component {
 
 export const mapStateToProps = state => {
     return {
-        user: state.user
+        ...state
+        //     user: state.user,
+        //     propertiesList:spropertiesList,
+        // ownersList :GetFunction('PropertyOwner/getAllOwners'),
+        // rentalsList :GetFunction('Rental/GetAllRentals'),
+        // rentersList =GetFunction('Renter/GetAllRenters'),
+        // SubPropertiesList :GetFunction('SubProperty/GetAllSubProperties'),
+        // tasksLists :GetFunction('Task/GetAllTasks'),
+        // cities:GetFunction('Property/GetAllCities')
+
     }
 };
 export const mapDispatchToProps = dispatch => {

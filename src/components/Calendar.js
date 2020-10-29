@@ -48,7 +48,7 @@ class Calendar extends React.Component {
   }
 
   handleDateClick = (arg) => {
-    alert('working');
+    //alert('working');
     this.setState({
       showAddTask: <Tasks type='form' formType='Add' formName='הוסף' object={{ DateForHandling: arg.date }}
         isOpen={this.state.showAddTask === null} closeModal={this.closeModal} />
