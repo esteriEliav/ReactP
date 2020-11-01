@@ -5,9 +5,9 @@ const property = () => {
         PropertyID: null,
         OwnerID: null,
         CityID: null,
-        CityName: null,
+        
         StreetID: null,
-        StreetName: null,
+        
         Number: null,
         Size: null,//--גודל דירה
         Floor: null,

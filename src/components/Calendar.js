@@ -52,7 +52,7 @@ class Calendar extends React.Component {
       showAddTask: <Tasks type='form' formType='Add' formName='הוסף' object={{ DateForHandling: arg.date }}
         isOpen={this.state.showAddTask === null} closeModal={this.closeModal} />
     })
-    debugger;
+    
     // let path = '/AddTask'+arg.event.date;
     //this.props.history.push(path);
   };

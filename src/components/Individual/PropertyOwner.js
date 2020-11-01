@@ -29,6 +29,10 @@ export class PropertyOwner extends Component {
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }],
         ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.ownersList,
+       fieldsToSearch:[{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
+       { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
+       { field: 'Phone', name: 'טלפון', type: 'text',},
+       { field: 'Email', name: 'אימייל', type: 'text' }],
         showForm: false,
         showDetails: false,
         showSomthing: null,
@@ -47,17 +51,22 @@ export class PropertyOwner extends Component {
 
         this.setState({ showForm: false, showSomthing: null })
     }
-    submitSearch = (object) => {
+    submitSearch =async (object) => {
+     
         const path = 'PropertyOwner/Search';
 
         if (object) {
-            let objects = Search(object, path)
+               
+            let objects =await Search(object, path)
+
             let name = 'תוצאות חיפוש'
-            if (objects === null || objects === []) {
-                objects = []
-                name = 'לא נמצאו תוצאות'
+            if (objects)
+            {
+            if (objects.length ===0 ) {
+                name = 'לא נמצאו תוצאות'    
             }
-            this.setState({ objectsArray: objects, name })
+            this.setState({ ObjectsArray: objects, name:name,fieldsToSearch:null })
+            }
         }
     }
     submit = async (type, object) => {
@@ -120,7 +129,12 @@ export class PropertyOwner extends Component {
         let LinksForTable = []
 
         if (this.state.name !== 'משכירים')
-            LinksForTable = [<button type='button' type='button' onClick={() => { this.setState({ ObjectsArray: this.props.ownersList, name: 'משכירים' }) }}>חזרה למשכירים</button>]
+            LinksForTable = [<button type='button' type='button' onClick={() => { 
+                this.setState({ ObjectsArray: this.props.ownersList, name: 'משכירים' ,
+                fieldsToSearch:[{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
+                { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
+                { field: 'Phone', name: 'טלפון', type: 'text',},
+                { field: 'Email', name: 'אימייל', type: 'text' }],}) }}>חזרה למשכירים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -141,23 +155,29 @@ export class PropertyOwner extends Component {
         const LinksPerObject = []
         return { fieldsToAdd, LinksPerObject }
     }
-    set = (object) => {
+    set =(object) => {
 
         let properties = null
         let fieldsToAdd = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
-        postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: this.props.user.UserID }).then(res => this.setState({ properties: res }))
-        let res = this.state.properties
-        res = res !== null ? res : [];
+        
+       postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: object.OwnerID}).then(res =>{ this.setState({ properties: res })})
+     //this.setState({properties: await postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: object.OwnerID})})
+       // let res = this.state.properties
+        // res = res !== null ? res : [];
         let LinksForEveryRow = [<Link 
             to={{
-                pathname: '/Properties', objects: res
+                pathname: '/Properties', objects: this.state.properties!== null ?this.state.properties  : []
+               
             }} >דירות</Link>]
-        postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => this.setState({ dock: res }))
-        if (this.state.docks && this.state.docks[0]) {
-            fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+            
+        postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => {this.setState({ docks: res });})    
+       //this.setState({docks: await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })})
+       if (this.state.docks && this.state.docks[0]) {
+        fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
+            
+        object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow, object, enable: true,
@@ -194,7 +214,7 @@ export class PropertyOwner extends Component {
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
                 validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsArray.filter((i, ind) => ind != 4)} />
+                fieldsToSearch={this.state.fieldsToSearch} />
                 {this.state.showSomthing}</div>
         }
     }

@@ -45,8 +45,20 @@ export class Form extends Component {
     }
 
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
-
-        if (e.target.type === 'file') {
+        debugger;
+if(e)
+{
+        if(!e.target)
+        {
+            let tempObject = { ...this.state.Object };
+            tempObject[field] = e[0].id ;
+            const links = this.props.setForForm(tempObject)
+            this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
+        }
+       else 
+       {
+       if (
+            e.target.type === 'file') {
             if (e.target.files[0]) {
                 let reader = new FileReader();
                 reader.readAsDataURL(e.target.files[0]);
@@ -70,7 +82,8 @@ export class Form extends Component {
         tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         const links = this.props.setForForm(tempObject)
         this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
-
+    }
+}
     }
 
 
@@ -122,7 +135,7 @@ export class Form extends Component {
 
         return (
             <div>
-                <Popup open={this.props.isOpen} closeOnDocumentClick={false}
+                <Popup open={true} closeOnDocumentClick={false}
                     contentStyle={{ backgroundColor: "gray", width: '50%' }} nested modal>
 
                     <a className="close" onClick={this.props.closeModal}>
@@ -135,12 +148,12 @@ export class Form extends Component {
                                 <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} focusHandler={focusHandler} />
                                 {this.state.erors[field.field] && <><br /><em>{this.state.erors[field.field]}</em></>}
                                 {func(index)}
-                                <p />
+                                
                             </span>
 
                         )}
                         {func('end')}
-                        <p />
+                      
                         {/* באטן של סבמיט */}
                         <button type='submit' name={this.props.name} >{this.props.name}</button>
                     </form>

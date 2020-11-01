@@ -123,7 +123,7 @@ export const Search = async (object, path) => {
     let x;
     await Axios.post(path, { ...object })
         .then(res => {
-            console.log('בהצלחה')
+            console.log(path,res.data)
             x = res.data;
         }
             , () => {
@@ -135,7 +135,7 @@ export const Search = async (object, path) => {
 export const GetFunction = async (path) => {// לפונקציות get 
     let x;
     await Axios.get(path).then(res => {
-        console.log(res.data)
+        console.log(path,res.data)
         x = res.data
     }, res => { console.log(res); x = null })
     return x;
@@ -144,7 +144,7 @@ export const GetFunction = async (path) => {// לפונקציות get
 export const postFunction = async (path, data) => {//לפונקציות ששולחות ערך אחד
     let x;
     await Axios.post(path, data).then(res => {
-        console.log(res.data)
+        console.log(path,res.data)
         x = res.data;
         ;
     }, () => { x = null })

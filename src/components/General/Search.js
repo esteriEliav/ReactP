@@ -13,9 +13,9 @@ export class Search extends Component {
         isRedirect: false,
     }
     componentDidMount = () => {
-        let tempObject = {}
-        this.props.fieldsArray.map(field => { tempObject[field.field] = "" });
-        this.setState({ Object: tempObject });
+        // let tempObject = {}
+        // this.props.fieldsArray.map(field => { tempObject[field.field] = "" });
+        // this.setState({ Object: tempObject });
 
     }
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
@@ -26,8 +26,9 @@ export class Search extends Component {
     }
     submitHandler = (e) => {
         e.preventDefault();
-
-        this.setState({ isRedirect: this.props.submit('Search', this.state.Object) })
+        this.props.submit(this.state.Object)
+debugger;
+        // this.setState({ isRedirect: this.props.submit(this.state.Object) })
     }
 
     render() {
@@ -44,7 +45,7 @@ export class Search extends Component {
                     {/* באטן של סבמיט */}
                     <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
                 </form>
-                {this.state.isRedirect}
+                {/* {this.state.isRedirect} */}
             </div>
         )
     }

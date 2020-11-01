@@ -38,7 +38,7 @@ export class Renter extends Component {
         // { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }],
 
         fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
-        { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }, { field: 'Phone', name: 'טלפון', type: 'tel' }],
+        { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'text' }],
         isAutho: true,
         showForm: this.props.type == 'form' ? true : false,
         showDetails: this.props.type == 'details' ? true : false,
@@ -71,17 +71,19 @@ export class Renter extends Component {
         return { isErr: isErr, generalEror: generalEror, erors: erors }
 
     }
-    submitSearch = (object) => {
+    submitSearch =async (object) => {
         const path = 'Renter/Search';
 
         if (object) {
-            let objects = Search(object, path)
+            let objects =await Search(object, path)
+            if (objects)
+            {
             let name = 'תוצאות חיפוש'
-            if (objects === null || objects === []) {
-                objects = []
+            if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ objectsArray: objects, name })
+            this.setState({ ObjectsArray: objects, name,fieldsToSearch:null })
+        }
         }
     }
     submit = async (type, object) => {
@@ -132,7 +134,11 @@ export class Renter extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'שוכרים')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.rentersList, name: 'שוכרים' }) }}>חזרה לשוכרים</button>]
+            LinksForTable = [<button type='button' onClick={() => { 
+                this.setState({ ObjectsArray: this.props.rentersList, name: 'שוכרים',
+                fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
+                { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'text' }],
+                 }) }}>חזרה לשוכרים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })

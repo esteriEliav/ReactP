@@ -36,7 +36,8 @@ export class SubProperties extends Component {
         ObjectsArray: //this.props.location.objects
             [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
 
-        fieldsToSearch: [],//[{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
+        
+            fieldsToSearch: [],//[{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         // { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
         isAutho: true,//false
         showForm: this.props.type == 'form' ? true : false,
@@ -84,17 +85,19 @@ export class SubProperties extends Component {
         }
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
-    submitSearch = (object) => {
+    submitSearch =async (object) => {
         const path = 'SubProperty/Search';
 
         if (object) {
-            let objects = Search(object, path)
+            let objects =await Search(object, path)
+            if (objects)
+            {
             let name = 'תוצאות חיפוש'
-            if (objects === null || objects === []) {
-                objects = []
+            if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ objectsArray: objects, name })
+            this.setState({ ObjectsArray: objects, name })
+        }
         }
     }
     submit =async (type, object) => {
@@ -235,7 +238,8 @@ export class SubProperties extends Component {
             return <div><Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
-                validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
+                validate={this.validate} erors={this.state.erors} submit={this.submit} 
+                submitSearch={this.submitSearch}
             />{this.state.showSomthing}</div>
 
     }

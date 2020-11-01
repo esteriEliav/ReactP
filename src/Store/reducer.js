@@ -10,7 +10,8 @@ const initialState = {
     rentersList: [],
     SubPropertiesList: [],
     tasksList: [],
-    cities: []
+    cities: [],
+    streets: []
 
 
 };
@@ -55,6 +56,11 @@ const reducer = (state= initialState, action) => {
         return {
             ...state,
             cities: action.cities
+        }
+        if (action.type === 'SET_STREETS')
+        return {
+            ...state,
+            streets: action.streets
         }
     return state
 };

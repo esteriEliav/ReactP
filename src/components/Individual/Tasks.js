@@ -117,21 +117,22 @@ export class Tasks extends Component {
             this.closeExtentionModal()
         }
     }
-    submitSearch = (object) => {
+    submitSearch =async (object) => {
         const path = 'Task/Search';
 
         if (object) {
-            let objects = Search(object, path)
+            let objects =await Search(object, path)
+            if (objects)
+            {
             let name = 'תוצאות חיפוש'
-            if (objects === null || objects === []) {
-                objects = []
+            if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ objectsArray: objects, name })
+            this.setState({ ObjectsArray: objects, name ,fieldsToSearch:null})
+        }
         }
     }
     submit = async (type, object) => {
-        ;
         let path = 'Task/' + type + 'Task';
         if (type === 'Add' || type === 'Update') {
             let newObj = TaskObject();
@@ -178,7 +179,11 @@ export class Tasks extends Component {
         let LinksForTable = [];
 
         if (this.state.name !== 'משימות') {
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.tasksList, name: 'משימות' }) }}>חזרה למשימות</button>]
+            LinksForTable = [<button type='button' onClick={() => { 
+                this.setState({ ObjectsArray: this.props.tasksList, name: 'משימות',
+                fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] },
+                { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+         }) }}>חזרה למשימות</button>]
 
         }
         else

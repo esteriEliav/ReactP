@@ -21,7 +21,7 @@ export class Login extends Component {
 
         }
     componentDidMount = async () => {
-        
+        debugger;
        let list = await GetFunction('PropertyOwner/getAllOwners')
         this.props.setOwners(list !== null ? list : [])
          list = await GetFunction('Property/GetAllProperties')
@@ -36,7 +36,9 @@ export class Login extends Component {
         this.props.setTasks(list !== null ? list : [])
         list = await GetFunction('Property/GetAllCities')
         this.props.setCities(list !== null ? list : [])
-
+        list=await GetFunction('Property/GetAllStreets')
+        this.props.setStreets(list !== null ? list : [])
+        debugger;
 
     }
 
@@ -66,6 +68,9 @@ export class Login extends Component {
                 this.props.setTasks(list !== null ? list : [])
                 list = await GetFunction('Property/GetAllCities')
                 this.props.setCities(list !== null ? list : [])
+                list=await GetFunction('Property/GetAllStreets')
+                this.props.setStreets(list !== null ? list : [])
+                
             }
         }
         else
@@ -120,6 +125,7 @@ export const mapDispatchToProps = dispatch => {
         setSubProperties: (SubPropertiesList) => dispatch({ type: 'SET_SUBPROPERTIES', SubPropertiesList }),
         setTasks: (tasksList) => dispatch({ type: 'SET_TASKS', tasksList }),
         setCities: (cities) => dispatch({ type: 'SET_CITIES', cities }),
+        setStreets: (streets) => dispatch({ type: 'SET_STREETS', streets }),
 
     }
 }

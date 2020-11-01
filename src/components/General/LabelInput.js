@@ -12,6 +12,7 @@ export class LabelInput extends Component {
         let content = this.props.content
         if (type === 'select') {
             content = this.props.field.selectOptions.find(i => i.id === content)
+            debugger;
         }
         else if (type === 'date') {
             content = new Date(content).toLocaleDateString()
@@ -19,6 +20,7 @@ export class LabelInput extends Component {
                 .map(i => i > 9 ? i : '0' + i)
                 .join('-');
         }
+       
         return (
             <span>
 
@@ -28,7 +30,7 @@ export class LabelInput extends Component {
                     : type === 'checkbox' ? <input dir='rtl' type='checkbox' checked={content} onChange={(e) => { this.props.change(e, this.props.field.field) }} />
                         : type === 'select' ?
                             <Select dir='rtl' placeholder={this.props.field.name} options={this.props.field.selectOptions} labelField='name' valueField='id' values={content ? [content] : []}
-                                onChange={(e) => { this.props.change(e, this.props.field.field) }} direction='rtl' noDataLabel='אין נתונים' required={this.props.field.required} />
+                                onChange={(e) => { this.props.change(e, this.props.field.field); debugger}} direction='rtl' noDataLabel='אין נתונים' required={this.props.field.required} />
                             // <select value={content} onChange={(e) => { this.props.change(e, this.props.field.field) if(this.props.field.field==='CityID') }}>
                             //    {/* {this.props.field.selectOptions.map(opp => <option key={opp.id} value={opp.id}>opp.name</option>)}*/}
                             // </select>

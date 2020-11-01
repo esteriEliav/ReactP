@@ -56,7 +56,7 @@ export class Rentals extends Component {
 
     }
     componentDidMount = async () => {
-        const PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes');
+        let PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes');
         PaymentTypeOptions = PaymentTypeOptions !== null ?
             PaymentTypeOptions.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
         const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
@@ -101,17 +101,19 @@ export class Rentals extends Component {
         }
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
-    submitSearch = (object) => {
+    submitSearch =async (object) => {
         const path = 'Rental/Search';
 
         if (object) {
-            let objects = Search(object, path)
+            let objects =await Search(object, path)
+            if (objects)
+            {
             let name = 'תוצאות חיפוש'
-            if (objects === null || objects === []) {
-                objects = []
+            if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ objectsArray: objects, name })
+            this.setState({ ObjectsArray: objects, name,fieldsToSearch:null })
+        }
         }
     }
     submit = async (type, object) => {
@@ -161,7 +163,11 @@ export class Rentals extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'השכרות')
-            LinksForTable = [<button type='button' onClick={() => { this.setState({ ObjectsArray: this.props.rentalsList, name: 'השכרות' }) }}>חזרה להשכרות</button>]
+            LinksForTable = [<button type='button' onClick={() => {
+                 this.setState({ ObjectsArray: this.props.rentalsList, name: 'השכרות',
+                 fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'Owner', name: 'שם משכיר', type: 'text' }, { field: 'User', name: 'שם שוכר ', type: 'text' },
+        { field: 'EnteryDate', name: 'מתאריך כניסה לדירה', type: 'date' },
+        { field: 'EndDate', name: 'עד תאריך סיום חוזה', type: 'date' }], }) }}>חזרה להשכרות</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 debugger;

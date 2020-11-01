@@ -40,7 +40,7 @@ export class Details extends Component {
 
         return (
             <div>
-                <Popup open={this.props.isOpen} closeOnDocumentClick={false}
+                <Popup open={true} closeOnDocumentClick={false}
                     contentStyle={{ backgroundColor: "gray" }} nested modal>
                     <a className="close" onClick={this.props.closeModal}>&times; </a>
 
