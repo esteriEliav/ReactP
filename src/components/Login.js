@@ -38,6 +38,8 @@ export class Login extends Component {
         this.props.setCities(list !== null ? list : [])
         list=await GetFunction('Property/GetAllStreets')
         this.props.setStreets(list !== null ? list : [])
+        list=await GetFunction('User/GetAllDocuments')
+         this.props.setDocuments(list !== null ? list : [])
         debugger;
 
     }
@@ -70,6 +72,8 @@ export class Login extends Component {
                 this.props.setCities(list !== null ? list : [])
                 list=await GetFunction('Property/GetAllStreets')
                 this.props.setStreets(list !== null ? list : [])
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
                 
             }
         }
@@ -126,7 +130,7 @@ export const mapDispatchToProps = dispatch => {
         setTasks: (tasksList) => dispatch({ type: 'SET_TASKS', tasksList }),
         setCities: (cities) => dispatch({ type: 'SET_CITIES', cities }),
         setStreets: (streets) => dispatch({ type: 'SET_STREETS', streets }),
-
+        setDocuments: (documents) => dispatch({ type: 'SET_DOCUMENTS', documents })
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

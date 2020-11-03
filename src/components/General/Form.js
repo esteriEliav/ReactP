@@ -45,15 +45,20 @@ export class Form extends Component {
     }
 
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
-        debugger;
+      
 if(e)
 {
         if(!e.target)
         {
+            if(e[0])
+            {
             let tempObject = { ...this.state.Object };
             tempObject[field] = e[0].id ;
             const links = this.props.setForForm(tempObject)
-            this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
+            
+          this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
+     }
+    
         }
        else 
        {
@@ -79,7 +84,8 @@ if(e)
         }
 
         let tempObject = { ...this.state.Object };
-        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked :
+        e.target.type === 'radio'?parseInt(e.target.value): e.target.value;
         const links = this.props.setForForm(tempObject)
         this.setState({ Object: tempObject, fieldsToAdd: links.fieldsToAdd, LinksPerObject: links.LinksPerObject })
     }
@@ -111,7 +117,7 @@ if(e)
 
         }
 
-        const submitHandler = (e) => {
+        const submitHandler =async (e) => {
 
             e.preventDefault();
             const val = this.props.validate(this.state.Object)
@@ -119,7 +125,10 @@ if(e)
                 this.setState({ generalEror: val.generalEror, erors: val.erors })
             else {
                 //this.setState({ Redirect: this.props.submit(this.props.type, this.state.Object) })
-                this.props.submit(this.props.type, this.state.Object)
+                const res=await this.props.submit(this.props.type, this.state.Object)
+                
+                if(res!==null)
+                this.props.closeModal();
             }
         }
 

@@ -56,21 +56,30 @@ export class Rentals extends Component {
 
     }
     componentDidMount = async () => {
+      
         let PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes');
+        
         PaymentTypeOptions = PaymentTypeOptions !== null ?
             PaymentTypeOptions.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
-        const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.FirstName + ' ' + item.LastName } })
-        const cities = this.props.cities
-        const propertiesOptions = this.props.propertiesList.map(async item => {
-            const street = await postFunction('Property/GetStreetByID', item.CityID);
-            if (street !== null)
-                return { id: item.PropertyID, name: item.PropertyID + ':' + street.streetName + ' ' + item.Number + ' ' + cities.find(city => city.CityID === item.CityID).cityName }
+        const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
+        //const cities = this.props.cities
+        
+        let city;
+        let street;
+        const propertiesOptions = this.props.propertiesList.map(item => {
+            //const street = await postFunction('Property/GetStreetByID', item.CityID);
+           city=this.props.cities.find(i=>i.CityId===item.CityID)
+            street=this.props.streets.find(i=>i.CityId===item.CityID && i.StreetID===item.StreetID)
+            
+            return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
         })
         let fieldsArray = [...this.state.fieldsArray];
         fieldsArray[0].selectOptions = propertiesOptions;
         fieldsArray[1].selectOptions = renters;
         fieldsArray[3].radioOptions = PaymentTypeOptions;
-        this.setState({ fieldsArray, PaymentTypeOptions: PaymentTypeOptions })
+        this.setState({ fieldsArray, PaymentTypeOptions})
+        
+        
 
     }
 
@@ -119,9 +128,17 @@ export class Rentals extends Component {
     submit = async (type, object) => {
         let path = 'Rental/' + type + 'Rental'
         if (type === 'Add' || type === 'Update') {
+           
             let newObj = RentalObject()
-            if (type === 'Add')
+            if (type === 'Add') {
                 newObj.RentalID = 1
+               let property= this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
+                if(property.IsRented!==true)
+                {
+                    property.IsRented=true;
+                    postFunction('Property/UpdateProperty',property);
+                }
+            }
             else
                 newObj.RentalID = object.RentalID
             // newObj.PropertyID = object.PropertyID
@@ -152,10 +169,10 @@ export class Rentals extends Component {
             object = { id: object.RentalID }
 
         }
-        const res = await CommonFunctions(type, object, path)
-        if (res && res !== null) {
-            this.closeFormModal();
-        }
+       return await CommonFunctions(type, object, path)
+        // if (res && res !== null) {
+        //     this.closeFormModal();
+        // }
     }
 
     //אמורה להיות פונקציה שממפה עבור כל איידי את השם
@@ -170,7 +187,7 @@ export class Rentals extends Component {
         { field: 'EndDate', name: 'עד תאריך סיום חוזה', type: 'date' }], }) }}>חזרה להשכרות</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
-                debugger;
+               
                 this.setState({ showForm: true })
                 this.setState({
                     showSomthing: <Form closeModal={this.closeFormModal} isOpen={this.state.showForm}
@@ -218,83 +235,118 @@ export class Rentals extends Component {
         let LinksPerObject = []
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
+      let  tempObject={...object}
         let fieldsToAdd = []
-        postFunction('Property/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ property: res }))
+        //postFunction('Property/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ property: res }))
+        const property=this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
+        
+        //postFunction('PropertyOwner/GetOwnerByID', { id: this.state.property.OwnerID }).then(res => this.setState({ owner: res }))
+        const ownerObject=this.props.ownersList.find(i=>i.OwnerID===property.OwnerID)
 
-        postFunction('PropertyOwner/GetOwnerByID', { id: this.state.property.OwnerID }).then(res => this.setState({ owner: res }))
-
-
-        postFunction('Renter/GetRenterByID', { id: object.UserID }).then(res => this.setState({ userObject: res }))
-        object.PropertyID = <Link onClick={() => {
+        //postFunction('Renter/GetRenterByID', { id: object.UserID }).then(res => this.setState({ userObject: res }))
+        const userObject=this.props.rentersList.find(i=>i.UserID===object.UserID)
+        
+        
+        tempObject.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
-                    <Properties type='details' object={this.state.property !== null ? this.state.property : {}}
+                    <Properties type='details' object={property !== null ? property : {}}
                         isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
             })
         }}
+    
+    
         >{object.PropertyID}</Link>
 
-        LinksPerObject.push(<button type='button' onClick={() => {
+        LinksPerObject.push(<button type='button' index={0} onClick={() => {
             this.setState({
                 showForm: true, showSomthing:
-                    <Properties type='form' formType='Update' formName='עריכה' index={0} object={this.state.property}
+                    <Properties type='form' formType='Update' formName='עריכה' index={0} object={property}
                         isOpen={this.state.showForm} closeModal={this.closeFormModal} />
             })
         }}>
-            ערוך נכס</button>)
+            ערוך פרטי נכס</button>)
 
-        if (object.SubPropertyID !== null) {
-            postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID }).then(res => this.setState({ spobject: res }))
-            LinksPerObject.push(<button type='button' index='end' onClick={() => {
-                this.setState({ showDetails: true })
-                this.setState({
-                    showSomthing:
-                        <SubProperties isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
-                            object={this.state.spobject}
-                            type='details' />
-                })
-            }} >פרטי נכס מחולק </button>)
-
-        }
-        object.UserID = <Link onClick={() => {
+        
+        
+        if(userObject)
+        {
+        let renterName=userObject.FirstName!==null?userObject.FirstName:'';
+        renterName+=userObject.LastName!==null?' '+userObject.LastName:'';
+        tempObject.UserID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
-                    <Renter type='details' object={this.state.userObject !== null ? this.state.userObject : {}}
+                    <Renter type='details' object={userObject !== null ? userObject : {}}
                         isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
             })
         }}>
-            {this.state.userObject && this.state.userObject.FirstName + ' ' + this.state.userObject.LastName}</Link>
-
-        object.EnteryDate = new Date(object.EnteryDate).toLocaleDateString();
-        object.EndDate = new Date(object.EndDate).toLocaleDateString();
+            {userObject && renterName}</Link>
+        }
+         
+         if(object.EnteryDate)
+       tempObject.EnteryDate = new Date(object.EnteryDate).toLocaleDateString();
+       if(object.EndDate)
+        tempObject.EndDate = new Date(object.EndDate).toLocaleDateString();
+        if(object.PaymentTypeID && this.state.PaymentTypeOptions.length>0)
+        {
+           
+        const PaymentType = this.state.PaymentTypeOptions.find(i => i.id === object.PaymentTypeID);
+        tempObject.PaymentTypeID = PaymentType.name
+    }
+    if(object.ContactRenew)
+    tempObject.ContactRenew='V'
+    else
+    tempObject.ContactRenew='X'
+        if(ownerObject)
+        {
+        let ownerName=ownerObject.OwnerFirstName !==null?': '+ownerObject.OwnerFirstName :'';
+        ownerName+=ownerObject.OwnerLastName!==null?' '+ownerObject.OwnerLastName:'';
         LinksPerObject.push(<button type='button' index='end' onClick={() => {
             this.setState({
-                showDetails: true, showSomthing: <PropertyOwner Object={this.state.ownerobject}
-                    type='details' isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
+                showDetails: true, showSomthing: <PropertyOwner object={ownerObject}
+                    type='details' isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} 
+                    propertiesList={this.props.propertiesList}
+                    documents={this.props.documents}/>
             })
         }}
-        >{this.state.ownerobject && this.state.ownerobject.OwnerFirstName + ' ' + this.state.ownerobject.OwnerLastName}:משכיר</button>,
+        >משכיר{ownerName}</button>,
 
             <button type='button' index='end' onClick={() => {
                 this.setState({ showForm: true })
                 this.setState({
                     showSomthing:
                         <PropertyOwner type='form' formType='Update' formName='עריכה'
-                            object={this.state.ownerobject} isOpen={this.state.showForm} closeModal={this.closeFormModal} />
+                            object={ownerObject} isOpen={this.state.showForm} closeModal={this.closeFormModal} />
                 })
             }}>
                 ערוך משכיר </button>)
-        const PaymentType = this.state.PaymentTypeOptions.find(i => i.id === object.PaymentTypeID);
-        object.PaymentTypeID = PaymentType.name
-        postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 }).then(res => this.setState({ docks: res }))
-
-        if (this.state.docks && this.state.docks[0]) {
-            fieldsToAdd.push({ field: 'document', name: 'מסמכים', type: 'file', index: 'end' })
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+        }
+         
+       
+        //postFunction('User/GetUserDocuments', { id: object.RentalID, type: 3 }).then(res => this.setState({ docks: res }))
+        if (object.SubPropertyID !== null) {
+            // postFunction('SubProperty/GetSubPropertyByID', { id: object.SubPropertyID }).then(res => this.setState({ spobject: res }))
+            const spobject=this.props.SubPropertiesList.find(i=>i.SubPropertyID===object.SubPropertyID)
+            LinksPerObject.push(<button type='button' index='end' onClick={() => {
+                 this.setState({ showDetails: true })
+                 this.setState({
+                     showSomthing:
+                         <SubProperties isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
+                             object={spobject}
+                             type='details' />
+                 })
+             }} >פרטי נכס מחולק </button>)
+ 
+         }
+        const docks=this.props.documents.filter(i=>i.type===3 && i.DocUser===object.RentalID)
+       
+       if (docks && docks[0]) {
+        fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
+        object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow,
-            ButtonsForEveryRow, object, enable: true,
+            ButtonsForEveryRow, object:tempObject, 
             LinksPerObject
         };
 

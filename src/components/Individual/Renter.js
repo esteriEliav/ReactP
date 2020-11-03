@@ -124,11 +124,11 @@ export class Renter extends Component {
                 return;
             object = { id: object.UserID }
         }
-        const res = await CommonFunctions(type, object, path)
+        return await CommonFunctions(type, object, path)
             ;
-        if (res && res !== null) {
-            this.closeFormModal();
-        }
+        // if (res && res !== null) {
+        //     this.closeFormModal();
+        // }
     }
 
     setForTable = () => {
@@ -181,11 +181,13 @@ export class Renter extends Component {
         let fieldsToAdd = [];
         let LinksForEveryRow = [<Link
             to={{ pathname: '/Properties', objects: this.state.properties }}>דירות ששוכר</Link>]
-        postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0]) {
-            fieldsToAdd.push({ field: 'document', name: 'מסמכים', type: 'file', index: 'end' })
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-        }
+        //postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
+        const docks=this.props.documents.filter(i=>i.type===4 && i.DocUser===object.UserID)
+       
+        if (docks && docks[0]) {
+         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
+         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+         }
         return {
             fieldsToAdd, LinksForEveryRow: LinksForEveryRow, object, enable: true,
             ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject

@@ -45,11 +45,12 @@ export class PropertyOwner extends Component {
     }
     closeDetailsModal = () => {
 
-        this.setState({ showDetails: false, showSomthing: null })
+        this.setState({ showSomthing: null })
     }
     closeFormModal = () => {
 
-        this.setState({ showForm: false, showSomthing: null })
+        this.setState({  showSomthing: null })
+        
     }
     submitSearch =async (object) => {
      
@@ -91,7 +92,7 @@ export class PropertyOwner extends Component {
                 Dock = object.add;
 
             }
-
+           
             object = new PropertyOwnerObject(OwnerID, OwnerFirstName, OwnerLastName, Phone, Email, Dock, docName)
 
 
@@ -103,11 +104,10 @@ export class PropertyOwner extends Component {
                 return;
             object = { id: object.OwnerID }
         }
-        const res = await CommonFunctions(type, object, path)
-            ;
-        if (res && res !== null) {
-            this.closeFormModal();
-        }
+        return await CommonFunctions(type, object, path)
+        // if (res!==null) {
+        //     this.closeFormModal();
+        // }
     }
 
 
@@ -157,27 +157,30 @@ export class PropertyOwner extends Component {
     }
     set =(object) => {
 
-        let properties = null
+        //let properties = null
         let fieldsToAdd = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
         
-       postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: object.OwnerID}).then(res =>{ this.setState({ properties: res })})
+       //postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: object.OwnerID}).then(res =>{ this.setState({ properties: res })})
+       const properties=this.props.propertiesList.filter(i=>i.OwnerID
+        ===object.OwnerID)
      //this.setState({properties: await postFunction('PropertyOwner/GetPropertiesbyOwnerID', { id: object.OwnerID})})
        // let res = this.state.properties
         // res = res !== null ? res : [];
         let LinksForEveryRow = [<Link 
             to={{
-                pathname: '/Properties', objects: this.state.properties!== null ?this.state.properties  : []
+                pathname: '/Properties', objects: properties!== null ?properties  : []
                
             }} >דירות</Link>]
             
-        postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => {this.setState({ docks: res });})    
+        //postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => {this.setState({ docks: res });})    
        //this.setState({docks: await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })})
-       if (this.state.docks && this.state.docks[0]) {
-        fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
-            
-        object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.name.dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
+       const docks=this.props.documents.filter(i=>i.type===2 && i.DocUser===object.OwnerID)
+       
+       if (docks && docks[0]) {
+        fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
+        object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow, object, enable: true,

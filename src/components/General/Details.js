@@ -24,8 +24,9 @@ export class Details extends Component {
         let i = 0, j = 0, k = 0, x
         const func = (index) => {//פונקציה שמחזירה את כל הקישורים,הלחצנים והשדות עבור האוביקט בשביל שדה מסוים
             let items = [];
-            console.log('object-det', this.state.object)
+           
             while (i < this.props.LinksPerObject.length && this.props.LinksPerObject[i].props.index === index) {
+                
                 items.push(this.props.LinksPerObject[i])
                 i += 1
             }
@@ -45,12 +46,12 @@ export class Details extends Component {
                     <a className="close" onClick={this.props.closeModal}>&times; </a>
 
                     {this.props.fieldsArray.map((item, index) => {
+                       
+                        return  <div key={index}>
 
-                        return this.props.Object[item.field] && <div key={index}>
+                          {this.props.Object[item.field] &&  <div><label dir='rtl'>{item.name}</label>:
 
-                            <label dir='rtl'>{item.name}</label>:
-
-                  <label dir='rtl'>{this.props.Object[item.field]}</label>
+                  <label dir='rtl'>{this.props.Object[item.field]}</label></div>}
                             <span>
                                 {func(index).map(item => <div>{item}</div>)}
                             </span>

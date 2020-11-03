@@ -87,6 +87,7 @@ import { Link, Redirect } from 'react-router-dom';
 
 export const CommonFunctions = async (type, object, path) => {
     let x;
+    debugger;
     await Axios.post(path, object).then(res => {
         if (type == 'Add')
             alert('נוסף בהצלחה')

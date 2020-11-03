@@ -168,10 +168,10 @@ export class Tasks extends Component {
                 return;
             object = { id: object.TaskID }
         }
-        const res = await CommonFunctions(type, object, path)
-        if (res && res !== null) {
-            this.closeFormModal();
-        }
+        return await CommonFunctions(type, object, path)
+        // if (res && res !== null) {
+        //     this.closeFormModal();
+        // }
     }
 
 
@@ -291,11 +291,13 @@ export class Tasks extends Component {
         }
         if (object.IsHandled)
             object.HandlingDate = new Date(object.HandlingDate).toLocaleDateString();
-        postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
-        if (this.state.docks && this.state.docks[0]) {
-            fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
-            object.document = this.state.docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.docName.substring(dock.docName.lastIndexOf('/'))}</button>)
-        }
+        //postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
+        const docks=this.props.documents.filter(i=>i.type===6 && i.DocUser===object.TaskID)
+       
+        if (docks && docks[0]) {
+         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
+         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+         }
         return {
             fieldsToAdd, LinksForEveryRow, enable: true,
             ButtonsForEveryRow, object: tempobject, LinksPerObject

@@ -14,7 +14,7 @@ export class PopUpForProperties extends Component {
     }
     render() {
         return (
-            <Popup open={this.props.isOpen} closeOnDocumentClick={false}
+            <Popup open={true} closeOnDocumentClick={false}
                 contentStyle={{ backgroundColor: "red" }} >
                 <a className="close" onClick={this.props.closeModal}>
                     &times;</a>
