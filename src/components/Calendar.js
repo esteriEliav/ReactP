@@ -2,11 +2,11 @@ import React from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import { Redirect, withRouter } from 'react-router-dom';
-import { mapStateToProps } from './Login'
+import { mapStateToProps } from './Login/Login'
 import { connect } from 'react-redux'
 import interactionPlugin from '@fullcalendar/interaction';
 import Axios from './Axios';
-import Tasks from './Individual/Tasks';
+import Tasks from './Individual/Task/Tasks';
 
 
 

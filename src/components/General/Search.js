@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
 //import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import Popup from 'reactjs-popup';
-import { mapStateToProps } from '../Login'
+import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 
 export class Search extends Component {

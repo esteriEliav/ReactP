@@ -2,13 +2,13 @@ import Axios from '../Axios';
 import React, { Component } from 'react'
 import Table from '../General/Table'
 import Main1 from "../Individual/PropertyOwner";
-import PropertyForRenter from "../Individual/PropertyForRenter";
-import Properties from "../Individual/Properties";
-import Rentals from "../Individual/Rentals";
-import Tasks from "../Individual/Tasks";
+import PropertyForRenter from "../Individual/PropertiesForRenter/PropertyForRenter";
+import Properties from "../Individual/Properties/Properties";
+import Rentals from "../Individual/Rentals/Rentals";
+import Tasks from "../Individual/Task/Tasks";
 import SubProperties from "../Individual/SubProperties";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import TasksPopUp from "../Individual/TasksPopUp";
+import TasksPopUp from "../TasksPopUp/TasksPopUp";
 import { Link, Redirect } from 'react-router-dom';
 import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 import { connect } from 'react-redux'

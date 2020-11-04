@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Login from './components/Login'
+import Login from './components/Login/Login'
 import Calendar from './components/Calendar'
 import EventDetails from './components/EventDetails'
 import Sign_up from './components/Sign_up'
-import Home from './components/Home'
+import Home from './components/Home/Home'
 import Form from './components/General/Form'
 import Details from './components/General/Details'
-import Properties from "./components/Individual/Properties";
+import Properties from "./components/Individual/Properties/Properties";
 import PropertyOwner from "./components/Individual/PropertyOwner";
-import PropertyForRenter from "./components/Individual/PropertyForRenter";
-import Rentals from "./components/Individual/Rentals";
-import Tasks from "./components/Individual/Tasks";
+import PropertyForRenter from "./components/Individual/PropertiesForRenter/PropertyForRenter";
+import Rentals from "./components/Individual/Rentals/Rentals";
+import Tasks from "./components/Individual/Task/Tasks";
 import SubProperties from "./components/Individual/SubProperties";
 import ReportForm from "./components/Individual/ReportForm";
-import Renter from './components/Individual/Renter';
+import Renter from './components/Individual/Renter/Renter';
 import NotFound from './components/General/NotFound';
 import Router from './components/Router';
 import { Route, Switch, withRouter } from 'react-router-dom';
-import TasksPopUp from './components/Individual/TasksPopUp';
+import TasksPopUp from './components/TasksPopUp/TasksPopUp';
 import Search from './components/General/Search';
 import PopUpForProperties from './components/Individual/PopUpForProperties';
 

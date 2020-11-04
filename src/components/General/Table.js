@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import Item from './Item'
+import Item from './Item/Item'
 import Form from './Form'
 import Search from './Search'
 import { Link } from 'react-router-dom'
 import Details, { } from "./Details";
 import ReactExport from "react-export-excel";
-import { mapStateToProps } from '../Login'
+import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 
 

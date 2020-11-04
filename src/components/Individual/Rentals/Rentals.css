@@ -1,0 +1,77 @@
+/* .container-rentals */
+div > form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+ form{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+    margin-bottom: 23px;
+    width: fit-content;
+    /* transform: translate(13%, 0); */
+}
+/* .container-rentals  */
+form input{
+    margin-right: 5px;
+    height: 30px;
+    width: fit-content;
+}
+/* .container-rentals */
+ form span{
+    display: flex;
+    flex-direction: column-reverse;
+}
+/* .container-rentals  */
+form span input{
+    width: max-content;
+}
+/* .container-rentals */
+ form span label{
+    margin-bottom: 0 !important;
+}
+/* .container-rentals */
+ form button{
+        color: white;
+        background-color: #9f8946;
+        border: none;
+        width: 92px;
+        height: 39px;
+        font-size: 20px;
+        margin-right: 30px;
+    }
+/* form button{
+    background-color: #9f8946;
+    border: none;
+    height: 45px;
+    width: 9rem;
+    color: white;
+} */
+/* .container-rentals  */
+table{
+    direction: rtl;
+    width: 97%;
+    margin-right: 2rem;
+}
+/* .container-rentals  */
+table tr th{
+    text-decoration: underline;
+    text-underline-position: under;
+    text-decoration-color: #9f8946;
+
+}
+/* .container-rentals  */
+.AddRent{
+    margin-bottom: 50px;
+    height: 40px;
+    background-color: white;
+    color: #9f8946;
+    border: 1px solid #9f8946;
+    font-weight: bold;
+}
+/* .container-rentals */
+ h1{
+    margin-bottom: 30px;
+}

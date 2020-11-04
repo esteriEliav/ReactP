@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Select from "react-dropdown-select";
-import { mapStateToProps } from '../Login'
+import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 //field,content,change
 
@@ -26,12 +26,11 @@ export class LabelInput extends Component {
             <span>
 
                 {type === 'radio' ?
-                    this.props.field.radioOptions.map((rad, ind) =>{; return  <span key={ind}><input type='radio' name={this.props.field.name} id={rad.id} value={rad.id}
+                    this.props.field.radioOptions.map((rad, ind) =>{ return  <React.Fragment key={ind}><input type='radio' name={this.props.field.name} id={rad.id} value={rad.id}
                         checked={content === rad.id}
-                        
                          onChange={(e) => { this.props.change(e, this.props.field.field);
                              }} />
-                            {rad.name}</span>})
+                            {rad.name}</React.Fragment>})
                     : type === 'checkbox' ? <input dir='rtl' type='checkbox' checked={content} onChange={(e) => { this.props.change(e, this.props.field.field) }} />
                         : type === 'select' ?
                             <Select dir='rtl' placeholder={this.props.field.name} options={this.props.field.selectOptions} labelField='name' valueField='id' values={content ? [content] : []}

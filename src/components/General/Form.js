@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import LabelInput from './LabelInput'
 //import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
-import { mapStateToProps } from '../Login'
+import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import Popup from 'reactjs-popup';
 

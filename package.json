@@ -15,6 +15,7 @@
     "fomantic-ui": "^2.8.6",
     "node-cron": "^2.0.3",
     "react": "^16.13.1",
+    "react-awesome-slider": "^4.1.0",
     "react-dom": "^16.13.1",
     "react-dropdown": "^1.9.0",
     "react-dropdown-select": "^4.5.2",

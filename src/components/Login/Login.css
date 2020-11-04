@@ -1,0 +1,37 @@
+.container-login{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+.login-form{
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  position: relative;
+  display: unset;
+  border: 2px solid #c2a456;
+}
+.login-button{
+  background-color: #c2a456;
+  border: none;
+}
+.forget-password{
+  color: black;
+  text-decoration: none;
+}
+.forget-password a{
+  font-size: 10px;
+  color: #c2a456;
+  margin-right: 4px;
+}
+.close-login{
+  font-size: 32px;
+  position: absolute;
+  top: -58px;
+  left: 50%;
+  font-weight: bolder;
+  color: white;
+  transform: translate(-50%, 0px);
+  font-family: sans-serif;
+}

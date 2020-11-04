@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 //import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 import Popup from 'reactjs-popup';
-import { mapStateToProps } from '../Login'
+import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import Form from './Form';
 

@@ -3,15 +3,15 @@ import Table from '../General/Table'
 import Details from '../General/Details'
 import Form from '../General/Form'
 import AddCommonLinks from '../General/AddCommonLinks'
-import MPropertyForRenterain1 from './PropertyForRenter';
+import MPropertyForRenterain1 from './PropertiesForRenter/PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
 import { CommonFunction, CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
-import { mapStateToProps,mapDispatchToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
-import { Properties } from './Properties'
+import { Properties } from './Properties/Properties'
 
 
 
