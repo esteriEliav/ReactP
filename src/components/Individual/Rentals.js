@@ -7,7 +7,7 @@ import Renter from './Renter';
 import Properties from './Properties';
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import RentalObject from '../../Models-Object/RentalObject';
-import { mapStateToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login'
 import { connect } from 'react-redux'
 import Form from '../General/Form'
 import PropertyOwner from './PropertyOwner';
@@ -56,11 +56,11 @@ export class Rentals extends Component {
 
     }
     componentDidMount = async () => {
-      
-        let PaymentTypeOptions = await GetFunction('Rental/GetAllPaymentTypes');
+      debugger
+        let PaymentTypeOptions1 = await GetFunction('Rental/GetAllPaymentTypes');
         
-        PaymentTypeOptions = PaymentTypeOptions !== null ?
-            PaymentTypeOptions.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
+        PaymentTypeOptions1 = PaymentTypeOptions1 !== null ?
+            PaymentTypeOptions1.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
         const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
         //const cities = this.props.cities
         
@@ -73,16 +73,16 @@ export class Rentals extends Component {
             
             return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
         })
-        let fieldsArray = [...this.state.fieldsArray];
-        fieldsArray[0].selectOptions = propertiesOptions;
-        fieldsArray[1].selectOptions = renters;
-        fieldsArray[3].radioOptions = PaymentTypeOptions;
-        this.setState({ fieldsArray, PaymentTypeOptions})
+        const PaymentTypeOptions=[...PaymentTypeOptions1]
+         let fieldsArray1 = [...this.state.fieldsArray];
+        fieldsArray1[0].selectOptions = propertiesOptions;
+        fieldsArray1[1].selectOptions = renters;
+        fieldsArray1[3].radioOptions = PaymentTypeOptions;
         
-        
-
+       this.setState({ fieldsArray:fieldsArray1, PaymentTypeOptions})
+   
     }
-
+    
     closeDetailsModal = () => {
 
         this.setState({ showDetails: false, showSomthing: null })
@@ -91,9 +91,7 @@ export class Rentals extends Component {
 
         this.setState({ showForm: false, showSomthing: null })
     }
-    componentDidUpdate = () => {
-
-    }
+   
     validate = object => {
         let isErr = false
         let erors = []
@@ -141,10 +139,9 @@ export class Rentals extends Component {
             }
             else
                 newObj.RentalID = object.RentalID
-            // newObj.PropertyID = object.PropertyID
-            //newObj.SubPropertyID = object.SubPropertyID
-            if (object.Phone && object.Phone !== '')
-                newObj.UserID = object.UserID
+             newObj.PropertyID = object.PropertyID
+           newObj.SubPropertyID = object.SubPropertyID
+            newObj.UserID = object.UserID
             if (object.RentPayment && object.RentPayment !== '')
                 newObj.RentPayment = parseFloat(object.RentPayment)
             newObj.PaymentTypeID = object.PaymentTypeID
@@ -169,7 +166,14 @@ export class Rentals extends Component {
             object = { id: object.RentalID }
 
         }
-       return await CommonFunctions(type, object, path)
+      const res= await CommonFunctions(type, object, path)
+      
+             let   list = await GetFunction('Rental/GetAllRentals')
+                this.props.setRentals(list !== null ? list : [])
+               
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
+      return res
         // if (res && res !== null) {
         //     this.closeFormModal();
         // }
@@ -213,7 +217,7 @@ export class Rentals extends Component {
         })
     }}  >הוסף נכס</button>
     linkToAddProperty = <button type='button' index={1} onClick={() => {
-        ;
+        
         this.setState({ showForm: true })
         this.setState({
             showSomthing:
@@ -232,6 +236,9 @@ export class Rentals extends Component {
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
+        
+        
+        
         let LinksPerObject = []
         let LinksForEveryRow = []
         let ButtonsForEveryRow = []
@@ -287,9 +294,9 @@ export class Rentals extends Component {
        tempObject.EnteryDate = new Date(object.EnteryDate).toLocaleDateString();
        if(object.EndDate)
         tempObject.EndDate = new Date(object.EndDate).toLocaleDateString();
+        
         if(object.PaymentTypeID && this.state.PaymentTypeOptions.length>0)
-        {
-           
+        {          
         const PaymentType = this.state.PaymentTypeOptions.find(i => i.id === object.PaymentTypeID);
         tempObject.PaymentTypeID = PaymentType.name
     }
@@ -342,7 +349,7 @@ export class Rentals extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+        tempObject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -402,7 +409,7 @@ export class Rentals extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Rentals)
+export default connect (mapStateToProps,mapDispatchToProps)(Rentals)
 
 
 

@@ -9,7 +9,7 @@ import { PropertyOwner } from './PropertyOwner'
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyObject from '../../Models-Object/PropertyObject';
 import DocumentObject from '../../Models-Object/DocumentObject'
-import { mapStateToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login'
 import { connect } from 'react-redux'
 import property from '../../Models-Object/PropertyObject';
 import SubProperties from './SubProperties';
@@ -135,7 +135,23 @@ export class Properties extends Component {
         if (res) {
             this.closeExtentionModal()
         }
-    }
+        let list
+        if(type.contains('City')) 
+        {  
+                list = await GetFunction('Property/GetAllCities')
+                this.props.setCities(list !== null ? list : [])
+       } 
+                else if(type.contains('Street'))
+                {
+                list=await GetFunction('Property/GetAllStreets')
+                this.props.setStreets(list !== null ? list : [])
+        }
+                else
+                {
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
+   }
+            }
     //סבמיט לחיפוש
     submitSearch =async (object) => {
         const path = 'Property/Search';
@@ -198,8 +214,14 @@ export class Properties extends Component {
             object = { id: object.propertyID }
         }
         
-       return await CommonFunctions(type, object, path)
-        //אם מה שחזר מהשרת אינו נל, סימו שהבקשה הצליחה וניתן לסגור את החלונית
+       const res= await CommonFunctions(type, object, path) 
+      let list = await GetFunction('PropertyOwner/GetAllProperties')
+       this.props.setProperties(list !== null ? list : [])
+      
+       list=await GetFunction('User/GetAllDocuments')
+       this.props.setDocuments(list !== null ? list : []) 
+       return res
+        //אם מה שחזר מהשרת אינו נל, סימו שהבקשה הצליחה וניתן ל סגור את החלונית
         // if (res && res !== null) {
         //     this.closeFormModal();
         // }
@@ -326,6 +348,7 @@ export class Properties extends Component {
     }
     //פונקציה שמוסיפה ומשנה דברים שקשורים לתצוגת אוביקט (גם באוביקט עצמו וגם באטנים ושדות שקשורים אליו)
     set = (object) => {    //הפונקציה ממפה את כל השדות של האוביקט והופכת איידי לשם ואת המפתחות זרים לקישורים
+        
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let tempobject = { ...object };
@@ -453,6 +476,7 @@ export class Properties extends Component {
         //בשדה משכיר ,באטן לפרטי משכיר
         //postFunction('PropertyOwner/GetOwnerByID', { id: object.OwnerID }).then(res => this.setState({ ownerobject: res }))
        // this.setState({ ownerobject: this.state.fieldsArray[1].selectOptions.find(i => i.id === object.OwnerID) })
+       debugger
        const ownerobject=this.props.ownersList.find(i=>i.OwnerID===object.OwnerID)
        let ownerName=ownerobject.OwnerFirstName!==null ? ownerobject.OwnerFirstName:'' ;
        ownerName+=ownerobject.OwnerLastName?  ' ' + ownerobject.OwnerLastName:''
@@ -478,7 +502,7 @@ export class Properties extends Component {
        
             if (docks && docks[0]) {
              fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-             object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+             tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
              }
         //מחזירה אוביקט:
         //fieldsToAdd- שדות נוספים הקשורים לאוביקט
@@ -537,7 +561,7 @@ export class Properties extends Component {
         }
     }
     render() {
-    
+        
         return (
 
             <div>
@@ -549,5 +573,5 @@ export class Properties extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Properties)
+export default connect(mapStateToProps,mapDispatchToProps)(Properties)
 

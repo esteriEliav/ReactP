@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import { CommonFunctions } from '../General/CommonFunctions';
 import TaskObject from '../../Models-Object/TaskObject';
-import { mapStateToProps } from '../Login'
+import { mapStateToProps ,mapDispatchToProps} from '../Login'
 import { connect } from 'react-redux'
 import Tasks from './Tasks';
 
@@ -111,4 +111,4 @@ export class PropertiesForRenter extends Component {
     }
 }
 
-export default connect(mapStateToProps)(PropertiesForRenter)
+export default connect (mapStateToProps,mapDispatchToProps)(PropertiesForRenter)

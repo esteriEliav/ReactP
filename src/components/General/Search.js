@@ -21,13 +21,15 @@ export class Search extends Component {
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
         let tempObject = { ...this.state.Object };
         console.log('e.target.checked', e.target.checked)
-        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : 
+        e.target.type === 'radio'?parseInt(e.target.value): e.target.value;
+        
         this.setState({ Object: tempObject });
     }
     submitHandler = (e) => {
         e.preventDefault();
         this.props.submit(this.state.Object)
-debugger;
+
         // this.setState({ isRedirect: this.props.submit(this.state.Object) })
     }
 

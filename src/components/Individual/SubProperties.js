@@ -7,7 +7,7 @@ import Axios from "../Axios";
 import Details from '../General/Details';
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import SubPropertyObject from '../../Models-Object/SubPropertyObject'
-import { mapStateToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login'
 import { connect } from 'react-redux'
 import Rentals from './Rentals';
 //import { propertiesList } from './Properties';
@@ -132,8 +132,14 @@ export class SubProperties extends Component {
                 return;
             object = { id: object.SubPropertyID }
         }
-        return await CommonFunctions(type, object, path)
-        // if (res && res !== null) {
+        const res= await CommonFunctions(type, object, path)
+        let  list = await GetFunction('SubProperty/GetAllSubProperties')
+                this.props.setSubProperties(list !== null ? list : [])
+               
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
+        return res
+        // if (res && res !==  null) {
         //     this.closeFormModal();
         // }
     }
@@ -215,7 +221,7 @@ export class SubProperties extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+        tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
@@ -268,6 +274,6 @@ export class SubProperties extends Component {
 
 }
 
-export default connect(mapStateToProps)(SubProperties);
+export default connect (mapStateToProps,mapDispatchToProps)(SubProperties);
 //export const SubPropertiesList = [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }]
 //GetFunction('SubProperty/GetAllSubProperties');

@@ -38,7 +38,7 @@ const reducer = (state= initialState, action) => {
             ...state,
             rentalsList: action.rentalsList
         }
-    if (action.type === 'SET_RENRERS')
+    if (action.type === 'SET_RENTERS')
         return {
             ...state,
             rentersList: action.rentersList

@@ -9,7 +9,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
 import { CommonFunction, CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
-import { mapStateToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login'
 import { connect } from 'react-redux'
 import { Properties } from './Properties'
 
@@ -59,13 +59,13 @@ export class PropertyOwner extends Component {
         if (object) {
                
             let objects =await Search(object, path)
-
             let name = 'תוצאות חיפוש'
             if (objects)
             {
             if (objects.length ===0 ) {
                 name = 'לא נמצאו תוצאות'    
             }
+            debugger
             this.setState({ ObjectsArray: objects, name:name,fieldsToSearch:null })
             }
         }
@@ -104,7 +104,14 @@ export class PropertyOwner extends Component {
                 return;
             object = { id: object.OwnerID }
         }
-        return await CommonFunctions(type, object, path)
+        const res= await CommonFunctions(type, object, path)
+     let list = await GetFunction('PropertyOwner/getAllOwners')
+                this.props.setOwners(list !== null ? list : [])
+                
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
+                this.setState({ObjectsArray:this.state.ObjectsArray})
+        return res
         // if (res!==null) {
         //     this.closeFormModal();
         // }
@@ -183,7 +190,7 @@ export class PropertyOwner extends Component {
         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
-            fieldsToAdd, LinksForEveryRow, object, enable: true,
+            fieldsToAdd, LinksForEveryRow, object,
             ButtonsForEveryRow, LinksPerObject
         }
     }
@@ -235,7 +242,7 @@ export class PropertyOwner extends Component {
     }
 }
 
-export default connect(mapStateToProps)(PropertyOwner);
+export default connect (mapStateToProps,mapDispatchToProps)(PropertyOwner);
 //export const ownersList =
     //GetFunction('PropertyOwner/getAllOwners')
     // [{ OwnerID: 1, OwnerFirstName: 'aaa', OwnerLastName: 'asd', Phone: '000', Email: 'acd' },

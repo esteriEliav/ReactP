@@ -11,7 +11,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
 import { CommonFunctions, CommonFunction, GetFunction, postFunction, Search } from '../General/CommonFunctions';
 import RenterObject from '../../Models-Object/UserObject'
-import { mapStateToProps } from '../Login'
+import { mapStateToProps,mapDispatchToProps } from '../Login'
 import { connect } from 'react-redux'
 
 // public int UserID { get; set; }
@@ -124,8 +124,13 @@ export class Renter extends Component {
                 return;
             object = { id: object.UserID }
         }
-        return await CommonFunctions(type, object, path)
-            ;
+        const res= await CommonFunctions(type, object, path)
+        let list = await GetFunction('Renter/GetAllRenters')
+                this.props.setRenters(list !== null ? list : [])
+               
+                list=await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : []) 
+           return res
         // if (res && res !== null) {
         //     this.closeFormModal();
         // }
@@ -175,12 +180,16 @@ export class Renter extends Component {
     }
     set = (object) => {
 
-        postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID }).then(res => this.setState({ properties: res }))
+      //  postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID }).then(res => this.setState({ properties: res }))
+      const rentals=this.props.rentalsList.filter(i=>i.UserID===object.UserID)
+      let properties=[]
+      rentals.map(item=>{properties.push(...this.props.propertiesList.filter(i=>i.PropertyID===item.PropertyID)) })
+     
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let fieldsToAdd = [];
         let LinksForEveryRow = [<Link
-            to={{ pathname: '/Properties', objects: this.state.properties }}>דירות ששוכר</Link>]
+            to={{ pathname: '/Properties', objects: properties }}>דירות ששוכר</Link>]
         //postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
         const docks=this.props.documents.filter(i=>i.type===4 && i.DocUser===object.UserID)
        
@@ -189,8 +198,8 @@ export class Renter extends Component {
          object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
          }
         return {
-            fieldsToAdd, LinksForEveryRow: LinksForEveryRow, object, enable: true,
-            ButtonsForEveryRow: ButtonsForEveryRow, LinksPerObject: LinksPerObject
+            fieldsToAdd, LinksForEveryRow, object,
+            ButtonsForEveryRow, LinksPerObject
         }
     }
     rend = () => {
@@ -241,7 +250,7 @@ export class Renter extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Renter);
+export default connect (mapStateToProps,mapDispatchToProps)(Renter);
 // export const rentersList = [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
 // { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
 // { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }]

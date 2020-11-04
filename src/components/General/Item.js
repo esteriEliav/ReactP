@@ -53,7 +53,7 @@ export class Item extends Component {
     render() {
         return (
             <React.Fragment>
-                <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
+                <tr>{this.props.fieldsArray.map((item, index) => {if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
                     {(this.props.user.RoleID == 1 || this.props.user.RoleID == 2) &&
                         <div>
                             <td><button onClick={() => { this.setState({ details: true }) }} > לפרטים נוספים</button>{this.showdet()}</td>

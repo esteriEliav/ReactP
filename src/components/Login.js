@@ -59,7 +59,7 @@ export class Login extends Component {
                 let list = await GetFunction('Property/GetAllProperties')
                 this.props.setProperties(list !== null ? list : [])
                 list = await GetFunction('PropertyOwner/getAllOwners')
-                this.props.setRentals(list !== null ? list : [])
+                this.props.setOwners(list !== null ? list : [])
                 list = await GetFunction('Rental/GetAllRentals')
                 this.props.setRentals(list !== null ? list : [])
                 list = await GetFunction('Renter/GetAllRenters')

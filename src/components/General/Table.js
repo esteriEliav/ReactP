@@ -29,6 +29,7 @@ export class Table extends Component {
 
     }
     render() {
+       
         const some = this.props.setForTable()
         return (
             <div>
@@ -60,7 +61,7 @@ export class Table extends Component {
                     <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
                     {this.props.objectsArray.map(object =>
 
-                        <Item key={Object[this.props.fieldsArray[0].field]}
+                        <Item key={object[this.props.fieldsArray[0].field]}
                             fieldsArray={this.props.fieldsArray} Object={object} set={this.props.set} submit={this.props.submit}
                             setForForm={this.props.setForForm} validate={this.props.validate} />
 
