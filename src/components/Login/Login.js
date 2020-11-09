@@ -63,7 +63,10 @@ export class Login extends Component {
             this.props.setCities(list !== null ? list : [])
             list=await GetFunction('Property/GetAllStreets')
             this.props.setStreets(list !== null ? list : [])
-            
+            list= await GetFunction('Task/GetAllClassificationTypes');
+            this.props.setClassificationTypes(list !== null ? list : [])
+
+        
             debugger
             if (userObj.RoleID === 3)
             {
@@ -87,6 +90,12 @@ export class Login extends Component {
                 this.props.setTasks(list !== null ? list : [])
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+               list = await GetFunction('Task/GetAllTaskTypes');
+               this.props.setTaskTypes(list !== null ? list : []) 
+               list=await GetFunction('Rental/GetAllPaymentTypes');
+               this.props.setPaymentTypes(list !== null ? list : []) 
+              list=await GetFunction('Property/GetAllExclusivityPoeple')
+              this.props.setExclusivityPeople(list !== null ? list : [])
                 debugger
                 
             }
@@ -152,7 +161,14 @@ export const mapDispatchToProps = dispatch => {
         setTasks: (tasksList) => dispatch({ type: 'SET_TASKS', tasksList }),
         setCities: (cities) => dispatch({ type: 'SET_CITIES', cities }),
         setStreets: (streets) => dispatch({ type: 'SET_STREETS', streets }),
-        setDocuments: (documents) => dispatch({ type: 'SET_DOCUMENTS', documents })
+        setDocuments: (documents) => dispatch({ type: 'SET_DOCUMENTS', documents }),
+        setTaskTypes: (taskTypes) => dispatch({ type: 'SET_TASKTYPES', taskTypes }),
+        setClassificationTypes: (classificationTypes) => dispatch({ type: 'SET_CLASSIFICATIONTYPES', classificationTypes }),
+        setPaymentTypes: (paymentTypes) => dispatch({ type:'SET_PAYMENTTYPES', paymentTypes }),
+        setExclusivityPeople: (exclusivityPeople) => dispatch({ type:'SET_EXCLUSIVITYPEOPLE', exclusivityPeople }),
+
+
+        
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

@@ -17,8 +17,9 @@ import { Link, Redirect, Route } from 'react-router-dom';
 import { connect } from 'react-redux'
 import UserObject from '../../Models-Object/UserObject'
 import TasksPopUp from "../TasksPopUp/TasksPopUp";
+import RedirectTo from "../RedirectTo";
 import Axios from 'axios';
-import { postFunction } from '../General/CommonFunctions';
+import { GetFunction, postFunction } from '../General/CommonFunctions';
 import Select from "react-dropdown-select";
 
 import './Home.css';
@@ -40,7 +41,9 @@ export class Home extends Component {
     home:false,
     login:null
   }
-  
+  componentDidMount=()=>{
+    this.setHome(false)
+  }
   closeModel = () => {
     this.setState({ showt: false })
 
@@ -58,9 +61,12 @@ setHome=(bool)=>{
   this.setState({home:bool})
 }
 rend=()=>{
+  
   if(this.props.user.RoleID===1 || this.props.user.RoleID===2)
   {
-    return   this.state.showt && <TasksPopUp isOpen={this.state.showt} closeModal={this.closeModel} />
+    //this.state.showt &&
+    if(this.state.home===false)
+    return  <TasksPopUp setHome={this.setHome} />
 
   }
   else if(this.props.user.RoleID===3)
@@ -77,10 +83,9 @@ rend=()=>{
         this.setState({ showt: true })
 
       });
-
+      
     }
 
-    const use2 = new UserObject(1, 'aa', 'bb', null, null, null, 1);
      
 
     return (
@@ -148,8 +153,8 @@ rend=()=>{
   </div> 
   </div>
     {i()}
-    {this.rend()}
      {this.state.login}
+     {this.rend()}
        
 
 <switch>
@@ -169,6 +174,7 @@ rend=()=>{
     <Route path='/Route' component={Route} />
 
     <Route path='/Details' component={Details}></Route>
+    <Route path='/RedirectTo' component={RedirectTo} />
   </switch>
     </div>
       </div>

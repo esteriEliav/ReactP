@@ -11,6 +11,9 @@ import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import Rentals from './Rentals/Rentals';
 //import { propertiesList } from './Properties';
+import RedirectTo from "../RedirectTo";
+
+import fileDownload from 'js-file-download'
 
 /*
 SubPropertyID int  not null identity,--קוד נכס בן
@@ -44,6 +47,7 @@ export class SubProperties extends Component {
         //showDetails: this.props.type == 'details' ? true : false,
         showSomthing: null,
         docks: [],
+        red:null
         //propertyObject: {},
         //rental: {}
 
@@ -56,7 +60,7 @@ export class SubProperties extends Component {
            // const street = await postFunction('Property/GetStreetByID', item.CityID);
            const city=this.props.cities.find(i=>i.CityId===item.CityID)
            const street=this.props.streets.find(i=>i.StreetID===item.StreetID && i.CityId===item.CityID)
-           debugger
+           
             return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
     })
         let fieldsArray = [...this.state.fieldsArray];
@@ -138,6 +142,8 @@ export class SubProperties extends Component {
                
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/SubProperties'}}/>})
+
         return res
         // if (res && res !==  null) {
         //     this.closeFormModal();
@@ -162,7 +168,17 @@ export class SubProperties extends Component {
     }
     setForForm = object => {
         let fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
-        const LinksPerObject = []
+        let LinksPerObject = []
+        const docks=this.props.documents.filter(i=>i.type===5 && i.DocUser===object.SubPropertyID)
+        if (docks && docks[0]) {
+ 
+            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
+            <button index='end' type='button' key={index} onClick={async() => {
+                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+              let  list=await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : []) 
+        }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))} מחיקת מסמך</button>)}</div>)
+         }
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
@@ -221,7 +237,7 @@ export class SubProperties extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+        tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,dock.DocName) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
@@ -258,7 +274,7 @@ export class SubProperties extends Component {
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} 
                 submitSearch={this.submitSearch}
-            />{this.state.showSomthing}</div>
+            />{this.state.showSomthing}{this.state.red}</div>
 
     }
     render() {

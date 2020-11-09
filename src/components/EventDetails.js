@@ -11,7 +11,9 @@ class EventDetails extends React.Component {
   }
 
   componentDidMount(){
-    axios.get('https://jsonplaceholder.typicode.com/users/'+ this.props.match.params.id)
+    const events = this.props.tasksList;
+
+    axios.get(events+ this.props.match.params.id)
     .then( response => {
       this.setState({ev: response.data});
     });
@@ -24,7 +26,7 @@ class EventDetails extends React.Component {
     return (
       <React.Fragment>
       <h1> {this.state.ev.name} Details </h1>
-      <p> {this.state.ev.email}</p>
+      <p> {this.state.ev.EventDetails} navuuuuu</p>
       {/* <p> {this.state.ev.}</p> */}
       
       <a href={this.state.ev.link}></a>

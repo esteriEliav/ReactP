@@ -7,6 +7,8 @@ import TaskObject from '../../../Models-Object/TaskObject';
 import { mapStateToProps ,mapDispatchToProps} from '../../Login/Login'
 import { connect } from 'react-redux'
 import Tasks from '../Task/Tasks';
+import RedirectTo from "../../RedirectTo";
+
 import './PropertyForRenter.css';
 
 export class PropertiesForRenter extends Component {
@@ -33,7 +35,8 @@ export class PropertiesForRenter extends Component {
     submit = async (type, object) => {
         let path = 'Task/AddTask'
         let newObj = TaskObject()
-        newObj.TaskID = 1
+        
+        newObj.TaskTypeID = 1
         newObj.Description = object.Description
         newObj.PropertyID = object.PropertyID
         newObj.SubPropertyID = object.SubPropertyID
@@ -56,7 +59,7 @@ export class PropertiesForRenter extends Component {
         let erors = []
         Object.keys(TaskObject()).map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if (object.Description.split(/[^\s]+/).length > 3) {
+        if (object.Description.split(/[^\s]+/).length > 50) {
 
             erors.Description = 'עד 50 מילים'
             isErr = true

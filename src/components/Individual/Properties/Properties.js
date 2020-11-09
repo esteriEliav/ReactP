@@ -17,6 +17,9 @@ import { Rentals } from '../Rentals/Rentals';
 import PopUpForProperties from '../PopUpForProperties';
 import subProperty from '../../../Models-Object/SubPropertyObject';
 import './Properties.css';
+import RedirectTo from "../../RedirectTo";
+
+import fileDownload from 'js-file-download'
 
 
 /*PropertyID int  not null identity,
@@ -41,7 +44,7 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 */
 //קומפוננטת נכסים
 export class Properties extends Component {
-    componentDidMount = async () => {
+    componentWillMount =  () => {
         const owners = this.props.ownersList.map(item => { return { id: item.OwnerID, name:item.OwnerFirstName!==null && item.OwnerFirstName + ' ' +item.OwnerFirstName!==null && item.OwnerFirstName } })
         const res = this.props.cities;
         const cities = res !== null ?
@@ -49,12 +52,13 @@ export class Properties extends Component {
         let fieldsArray = [...this.state.fieldsArray];
         fieldsArray[1].selectOptions = owners;
         fieldsArray[2].selectOptions = cities;
-        let exclusivityPersons=await GetFunction('Property/GetAllExclusivityPoeple')
+        let exclusivityPersons=this.props.exclusivityPeople
         
             exclusivityPersons=exclusivityPersons!==null?
             exclusivityPersons.map(item=>{return {id:item.ExclusivityID,name:item.ExclusivityName}}):[]
         
         this.setState({ fieldsArray, cities,exclusivityPersons });
+        
 
     }
     state = {
@@ -84,7 +88,8 @@ export class Properties extends Component {
         spobjects: null,
         rentalObject: null,
         streets: [],
-        exclusivityPersons: []
+        exclusivityPersons: [],
+        red:null
     }
     //סוגרת חלונית מסוג דיטיילס
     closeDetailsModal = () => {
@@ -99,7 +104,7 @@ export class Properties extends Component {
     closeExtentionModal = () => {
 
         this.setState({  showExtention: null })
-        debugger;
+        ;
     }
     //בדיקת תקינות אוביקט מסוג נכס
     validate = object => {
@@ -129,9 +134,9 @@ export class Properties extends Component {
     }
     submitForExtentions = async (type, object) => {
         let path = 'Property/' + type;
-        debugger
+        
         const res = await CommonFunctions('Add', object, path);
-        debugger
+        
         if (res) {
             this.closeExtentionModal()
         }
@@ -140,17 +145,20 @@ export class Properties extends Component {
         {  
                 list = await GetFunction('Property/GetAllCities')
                 this.props.setCities(list !== null ? list : [])
-       } 
+        }
                 else if(type.contains('Street'))
                 {
                 list=await GetFunction('Property/GetAllStreets')
                 this.props.setStreets(list !== null ? list : [])
-        }
+                 }
                 else
                 {
-                list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : []) 
-   }
+                    list=await GetFunction('Property/GetAllExclusivityPoeple')
+              this.props.setExclusivityPeople(list !== null ? list : [])
+                
+                }
+   this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Properties'}}/>})
+
             }
     //סבמיט לחיפוש
     submitSearch =async (object) => {
@@ -196,8 +204,8 @@ export class Properties extends Component {
             newObj.IsPaid = object.IsPaid
             newObj.IsRented = object.IsRented
             newObj.IsExclusivity = object.IsExclusivity
-            if (object.exclusivityPersons !== '')
-                newObj.exclusivityPersons = object.exclusivityPersons
+            if (object.ExclusivityID && object.ExclusivityID !== '')
+                newObj.ExclusivityID = object.ExclusivityID
             newObj.IsWarranty = object.IsWarranty
             if (object.add) {
                 newObj.docName = object.document
@@ -215,11 +223,12 @@ export class Properties extends Component {
         }
         
        const res= await CommonFunctions(type, object, path) 
-      let list = await GetFunction('PropertyOwner/GetAllProperties')
+      let list = await GetFunction('Property/GetAllProperties')
        this.props.setProperties(list !== null ? list : [])
       
        list=await GetFunction('User/GetAllDocuments')
        this.props.setDocuments(list !== null ? list : []) 
+       this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Properties'}}/>})
        return res
         //אם מה שחזר מהשרת אינו נל, סימו שהבקשה הצליחה וניתן ל סגור את החלונית
         // if (res && res !== null) {
@@ -321,7 +330,7 @@ export class Properties extends Component {
             //     [];
             //שדה של אחראי בלעדיות של הדירה
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12 })
-            debugger
+            
             //באטן להוספת אחראי בלעדיות
             LinksPerObject.push(
                 <button index={12} type='button' onClick={() => {
@@ -335,6 +344,16 @@ export class Properties extends Component {
                 >הוסף אחראי בלעדיות</button>)
 
         }
+        const docks=this.props.documents.filter(i=>i.type===1 && i.DocUser===object.propertyID)
+        if (docks && docks[0]) {
+ 
+            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
+            <button index='end' type='button' key={index} onClick={async() => {
+                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+              let  list=await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : []) 
+        }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))} מחיקת מסמך</button>)}</div>)
+         }
         //הוספת שדה של הוספת מסמך
         fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
 
@@ -463,20 +482,21 @@ export class Properties extends Component {
         //postFunction('Property/GetRentalByPropertyID', { id: object.propertyID }).then(res => this.setState({ rentalObject: res }))
         //אם הדירה בלעדית
         if (object.IsExclusivity) {
-            const res = this.state.exclusivityPersons !== null ?
-                this.state.exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) :
-                [];
-                
+            object.IsExclusivity='V'
             //שדה של אחראי בלעדיות של הדירה
-            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: res, index: 12 })
-            tempobject.ExclusivityID = res.find(i => i.id === object.ExclusivityID).name
+            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12 })
+            
+            if(object.ExclusivityID)
+            tempobject.ExclusivityID = this.state.exclusivityPersons.find(i => i.id === object.ExclusivityID).name
         }
+        else
+        object.IsExclusivity='X'
 
 
         //בשדה משכיר ,באטן לפרטי משכיר
         //postFunction('PropertyOwner/GetOwnerByID', { id: object.OwnerID }).then(res => this.setState({ ownerobject: res }))
        // this.setState({ ownerobject: this.state.fieldsArray[1].selectOptions.find(i => i.id === object.OwnerID) })
-       debugger
+       
        const ownerobject=this.props.ownersList.find(i=>i.OwnerID===object.OwnerID)
        let ownerName=ownerobject.OwnerFirstName!==null ? ownerobject.OwnerFirstName:'' ;
        ownerName+=ownerobject.OwnerLastName?  ' ' + ownerobject.OwnerLastName:''
@@ -502,7 +522,7 @@ export class Properties extends Component {
        
             if (docks && docks[0]) {
              fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-             tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+             tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,dock.DocName) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
              }
         //מחזירה אוביקט:
         //fieldsToAdd- שדות נוספים הקשורים לאוביקט
@@ -519,6 +539,7 @@ export class Properties extends Component {
     }
     //פונקציה הבוחרת מה לרנדר  בהתאם לטייפ שנשלח אליה
     rend = () => {
+        
         // מציג פרטים של אוביקט מסוים מסוג נכס 
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
@@ -557,7 +578,7 @@ export class Properties extends Component {
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
                 fieldsToSearch={this.state.fieldsToSearch}
-            />{this.state.showsomthing}{this.state.showExtention}</div>
+            />{this.state.showsomthing}{this.state.showExtention}{this.state.red}</div>
         }
     }
     render() {

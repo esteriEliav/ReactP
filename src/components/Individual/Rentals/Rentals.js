@@ -13,6 +13,9 @@ import Form from '../../General/Form'
 import PropertyOwner from '../PropertyOwner';
 import SubProperties from '../SubProperties';
 import './Rentals.css';
+import RedirectTo from "../../RedirectTo";
+
+import fileDownload from 'js-file-download'
 
 
 /*
@@ -52,13 +55,14 @@ export class Rentals extends Component {
         owner: {},
         property: {},
         userObject: {},
-        PaymentTypeOptions: []
+        PaymentTypeOptions: [],
+        red:null
 
 
     }
-    componentDidMount = async () => {
-      debugger
-        let PaymentTypeOptions1 = await GetFunction('Rental/GetAllPaymentTypes');
+    componentWillMount =  () => {
+      
+        let PaymentTypeOptions1 = this.props.paymentTypes;
         
         PaymentTypeOptions1 = PaymentTypeOptions1 !== null ?
             PaymentTypeOptions1.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
@@ -174,6 +178,7 @@ export class Rentals extends Component {
                
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Rentals'}}/>})
       return res
         // if (res && res !== null) {
         //     this.closeFormModal();
@@ -232,8 +237,19 @@ export class Rentals extends Component {
     }}
     >הוסף שוכר</button>
     setForForm = object => {
+        let LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
+        const docks=this.props.documents.filter(i=>i.type===3 && i.DocUser===object.RentalID)
+        if (docks && docks[0]) {
+ 
+            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
+            <button index='end' type='button' key={index} onClick={async() => {
+                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+              let  list=await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : []) 
+        }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))} מחיקת מסמך</button>)}</div>)
+         }
         const fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
-        const LinksPerObject = [this.linkToAddRenter, this.linkToAddProperty]
+        
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
@@ -350,7 +366,7 @@ export class Rentals extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempObject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+        tempObject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,dock.DocName) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -363,7 +379,7 @@ export class Rentals extends Component {
         ;
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            console.log('some.object', some.object)
+            
             return <Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={some.object}
                 fieldsArray={this.state.fieldsArray}
@@ -391,7 +407,7 @@ export class Rentals extends Component {
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} ></Table>{this.state.showSomthing}</div>
+                fieldsToSearch={this.state.fieldsToSearch} ></Table>{this.state.showSomthing}{this.state.red}</div>
 
     }
     render() {

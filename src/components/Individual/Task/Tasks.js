@@ -12,7 +12,10 @@ import { CommonFunctions, GetFunction, postFunction, Search } from '../../Genera
 import TaskObject from '../../../Models-Object/TaskObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-import './Task.css';
+//import './Task.css';
+import RedirectTo from "../../RedirectTo";
+
+import fileDownload from 'js-file-download'
 
 /*
 create table Tasks--משימות
@@ -36,7 +39,7 @@ export class Tasks extends Component {
         name: 'משימות',
 
         fieldsArray: [
-        { field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
+        { field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] , required: true}, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
         { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
 
@@ -58,15 +61,17 @@ export class Tasks extends Component {
         propertiesOptions: [],
         docks: [],
         propertyObject: {},
-        spobject: {}
+        spobject: {},
+        red:null
 
     }
-    componentDidMount = async () => {
-        const x = await GetFunction('Task/GetAllClassificationTypes');
+    componentWillMount = () => {
+        
+        const x =this.props.classificationTypes; 
         const ClassificationOptions = x !== null ?
             x.map(item => { return { id: item.ClassificationID, name: item.ClassificationName } }) : []
 
-        const y = await GetFunction('Task/GetAllTaskTypes');
+        const y = this.props.taskTypes;
         const TaskTypeOptions = y !== null ?
             y.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }) : []
             
@@ -88,6 +93,7 @@ export class Tasks extends Component {
         fieldsArray[2].radioOptions = ClassificationOptions;
         fieldsToSearch[1].radioOptions = ClassificationOptions;
         this.setState({ fieldsArray, fieldsToSearch, ClassificationOptions, TaskTypeOptions, propertiesOptions })
+        
     }
     closeDetailsModal = () => {
 
@@ -120,6 +126,10 @@ export class Tasks extends Component {
     }
     submitForExtentions = async (type, object) => {
         const res = await CommonFunctions('Add', object, 'Task/AddTaskType');
+        let list = await GetFunction('Task/GetAllTaskTypes');
+        this.props.setTaskTypes(list !== null ? list : []) 
+        this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Tasks'}}/>})
+
         if (res) {
             this.closeExtentionModal()
         }
@@ -188,8 +198,10 @@ export class Tasks extends Component {
         
                let list = await GetFunction('Task/GetAllTasks')
                 this.props.setTasks(list !== null ? list : [])
+            
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Tasks'}}/>})
         return res
         // if (res && res !== null) {
         //     this.closeFormModal();
@@ -258,8 +270,17 @@ export class Tasks extends Component {
             fieldsToAdd.push({ field: 'HandlingDate', name: 'תאריך טיפול', type: 'date', index: 4 },
                 { field: 'HandlingWay', name: 'אופן טיפול', type: 'texterea', index: 4 })
         fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
-        console.log('fields', fieldsToAdd)
-
+        
+        const docks=this.props.documents.filter(i=>i.type===6 && i.DocUser===object.TaskID)
+        if (docks && docks[0]) {
+ 
+            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
+            <button index='end' type='button' key={index} onClick={async() => {
+                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+              let  list=await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : []) 
+        }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))} מחיקת מסמך</button>)}</div>)
+         }
         return { fieldsToAdd, LinksPerObject };
 
     }
@@ -326,7 +347,7 @@ export class Tasks extends Component {
        
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+         tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,dock.DocName) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
          }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -345,7 +366,7 @@ export class Tasks extends Component {
                 Object={{ PropertyID: this.props.object.PropertyID, SubPropertyID: this.props.object.SubPropertyID }}
                 name='שלח'
                 type='Report'
-                fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' },
+                fieldsArray={[{ field: 'Description', name: 'תיאור הבעיה', type: 'texterea' ,required:true},
                 { field: 'ClassificationID', name: 'רמת דחיפות', type: 'radio', radioOptions: this.state.ClassificationOptions }
                 ]}
                 submit={this.props.submit} setForForm={this.props.setForForm}
@@ -358,13 +379,14 @@ export class Tasks extends Component {
 
         else if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
-                Object={this.props.object}
+            return <Details closeModal={this.props.closeModal}
+                Object={some.object}
                 fieldsArray={this.state.fieldsArray}
                 LinksPerObject={some.LinksPerObject}
                 LinksForEveryRow={some.LinksForEveryRow}
                 ButtonsForEveryRow={some.ButtonsForEveryRow}
                 fieldsToAdd={some.fieldsToAdd}
+                
             />
 
         }
@@ -376,7 +398,7 @@ export class Tasks extends Component {
                 type={this.props.formType}
                 fieldsArray={this.state.fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
-                validate={this.validate} />{this.state.showSomthing}</div>
+                validate={this.validate} />{this.state.showSomthing}{this.state.red}</div>
         }
         else {
 
@@ -387,7 +409,8 @@ export class Tasks extends Component {
                 set={this.set} setForForm={this.setForForm}
                 delObject={this.submit}
                 validate={this.validate} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}{this.state.showExtention}</div>
+                fieldsToSearch={this.state.fieldsToSearch} />
+                {this.state.showSomthing}{this.state.showExtention}{this.state.red}</div>
         }
     }
     render() {
