@@ -1,0 +1,146 @@
+@font-face {
+    font-family: yehuda;
+    src: url('./../../yehuda/yehudaclm-light-webfont.woff');
+}
+@font-face {
+    font-family: PatrickHand;
+    src: url('./../../PatrickHand-Regular.ttf');
+}
+@font-face {
+    font-family: miri;
+    src: url('./../../miriwin-webfont.woff');
+}
+@font-face {
+    font-family: comixno;
+    src: url('./../../comixno2/comixno2clm_medium-webfont.woff');
+}
+.NavBar{
+    background-color: black;
+    height: 5rem;
+    width: 100%;
+    padding: 0 2%;
+    position: absolute;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    align-items: center;
+    z-index: 2;
+}
+.nav-bar-logo{
+    height: 4.5rem;
+    width: 6rem;
+}
+.NavBar-links{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.NavBar-links button{
+    background-color: black;
+    color: #e1be64;
+    font-size: 19px;
+    border: none;
+    margin: 2px;
+    height: 3rem;
+    width: 83px;
+}
+*{
+    font-family: yehuda;
+}
+.container-div{
+    position: absolute;
+    top: 8.2rem;
+    left: 0;
+    height:25rem;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    opacity: 0.5;
+
+}
+.carousel-inner>.item>a>img, .carousel-inner>.item>img, .img-responsive, .thumbnail a>img, .thumbnail>img{
+    height: 48rem;
+}
+/* AwesomeSlider, .awssld ,  */
+.awssld{
+    position: absolute !important;
+    top: 5rem;
+    height: 26.5rem;
+    z-index: 1;
+    opacity: 0.7;
+}
+.text-container {
+    background-color: white;
+    width: 28rem;
+    height: 19rem;
+    z-index: 2;
+    position: absolute;
+    top: 8.5rem;
+    padding: 0 5px;
+    padding-top: 13px;
+    left: 50%;
+    transform: translate(-50%, 0px);
+
+}
+.body-home-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 44rem;
+    width: 100%;
+}
+switch{
+    width: 75%;
+}
+.img-footer img{
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 14rem;
+    opacity: 0.5;
+    z-index: -1;
+    width: 100%;
+}
+.footer-img-left{
+    left: 0;
+}
+.footer-img-right{
+    right: 0;
+    transform: scaleX(-1);
+}
+.btn-login{
+    background-color: #9f8946;
+    color: white;
+    border: navajowhite;
+    width: 6rem;
+    height: 34px;
+}
+.title{
+    color: #9f8946;
+    font-family: 'PatrickHand';
+    margin-top: 8px;
+    font-size: 45px;
+    margin-bottom: 9px;
+}
+.text-container p{
+    line-height: normal;
+}
+.body-home-container .footer-img-right , .body-home-container .footer-img-left{
+    display: none;
+}
+.img-footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.about-text-home{
+    position: absolute;
+    top: 36rem;
+}
+.about-text-home-title{
+    font-size: 30px;
+    font-family: comixno;
+    color: #9f8946;
+}

@@ -1,0 +1,10 @@
+.button-container button{
+    background-color: #9f8946;
+    border: none;
+    padding: 6px 14px;
+    height: 32px;
+    font-size: 14px;
+    width: max-content;
+    color: white;
+
+}
