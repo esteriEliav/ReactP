@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import interactionPlugin from '@fullcalendar/interaction';
 import Axios from './Axios';
 import Tasks from './Individual/Task/Tasks';
-
+import { CommonFunctions, GetFunction, postFunction, Search } from './General/CommonFunctions';
 
 
 
@@ -19,38 +19,50 @@ class Calendar extends React.Component {
     ],
   showAddTask: null
   }
-  componentDidMount() {
+  async componentDidMount(){
 
-    Axios.get('Task/GetAllTasks')
-      .then(response => {
-        const events = response.data;
+    // Axios.get('Task/GetAllTasks')
+    
+    //   .then(response => {
+        const events = this.props.tasksList;
+        const y = await GetFunction('Task/GetAllTaskTypes');
+        const x=new Date()
+       
         //const property = propertiesList.find((item => item.typeTaskID === this.state.event.typeTaskID)) 
-        const updatedevents = events.map(event2 => {
+        const updatedevents = events.map(event => {
+        //tempobject.TaskTypeId = typeObj.name
+        let x= y.find(obj => obj.TaskTypeId === event.TaskTypeId)
           return {
-            id:event2.typeTaskID,
+            id:event.TaskID,
             // id:property.taskTypeName,
-            title: event2.name,
-            date: event2.DateForHandling
+            title:x.TaskTypeName,
+            date:event.DateForHandling
+            // date:new Date(event.DateForHandling.getFullYear(),
+            // event.DateForHandling.getMonth(),event.DateForHandling.getDate(),0,0,0,0)
           }
         });
 
         this.setState({ events: updatedevents });
         //Get call to the events Api
-      })
+      
   }
   closeModal = () => {
     this.setState({ showAddTask: null });
   }
   routeChange = (arg) => {
-    let path = '/EventDetails/' + arg.event.id;
-    this.props.history.push(path);
+   // let path = '/EventDetails/' + arg.event;
+   //console.log("details",arg.event)
+   const taskObj= this.props.tasksList.find(i=>i.TaskID===parseInt(arg.event.id))
+   this.setState({ showAddTask: <Tasks type='details' object={taskObj}
+  closeModal={this.closeModal} />})
+   //this.props.history.push(path);
   }
 
   handleDateClick = (arg) => {
     //alert('working');
     this.setState({
       showAddTask: <Tasks type='form' formType='Add' formName='הוסף' object={{ DateForHandling: arg.date }}
-        isOpen={this.state.showAddTask === null} closeModal={this.closeModal} />
+      closeModal={this.closeModal} />
     })
     
     // let path = '/AddTask'+arg.event.date;
@@ -64,6 +76,7 @@ class Calendar extends React.Component {
         plugins={[dayGridPlugin, interactionPlugin]}
         dateClick={this.handleDateClick}
         initialView="dayGridMonth"
+        displayEventTime={false}
         weekends={true}
         events={this.state.events}
         eventClick={this.routeChange}

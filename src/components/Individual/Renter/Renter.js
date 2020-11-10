@@ -14,6 +14,9 @@ import RenterObject from '../../../Models-Object/UserObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import './Renter.css'
+import RedirectTo from "../../RedirectTo";
+import PropertyOwner,{DocName} from '../PropertyOwner';
+import fileDownload from 'js-file-download'
 
 
 // public int UserID { get; set; }
@@ -46,7 +49,8 @@ export class Renter extends Component {
         showDetails: this.props.type == 'details' ? true : false,
         showSomthing: null,
         docks: [],
-        objects: []
+        objects: [],
+        red:null
 
     }
     closeDetailsModal = () => {
@@ -90,7 +94,7 @@ export class Renter extends Component {
     }
     submit = async (type, object) => {
         ;
-        let path = 'User/' + type + 'User';
+        let path = 'Renter/' + type + 'Renter';
         if (type === 'Add' || type === 'Update') {
 
             let UserID = null, FirstName = null, LastName = null, SMS = null, Email = null, Phone = null, UserName = null, Password = null, Dock = null, docName = null
@@ -116,7 +120,8 @@ export class Renter extends Component {
                 docName = object.document
                 Dock = object.add;
             }
-            let newObj = new RenterObject(UserID, FirstName, LastName, SMS, Email, Phone, 3, UserName, Password, document, docName);
+            let newObj = new RenterObject(UserID, FirstName, LastName, SMS, Email, Phone, 3, UserName, Password, Dock, docName);
+            
             object = newObj
 
         }
@@ -132,6 +137,7 @@ export class Renter extends Component {
                
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Renter'}}/>})
            return res
         // if (res && res !== null) {
         //     this.closeFormModal();
@@ -157,11 +163,12 @@ export class Renter extends Component {
                             validate={this.validate} />
                 })
             }} >הוספת שוכר </button>,
-            <button onClick={() => {
+            <button type='button'  onClick={async() => {
                 const con = window.confirm('לשלוח?')
                 if (con === true) {
                     let res;
-                    GetFunction('מה שם הפונקציה?').then(r => res = r);
+                   res=await GetFunction('User/SendAllRenter')
+                
                     if (res)
                         alert("נשלח")
                     else
@@ -177,7 +184,21 @@ export class Renter extends Component {
     }
     setForForm = object => {
         const fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
-        const LinksPerObject = []
+        let LinksPerObject = []
+        const docks=this.props.documents.filter(i=>i.type===4 && i.DocUser===object.UserID)
+        if (docks && docks[0]) {
+ 
+            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
+            <button index='end' type='button' key={index} onClick={async() => {
+                 const b=window.confirm('למחוק מסמך?')
+                if(b)
+                {
+                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+              let  list=await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : []) 
+                }
+ }}> מחיקת מסמך {DocName(dock.DocName)}</button>)}</div>)
+         }
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
@@ -197,7 +218,7 @@ export class Renter extends Component {
        
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{dock.DocName.substring(dock.DocName.lastIndexOf('/'))}</button>)
+         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
          }
         return {
             fieldsToAdd, LinksForEveryRow, object,
@@ -234,7 +255,7 @@ export class Renter extends Component {
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}</div>
+                fieldsToSearch={this.state.fieldsToSearch} />{this.state.showSomthing}{this.state.red}</div>
         }
     }
     render() {

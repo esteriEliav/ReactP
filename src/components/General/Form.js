@@ -64,6 +64,7 @@ if(e)
        {
        if (
             e.target.type === 'file') {
+                
             if (e.target.files[0]) {
                 let reader = new FileReader();
                 reader.readAsDataURL(e.target.files[0]);

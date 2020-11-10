@@ -10,10 +10,14 @@ const initialState = {
     rentersList: [],
     SubPropertiesList: [],
     tasksList: [],
+    
     cities: [],
     streets: [],
     documents: [],
-    renterProperties:[]
+   taskTypes:[],
+   classificationTypes:[],
+    paymentTypes:[],
+    exclusivityPeople:[]
 
 
 };
@@ -69,11 +73,32 @@ const reducer = (state= initialState, action) => {
             ...state,
             documents: action.documents
         }
-        if (action.type === 'SET_RENTERPROPERTIES')
+        if (action.type === 'SET_TASKTYPES')
         return {
             ...state,
-            renterProperties: action.renterProperties
+            taskTypes: action.taskTypes
         }
+        if (action.type === 'SET_CLASSIFICATIONTYPES')
+        
+        return {
+            ...state,
+           classificationTypes : action.classificationTypes
+        }
+        if (action.type === 'SET_PAYMENTTYPES')
+        
+        return {
+            ...state,
+           paymentTypes : action.paymentTypes
+        }
+        if (action.type === 'SET_EXCLUSIVITYPEOPLE')
+        
+        return {
+            ...state,
+            exclusivityPeople : action.exclusivityPeople
+        }
+        
+
+        
     return state
 };
 

@@ -32,7 +32,7 @@ export class Details extends Component {
             }
 
             while (k < this.props.fieldsToAdd.length && this.props.fieldsToAdd[k].index === index) {
-                items.push(<div><label >{this.props.fieldsToAdd[k].name}</label><label>{this.props.Object[this.props.fieldsToAdd[k].field]}</label><p /></div>)
+                items.push(<div><label >{this.props.fieldsToAdd[k].name}</label>:<label>{this.props.Object[this.props.fieldsToAdd[k].field]}</label></div>)
                 k += 1
             }
 
@@ -46,7 +46,7 @@ export class Details extends Component {
                     <a className="close" onClick={this.props.closeModal}>&times; </a>
 
                     {this.props.fieldsArray.map((item, index) => {
-                       
+                       debugger
                         return  <div key={index}>
 
                           {this.props.Object[item.field] &&  <div><label dir='rtl'>{item.name}</label>:

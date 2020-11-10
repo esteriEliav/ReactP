@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Axios from "./Axios";
 import { CommonFunctions, GetFunction, postFunction } from './General/CommonFunctions';
 import Popup from 'reactjs-popup';
-import './Login/Login.css';
 
 export class Sign_up extends Component {
   state =
@@ -43,6 +42,7 @@ closeModal=()=>{
 
        
         <form onSubmit= {this.onSubmit} className="login-form">
+      
                 <label className="login-item" htmlFor="user-name">שם משתמש</label>
                 <input className="login-item input-field" type="text" name="username" value={this.state.username} id="username" placeholder="שם משתמש" onChange={this.handleChange('username')} />                  
                 <label className="login-item" htmlFor="email">אימות אימייל</label> 

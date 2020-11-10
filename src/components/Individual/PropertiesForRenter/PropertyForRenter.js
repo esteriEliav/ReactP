@@ -7,12 +7,14 @@ import TaskObject from '../../../Models-Object/TaskObject';
 import { mapStateToProps ,mapDispatchToProps} from '../../Login/Login'
 import { connect } from 'react-redux'
 import Tasks from '../Task/Tasks';
+import RedirectTo from "../../RedirectTo";
+
 import './PropertyForRenter.css';
 
 export class PropertiesForRenter extends Component {
     state = {
         name: 'הדירות שלך',
-        fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
+        fieldsPropertyArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'CityID', name: 'עיר', type: 'text' }, { field: 'StreetID', name: 'רחוב', type: 'text' },
         { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }],
         PropertiesArray: this.props.propertiesList,
         // [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2 }]
@@ -33,7 +35,8 @@ export class PropertiesForRenter extends Component {
     submit = async (type, object) => {
         let path = 'Task/AddTask'
         let newObj = TaskObject()
-        newObj.TaskID = 1
+        
+        newObj.TaskTypeID = 1
         newObj.Description = object.Description
         newObj.PropertyID = object.PropertyID
         newObj.SubPropertyID = object.SubPropertyID
@@ -56,7 +59,7 @@ export class PropertiesForRenter extends Component {
         let erors = []
         Object.keys(TaskObject()).map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if (object.Description.split(/[^\s]+/).length > 3) {
+        if (object.Description.split(/[^\s]+/).length > 50) {
 
             erors.Description = 'עד 50 מילים'
             isErr = true
@@ -78,12 +81,13 @@ export class PropertiesForRenter extends Component {
     }
     set = object => {
         let tempobject={...object}
-
+         debugger
         
         const street=this.props.streets.find(i => i.CityId === object.CityID && i.StreetID==object.StreetID)
         tempobject.StreetID=street.StreetName
         const city=this.props.cities.find(i => i.CityId === object.CityID)
         tempobject.CityID = city.CityName
+       
         let ButtonsForEveryRow = [<button type='button' onClick={() => {
             this.setState({ showForm: true })
             this.setState({

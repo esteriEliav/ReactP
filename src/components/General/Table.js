@@ -60,11 +60,13 @@ export class Table extends Component {
 
                     <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) { return <th key={item.field}>{item.name}</th> } })}</tr>
                     {this.props.objectsArray.map(object =>
-
-                        <Item key={object[this.props.fieldsArray[0].field]}
+                    {
+                        debugger
+                        if(object.status===undefined || (object.status && object.status===true ))
+                      return  <Item key={object[this.props.fieldsArray[0].field]}
                             fieldsArray={this.props.fieldsArray} Object={object} set={this.props.set} submit={this.props.submit}
                             setForForm={this.props.setForForm} validate={this.props.validate} />
-
+}
                     )}
 
                 </table>

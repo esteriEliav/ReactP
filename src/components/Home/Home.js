@@ -17,15 +17,19 @@ import { Link, Redirect, Route } from 'react-router-dom';
 import { connect } from 'react-redux'
 import UserObject from '../../Models-Object/UserObject'
 import TasksPopUp from "../TasksPopUp/TasksPopUp";
+import RedirectTo from "../RedirectTo";
 import Axios from 'axios';
-import { postFunction } from '../General/CommonFunctions';
+import { GetFunction, postFunction } from '../General/CommonFunctions';
 import Select from "react-dropdown-select";
 
 import './Home.css';
 import Logo from './../../logo-nav-bar.jpg';
 import Pic7 from './../../../src/pic7.jpg';
-import Pic2 from './../../pic2.jpg';
+//import Pic2 from './../../pic2.jpg';
 import Pic6 from './../../../src/building.jpg';
+
+import Pic1 from './../../pic1.png';
+//import Pic6 from './../../pic6.png';
 import Pic9 from './../../pic9.png';
 
 import AwesomeSlider from 'react-awesome-slider';
@@ -58,15 +62,19 @@ setHome=(bool)=>{
   this.setState({home:bool})
 }
 rend=()=>{
+  
   if(this.props.user.RoleID===1 || this.props.user.RoleID===2)
   {
-    return   this.state.showt && <TasksPopUp isOpen={this.state.showt} closeModal={this.closeModel} />
+    //this.state.showt &&
+    if(this.state.home===false)
+    return  <TasksPopUp setHome={this.setHome} />
 
   }
   else if(this.props.user.RoleID===3)
   {
-    
-      return <PropertyForRenter />
+    if(this.state.home===false)
+     this.setState({home:true})
+      return <Redirect to= '/PropertyForRenter' />
     }
 }
   render() {
@@ -77,10 +85,9 @@ rend=()=>{
         this.setState({ showt: true })
 
       });
-
+      
     }
 
-    const use2 = new UserObject(1, 'aa', 'bb', null, null, null, 1);
      
 
     return (
@@ -119,6 +126,7 @@ rend=()=>{
        onClick={() => {this.setHome(false)}}><button >דף הבית</button></Link>
       
 </div>
+{this.rend()}
 <div hidden={this.state.home}>
   
   <div>
@@ -152,10 +160,10 @@ rend=()=>{
   <img className='footer-img-left' src={Pic9}></img>
   </div>
   </div> 
- 
+  
     {i()}
-    {this.rend()}
      {this.state.login}
+     
        
 
 <switch>
@@ -175,9 +183,10 @@ rend=()=>{
     <Route path='/Route' component={Route} />
 
     <Route path='/Details' component={Details}></Route>
+    <Route path='/RedirectTo' component={RedirectTo} />
   </switch>
-   
-      </div>
+    // </div>
+    //   </div>
 
     )
   }
