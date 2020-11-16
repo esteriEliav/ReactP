@@ -31,7 +31,7 @@ function App() {
     <div className="App">
 
       <Home />
-      <Switch>
+      {/* <Switch>
         <Route path="/Home" component={Home}></Route>
         <Route path="/Calendar" component={Calendar} />
         <Route path='/EventDetails/:id' exact strict component={EventDetails} />
@@ -48,7 +48,7 @@ function App() {
         <Route path='/Search' component={Search}></Route>
         <Route path='/PopUpForProperties' component={PopUpForProperties}></Route>
         <Route path="/PropertyForRenter" component={PropertyForRenter}></Route>
-      </Switch>
+      </Switch> */}
     </div>
 
   );

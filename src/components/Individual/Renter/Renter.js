@@ -70,6 +70,11 @@ export class Renter extends Component {
         //     generalEror = 'SMS חובה להכניס אימייל או '
         //     isErr = true
         // }
+        if((object.FirstName===undefined || object.FirstName==='' ) && (object.LastName===undefined || object.LastName==='' ))
+        {
+            generalEror = 'חובה להכניס שם או שם משפחה'
+            isErr = true
+        }
         if (!object.Email || object.Email === '') {
             erors.Email = 'חובה להכניס אימייל'
             isErr = true
@@ -88,7 +93,9 @@ export class Renter extends Component {
             if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ ObjectsArray: objects, name,fieldsToSearch:null })
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name,fieldsToSearch:null })
         }
         }
     }
@@ -218,7 +225,7 @@ export class Renter extends Component {
        
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+         object.doc = docks.map((dock, index) => <button className="button-file2" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
          }
         return {
             fieldsToAdd, LinksForEveryRow, object,
@@ -230,13 +237,13 @@ export class Renter extends Component {
 
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details Object={this.props.object} isOpen={this.props.isOpen} closeModal={this.props.closeModal}
+            return <div> <Details Object={this.props.object} isOpen={this.props.isOpen} closeModal={this.props.closeModal}
                 fieldsArray={this.state.fieldsArray}
                 LinksPerObject={some.LinksPerObject}
                 LinksForEveryRow={some.LinksForEveryRow}
                 ButtonsForEveryRow={some.ButtonsForEveryRow}
                 fieldsToAdd={some.fieldsToAdd}
-            />
+            /></div>
 
         }
         else if (this.props.type === 'form') {

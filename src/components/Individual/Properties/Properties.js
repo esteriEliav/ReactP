@@ -44,7 +44,7 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 //קומפוננטת נכסים
 export class Properties extends Component {
     componentWillMount =  () => {
-        const owners = this.props.ownersList.map(item => { return { id: item.OwnerID, name:item.OwnerFirstName!==null && item.OwnerFirstName + ' ' +item.OwnerFirstName!==null && item.OwnerFirstName } })
+        const owners = this.props.ownersList.filter(i=>i.status===true).map(item => { return { id: item.OwnerID, name:item.OwnerFirstName!==null && item.OwnerFirstName + ' ' +item.OwnerFirstName!==null && item.OwnerFirstName } })
         const res = this.props.cities;
         const cities = res !== null ?
             res.map(item => { return { id: item.CityId, name: item.CityName } }) : [];
@@ -156,6 +156,7 @@ export class Properties extends Component {
               this.props.setExclusivityPeople(list !== null ? list : [])
                 
                 }
+                
    this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Properties'}}/>})
 
             }
@@ -171,7 +172,9 @@ export class Properties extends Component {
             if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ ObjectsArray: objects, name,fieldsToSearch:null })
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name,fieldsToSearch:null })
             
         }
         }
@@ -181,41 +184,41 @@ export class Properties extends Component {
 
         let path = 'Property/' + type + 'Property';
         if (type === 'Add' || type === 'Update') {
+            
             let newObj = PropertyObject();
-            if (type === 'Add')
-                newObj.PropertyID = 1
-            else
-                newObj.PropertyID = object.PropertyID;
-            const proper=postFunction('Property/GetPropertyByID',object.PropertyID);
+            debugger
+            const proper=this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
             if(proper)
             {
-                if(proper.IsRented!=object.IsRented)
+                if(proper.IsRented!==object.IsRented)
                 {
-                    if(object.IsRented==false)
+                    if(object.IsRented===false)
                     {
                      const rental=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
                      if(rental)
                      {
                   const b=window.confirm('להסיר השכרה?')
                   if(b)  
-                  postFunction('Rental/DeleteRental',rental.RentalID);
+                 await postFunction('Rental/DeleteRental',{id:rental.RentalID});
                
                      }
-                     else if(object.IsRented==true)
+                    }
+                     else if(object.IsRented===true)
                      {
-                         
-                         this.setState({showsomthing:<Rentals 
-                            type='form'
-                            formType='Add'
-                            formName='הוסף השכרה'
-                            isOpen={this.state.showForm}
-                            closeModal={this.closeFormModal}
-                            object={{ propertyID: object.PropertyID }}/>})
+                        object.IsRented=false
+                        alert("לא ניתן להפוך את הנכס למושכר, יש להוסיף השכרה לנכס")
                      }
                 }
 
-                }
+                
             }
+            if (type === 'Add')
+                newObj.PropertyID = 1
+            else
+                newObj.PropertyID = object.PropertyID;
+               
+           // const proper=await postFunction('Property/GetPropertyByID',{id:object.PropertyID});
+           
             newObj.CityID = object.CityID
             newObj.StreetID = object.StreetID
             newObj.OwnerID = object.OwnerID
@@ -428,11 +431,11 @@ export class Properties extends Component {
 
 
         fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox',index:8 }) 
-       
-        //אם הדירה מושכרת
-        if (object.IsRented) {
+        const rentalObject=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
 
-            const rentalObject=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID)
+        //אם הדירה מושכרת
+        if (object.IsRented && rentalObject) {
+
             
             // יהיה קישור באוביקט עצמו לפרטי ההשכרה
             tempobject.IsRented = <Link onClick={() => {
@@ -450,8 +453,14 @@ export class Properties extends Component {
                         ownersList={this.props.ownersList}
                         documents={this.props.documents}
                         user={this.props.user}
+                        rentalsList={this.props.rentalsList}
                         cities={this.props.cities}
                         streets={this.props.streets}
+                       setRentals={this.props.setRentals}
+                       setProperties={this.props.setProperties}
+                       setDocuments={this.props.setDocuments}
+                       setTasks={this.props.setTasks}
+               
                         type='details'
                     />
                 })
@@ -471,12 +480,17 @@ export class Properties extends Component {
                         documents={this.props.documents}
                         paymentTypes={this.props.paymentTypes}
                         rentersList={this.props.rentersList}
+                        rentalsList={this.props.rentalsList}
                         propertiesList={this.props.propertiesList}
                         SubPropertiesList={this.props.SubPropertiesList}
                         cities={this.props.cities}
-                        streets={this.props.streets}/>
+                        streets={this.props.streets}
+                        setRentals={this.props.setRentals}
+                       setProperties={this.props.setProperties}
+                       setDocuments={this.props.setDocuments}
+                       setTasks={this.props.setTasks}/>
                 })
-            }}>ערוך השכרה</button>)
+            }}>ערוך-השכרה</button>)
         }
         //אחרת, אם לא מושכרת
         else {
@@ -498,12 +512,17 @@ export class Properties extends Component {
                         rentersList={this.props.rentersList}
                         ownersList={this.props.ownersList}
                         documents={this.props.documents}
+                        rentalsList={this.props.rentalsList}
                         user={this.props.user}
                         cities={this.props.cities}
                         streets={this.props.streets}
-                        object={{ propertyID: object.PropertyID }} />
+                        object={{ PropertyID: object.PropertyID }} 
+                        setRentals={this.props.setRentals}
+                       setProperties={this.props.setProperties}
+                       setDocuments={this.props.setDocuments}
+                       setTasks={this.props.setTasks}/>
                 })
-            }}>הוסף השכרה</button>)
+            }}>הוסף-השכרה</button>)
         }
         //אםהנכס מחולק לכמה נכסים
         if (object.IsDivided) {
@@ -524,7 +543,7 @@ export class Properties extends Component {
                         formName='הוסף נכס מחולק'
                         object={{ PropertyID: object.PropertyID }} />
                 })
-            }} >הוסף נכס משנה</button>)
+            }} >הוסף-נכס-משנה</button>)
         }
 
         else
@@ -611,8 +630,8 @@ export class Properties extends Component {
             fieldsArray.splice(0, 1)
             return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
-                name={this.props.name}
-                type={this.props.type}
+                name={this.props.formName}
+                type={this.props.formType}
                 fieldsArray={fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
                 validate={this.validate}

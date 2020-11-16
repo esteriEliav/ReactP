@@ -1,0 +1,63 @@
+.details-container{
+    background-color:white;
+}
+.more-details div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.more-details div label:first-child{
+    color: #9f8946;
+    font-weight: bold;
+}
+.more-details div label:last-child{
+ margin-right: 10px;
+}
+.more-details div label:last-child button{
+    width: fit-content;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    padding: 0 13px;
+}
+.more-details-link a{
+    color: #9f8946;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.more-details-link a:hover{
+    color: #4e4015;
+}
+.div-container-popup{
+    max-height: 30rem;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding: 3rem 2rem;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+ }
+ ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #9f8946; 
+    border-radius: 10px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #9f8946; 
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #58460f; 
+  }

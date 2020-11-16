@@ -14,7 +14,6 @@ import PropertyOwner,{DocName} from '../PropertyOwner';
 import SubProperties from '../SubProperties';
 import './Rentals.css';
 import RedirectTo from "../../RedirectTo";
-
 import fileDownload from 'js-file-download'
 
 
@@ -35,9 +34,9 @@ export class Rentals extends Component {
 
     state = {
         name: 'השכרות',
-        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: [] }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: [] },
-        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: [], required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date' },
-        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date' }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
+        fieldsArray: [{ field: 'PropertyID', name: 'קוד נכס', type: 'select', selectOptions: [] }, { field: 'UserID', name: 'שוכר', type: 'select', selectOptions: [],required:true  },
+        { field: 'RentPayment', name: 'דמי שכירות', type: 'text' }, { field: 'PaymentTypeID', name: 'סוג תשלום', type: 'radio', radioOptions: [], required: true }, { field: 'EnteryDate', name: 'תאריך כניסה לדירה', type: 'date',required:true  },
+        { field: 'EndDate', name: 'תאריך סיום חוזה', type: 'date',required:true }, { field: 'ContactRenew', name: 'לחדש חוזה?', type: 'checkbox' }],
 
         fieldsToSearch: [{ field: 'PropertyID', name: 'קוד נכס', type: 'text' }, { field: 'Owner', name: 'שם משכיר', type: 'text' }, { field: 'User', name: 'שם שוכר ', type: 'text' },
         { field: 'EnteryDate', name: 'מתאריך כניסה לדירה', type: 'date' },
@@ -66,12 +65,14 @@ export class Rentals extends Component {
         
         PaymentTypeOptions1 = PaymentTypeOptions1 !== null ?
             PaymentTypeOptions1.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } }) : [];
-        const renters = this.props.rentersList.map(item => { return { id: item.OwnerID, name: item.OwnerFirstName + ' ' + item.OwnerLastName } })
+            let renters=this.props.rentersList.filter(i=>i.status===true)
+       renters = renters.map(item => {return { id: item.UserID, name: item.FirstName + ' ' + item.LastName } })
         //const cities = this.props.cities
         
         let city;
         let street;
-        const propertiesOptions = this.props.propertiesList.map(item => {
+        let propertiesOptions=this.props.propertiesList.filter(i=>i.status===true)
+        .map(item => {
             //const street = await postFunction('Property/GetStreetByID', item.CityID);
            city=this.props.cities.find(i=>i.CityId===item.CityID)
             street=this.props.streets.find(i=>i.CityId===item.CityID && i.StreetID===item.StreetID)
@@ -124,29 +125,48 @@ export class Rentals extends Component {
             if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ ObjectsArray: objects, name,fieldsToSearch:null })
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name,fieldsToSearch:null })
         }
         }
     }
     submit = async (type, object) => {
         let path = 'Rental/' + type + 'Rental'
         if (type === 'Add' || type === 'Update') {
-           
+            debugger
             let newObj = RentalObject()
-            if (type === 'Add') {
-                newObj.RentalID = 1
-               let property= this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
+            let property= this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
                if(property)
                {
+                    if(property.IsRented===true)
+                   {
+                       const rental=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
+                     
+                       if(rental && rental.PropertyID!==object.PropertyID)
+                       {
+                          const bool= window.confirm('כבר קימת השכרה לנכס זה, להחליף?')
+                          if(bool===true)
+                          {
+                             await postFunction('Rental/DeleteRental',{id:rental.RentalID})
+                          }
+                          else
+                            object.PropertyID=rental.PropertyID
+                       }
+                   }
                 if(property.IsRented!==true)
                 {
                     property.IsRented=true;
                     postFunction('Property/UpdateProperty',property);
                 }
-            }
+            if (type === 'Add') {
+                newObj.RentalID = 1
+               
+               
             }
             else
                 newObj.RentalID = object.RentalID
+        }
              newObj.PropertyID = object.PropertyID
            newObj.SubPropertyID = object.SubPropertyID
             newObj.UserID = object.UserID
@@ -175,7 +195,7 @@ export class Rentals extends Component {
 
         }
       const res= await CommonFunctions(type, object, path)
-      
+      debugger
              let   list = await GetFunction('Rental/GetAllRentals')
                 this.props.setRentals(list !== null ? list : [])
                 list = await GetFunction('Property/GetAllProperties')
@@ -299,9 +319,9 @@ export class Rentals extends Component {
                     <Properties type='form' formType='Update' formName='עריכה' index={0} object={property}
                         isOpen={this.state.showForm} closeModal={this.closeFormModal} />
             })
-        }}>
-            ערוך פרטי נכס</button>)
+        }}>ערוך-פרטי-נכס</button>)
 
+            
         
         
         if(userObject)
@@ -377,7 +397,7 @@ export class Rentals extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempObject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+        tempObject.doc = docks.map((dock, index) => <button className="button-file1" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -428,7 +448,11 @@ export class Rentals extends Component {
 
                     this.rend() : <Redirect to='/a' />}
 
-
+  {/* <div className="img-footer">
+  <img className='footer-img-right' src={Pic9}></img>
+  <img className='footer-img-left' src={Pic9}></img>
+  <img className='footer-img-left' src={Pic9}></img>
+  </div> */}
             </div>
         )
 

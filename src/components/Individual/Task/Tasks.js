@@ -12,7 +12,7 @@ import { CommonFunctions, GetFunction, postFunction, Search } from '../../Genera
 import TaskObject from '../../../Models-Object/TaskObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-//import './Task.css';
+import './Task.css';
 import RedirectTo from "../../RedirectTo";
 import PropertyOwner,{DocName} from '../PropertyOwner';
 import fileDownload from 'js-file-download'
@@ -77,7 +77,7 @@ export class Tasks extends Component {
             
             let city;
             let street;
-            const propertiesOptions = this.props.propertiesList.map(item => {
+            const propertiesOptions = this.props.propertiesList.filter(i=>i.status===true).map(item => {
                 //const street = await postFunction('Property/GetStreetByID', item.CityID);
                city=this.props.cities.find(i=>i.CityId===item.CityID)
                 street=this.props.streets.find(i=>i.CityId===item.CityID && i.StreetID===item.StreetID)
@@ -146,8 +146,9 @@ export class Tasks extends Component {
             if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            
-            this.setState({ ObjectsArray: objects, name ,fieldsToSearch:null})
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name ,fieldsToSearch:null})
         }
         }
     }
@@ -202,6 +203,7 @@ export class Tasks extends Component {
             
                 list=await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : []) 
+                debugger
                 this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Tasks'}}/>})
         return res
         // if (res && res !== null) {
@@ -218,7 +220,7 @@ export class Tasks extends Component {
                 this.setState({ ObjectsArray: this.props.tasksList, name: 'משימות',
                 fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions:this.state.TaskTypeOptions },
                  { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: this.state. ClassificationOptions},
-                { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }, { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
+                { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }],
          }) }}>חזרה למשימות</button>]
 
         }
@@ -254,7 +256,7 @@ export class Tasks extends Component {
 
             if (property && property.IsDivided) {
                 const SubProperties = this.props.SubPropertiesList.filter(item => item.PropertyID === object.PropertyID)
-                const subPropertiesOptions = SubProperties.map(item => { return { id: item.SubPropertyID, name: item.num } })
+                const subPropertiesOptions = SubProperties.filter(i=>i.status===true).map(item => { return { id: item.SubPropertyID, name: item.num } })
                 fieldsToAdd.push({ field: 'SubPropertyID', name: 'סווג לקוח',required:true, type: 'select', index: 1, selectOptions: subPropertiesOptions });
             }
 
@@ -360,7 +362,7 @@ export class Tasks extends Component {
        
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+         tempobject.doc = docks.map((dock, index) => <button className="button-file4" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
          }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -429,7 +431,7 @@ export class Tasks extends Component {
     render() {
         
         return (
-            <div>
+            <div className="div-task-container">
                 {this.rend()}
             </div>
         )

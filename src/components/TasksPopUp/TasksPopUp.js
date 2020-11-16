@@ -3,7 +3,7 @@ import Popup from 'reactjs-popup';
 import Axios from '../Axios'
 import { Link } from 'react-router-dom';
 import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
-import './TasksPopup.css';
+import './TasksPopUp.css';
 import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 
@@ -40,7 +40,7 @@ export class TasksPopUp extends Component {
             //      <a className="close" onClick={this.props.closeModal}>
             //         &times;
             //   </a>
-            <div>
+            <div className="all-task">
 
                 {this.state.timepassed && this.state.timepassed.length > 0 && 
                 <h3 dir='rtl'> {this.state.timepassed.length} משימות שעבר זמנם <Link onClick={()=>{this.props.setHome(true)}}

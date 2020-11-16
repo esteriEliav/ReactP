@@ -1,0 +1,16 @@
+
+.calendar-container{
+    margin-top: 7rem;
+    padding: 20px;
+}
+.calendar-container a{
+    color: #9f8946;
+}
+.fc .fc-button-primary:disabled{
+    background-color: #9f8946;
+    border-color:#9f8946;
+}
+.fc .fc-button-primary{
+    background-color: #9f8946;
+    border-color:black;
+}

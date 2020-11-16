@@ -6,5 +6,13 @@
     font-size: 14px;
     width: max-content;
     color: white;
+    margin-left: 5px;
 
+}
+.icon-container button{
+    color: #9f8946;
+    font-weight: bold;
+    background-color: transparent;
+    border: navajowhite;
+    font-size: 26px;
 }

@@ -13,15 +13,16 @@ import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import { Properties } from './Properties/Properties'
 import RedirectTo from "../RedirectTo";
-import fileDownload from 'js-file-download'
+import fileDownload from 'js-file-download';
+import './PropertyOwner.css'
 
 
 export class PropertyOwner extends Component {
-    obj = []
-    componentDidMount = () => {
+    // obj = []
+    // componentDidMount = () => {
 
-        Axios.get('PropertyOwner/getAllOwners').then(res => { this.obj = res.data })
-    }
+    //     Axios.get('PropertyOwner/getAllOwners').then(res => { this.obj = res.data })
+    // }
     state = {
 
         name: 'משכירים',
@@ -66,8 +67,9 @@ export class PropertyOwner extends Component {
             if (objects.length ===0 ) {
                 name = 'לא נמצאו תוצאות'    
             }
-            
-            this.setState({ ObjectsArray: objects, name:name,fieldsToSearch:null })
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name:name,fieldsToSearch:null })
             }
         }
     }
@@ -125,6 +127,11 @@ export class PropertyOwner extends Component {
         let erors = []
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
+        if((object.OwnerFirstName===undefined || object.OwnerFirstName==='' ) && (object.OwnerLastName===undefined || object.OwnerLastName==='' ))
+        {
+            generalEror = 'חובה להכניס שם או שם משפחה'
+            isErr = true
+        }
         if (!((object.Phone && object.Phone !== '') || (object.Email !== '' && object.Email))) {
             generalEror = 'חובה להכניס אימייל או טלפון'
             isErr = true
@@ -202,7 +209,7 @@ export class PropertyOwner extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        object.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => {  fileDownload(dock.docCoding,DocName(dock.DocName))}}>{DocName(dock.DocName)}</button>)
+        object.doc = docks.map((dock, index) => <button className="button-file" type='button' key={index} onClick={() => {  fileDownload(dock.docCoding,DocName(dock.DocName))}}>{DocName(dock.DocName)}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow, object,

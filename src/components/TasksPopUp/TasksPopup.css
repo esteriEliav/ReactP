@@ -13,20 +13,19 @@
   .popup-overlay{
     background-color: rgba(0,0,0,0.6);
   }
-  .modal-content .close{
-    float: right;
-    font-size: 52px;
-    font-weight: 700;
+  .close{
+    font-size: 52px !important;
+    font-weight: 700 ;
     line-height: 1;
-    color: white;
+    color: white !important;
     text-shadow: 0 1px 0 #fff;
-    /* opacity: .5; */
+    opacity: 1 !important; 
     position: absolute;
     top: -3.5rem;
     left: 50%;
     transform: translate(-50%, 0);
   }
-  .modal-content button{
+   button{
     background-color: #9f8946;
     color: white;
     border: navajowhite;
@@ -35,20 +34,22 @@
     margin-top: 4px;
     margin-right: 79px;
   }
-  .modal-content h3{
+ h3{
     font-size: 26px;
     margin-top: 10px;
+    margin: 0 2rem;
   }
-  .modal-content h3 a{
-    position: absolute;
-    top: 72px;
-    left: 54%;
-    height: 33.5px;
-    display: flex;
-    font-size: 19px;
-    color: #9f8946;
-    border: 1px solid #9f8946;
-    justify-content: center;
-    align-items: center;
-    width: 87px;
+  h3 a{
+      height: 51.5px;
+      font-size: 19px;
+      color: #9f8946;
+  }
+  h3 a:hover{
+    color: #725b16;
+  }
+  .all-task h3:first-child{
+    margin-top: 2rem;
+  }
+  .all-task h3:last-child{
+    margin-bottom: 2rem;
   }

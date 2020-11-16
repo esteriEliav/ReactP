@@ -6,3 +6,15 @@
     border: 1px solid #9f8946;
     font-weight: bold;
 }
+.div-task-container form span{
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: inherit;
+    font-size: 18px;
+}
+.div-task-container form span input{
+    box-sizing: border-box;
+    padding: 0;
+    margin-right: 40px;
+    margin-left: 8px;
+}

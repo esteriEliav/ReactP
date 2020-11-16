@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import LabelInput from './LabelInput'
+import LabelInput from './LabelInput/LabelInput'
 //import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import Popup from 'reactjs-popup';
 import { mapStateToProps } from '../Login/Login'

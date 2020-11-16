@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import LabelInput from './LabelInput'
+import LabelInput from './LabelInput/LabelInput'
 //import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import Popup from 'reactjs-popup';
-
+import './Form.css';
 
 
 
@@ -129,7 +129,10 @@ if(e)
                 const res=await this.props.submit(this.props.type, this.state.Object)
                 
                 if(res!==null)
+            {
+                debugger
                 this.props.closeModal();
+            }
             }
         }
 
@@ -144,17 +147,36 @@ if(e)
         }
 
         return (
-            <div>
-                <Popup open={true} closeOnDocumentClick={false}
-                    contentStyle={{ backgroundColor: "gray", width: '50%' }} nested modal>
+            <div className="edit-container">
+                <Popup className="popup-edit" open={true} closeOnDocumentClick={false}
+                    contentStyle={{ 
+                    backgroundColor: "rgba(0,0,0,0.7)", 
+                    // padding: "4rem",
+                    position: "relative",
+                    margin: "auto",
+                    backgroundColor:"white",
+                    // padding: "0rem 5rem",
+                    border: "2px solid #d39e00",
+                    direction: "rtl",
+                    fontSize: "16px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    lineHeight: "35px",
+                    flexDirection: "column",
+    
+                 }} nested modal>
 
                     <a className="close" onClick={this.props.closeModal}>
-                        &times;
+                        &times; 
               </a>
-                    <form onSubmit={submitHandler}>
+              <div className="div-container-popup">
+                    <form className={this.state.fieldsArray.length+this.state.fieldsToAdd.length>11?
+                    'form-edit margin-top-div':'form-edit'}
+                     onSubmit={submitHandler}>
                         <p> <em>{this.state.generalEror}</em><br /></p>
                         {this.state.fieldsArray.map((field, index) =>
-                            <span key={index}>
+                            <span className="edit-span" key={index}>
                                 <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} focusHandler={focusHandler} />
                                 {this.state.erors[field.field] && <><br /><em>{this.state.erors[field.field]}</em></>}
                                 {func(index)}
@@ -162,11 +184,13 @@ if(e)
                             </span>
 
                         )}
-                        {func('end')}
+                       <div className="container-footer-edit"> {func('end')}
                       
                         {/* באטן של סבמיט */}
-                        <button type='submit' name={this.props.name} >{this.props.name}</button>
+                        <button className="submit-edit" type='submit' name={this.props.name} >{this.props.name}</button>
+                        </div>
                     </form>
+                    </div>
                 </Popup>
             </div>
         )

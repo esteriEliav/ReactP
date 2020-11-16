@@ -5,6 +5,10 @@ import { mapStateToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import Details from "../Details";
 import './Item.css';
+// import MoreDetails from './';
+// import Edit from './';
+// import Delete from './'
+
 
 
 //קומפוננטה להצגת שורה בטבלה
@@ -47,7 +51,7 @@ export class Item extends Component {
     showForm = (type, name) => {
         return this.state.form && <Form closeModal={this.closeFormModal} isOpen={this.state.form}
             fieldsArray={this.props.fieldsArray} Object={this.props.Object}
-            submit={this.props.submit} type={type} name={name}
+            submit={this.props.submit} type={type} formType={type} name={name}
             setForForm={this.props.setForForm} validate={this.props.validate}
         />
 
@@ -57,12 +61,19 @@ export class Item extends Component {
             <React.Fragment>
                 <tr>{this.props.fieldsArray.map((item, index) => {if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
                     {(this.props.user.RoleID == 1 || this.props.user.RoleID == 2) &&
-                        <div>
-                            <td><button onClick={() => { this.setState({ details: true }) }} > לפרטים נוספים</button>{this.showdet()}</td>
+                        <div className="icon-container">
+                            <td><button onClick={() => { this.setState({ details: true }) }} >
+                            &#10011;
+                             </button>{this.showdet()}</td>
 
-                            <td><button onClick={() => { this.setState({ form: true }) }} > עריכה</button>{this.showForm("Update", 'ערוך')} </td>
+                            <td><button onClick={() => { this.setState({ form: true }) }} > 
+                            &#128394;
+                            </button>{this.showForm("Update", 'ערוך')} </td>
 
-                            <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>מחיקה</button></td>
+                            <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>
+                            {/* &#10008; */}
+                            &#128465;
+                            </button></td>
                         </div>
                     }
                     {this.state.ButtonsForEveryRow.map((but, index) => <td index={index}> {but}</td>)}

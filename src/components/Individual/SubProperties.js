@@ -56,7 +56,7 @@ export class SubProperties extends Component {
 
       //  const cities = this.props.cities
         let propertiesOptions = this.props.propertiesList.filter(item =>item.IsDivided);
-        propertiesOptions=propertiesOptions.map(item=> {
+        propertiesOptions=propertiesOptions.filter(i=>i.status===true).map(item=> {
            // const street = await postFunction('Property/GetStreetByID', item.CityID);
            const city=this.props.cities.find(i=>i.CityId===item.CityID)
            const street=this.props.streets.find(i=>i.StreetID===item.StreetID && i.CityId===item.CityID)
@@ -103,7 +103,9 @@ export class SubProperties extends Component {
             if (objects.length === 0) {
                 name = 'לא נמצאו תוצאות'
             }
-            this.setState({ ObjectsArray: objects, name })
+            this.setState({ObjectsArray:[]})
+            const objArray=[...objects]
+            this.setState({ ObjectsArray: objArray, name })
         }
         }
     }
@@ -240,7 +242,7 @@ export class SubProperties extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+        tempobject.doc = docks.map((dock, index) => <button className="button-file3" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow: LinksForEveryRow,

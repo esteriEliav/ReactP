@@ -25,6 +25,7 @@ import Select from "react-dropdown-select";
 import './Home.css';
 import Logo from './../../logo-nav-bar.jpg';
 import Pic7 from './../../../src/pic7.jpg';
+import ImgFooter from '../../../src/footer.jpg'
 //import Pic2 from './../../pic2.jpg';
 import Pic6 from './../../../src/building.jpg';
 
@@ -126,27 +127,27 @@ rend=()=>{
        onClick={() => {this.setHome(false)}}><button >דף הבית</button></Link>
       
 </div>
-{this.rend()}
-<div hidden={this.state.home}>
+<div className="task-container">{this.rend()}</div>
+<div >
   
   <div>
     <img className='nav-bar-logo' src={Logo}></img>
   </div>
   </div>
   </div>
-  <div className="body-home-container">
+  <div className="body-home-container" hidden={this.state.home}>
   <AwesomeSlider>
     <div data-src={Pic6} />
     <div data-src={Pic7} />
     <div data-src={Logo} />
   </AwesomeSlider>
-<div className="text-container"> 
+<div className="text-container" hidden={this.props.user.RoleID===1 || this.props.user.RoleID===2}> 
     <p className="title">MY PROJECT</p>
     <p>זה האתר שלנו</p>
     <p>הוא ממש מושלם ומעניין שווה לכם לבוא לבקר פה...</p>
     <p>אני לא באמת יודעת מה לכתוב פה אבל צריך לכתוב משהו בקטנה על האתר</p>
     <p>אז פשוט תסגננו משהו ותכתבו במקום מה שכתבתי עכשיו</p>
-    <button className="btn-login">כניסה</button> 
+    {/* <button className="btn-login">כניסה</button>  */}
 
     {/* <img className='nav-bar-logo' src={Pic6}></img> */}
   </div>
@@ -154,10 +155,12 @@ rend=()=>{
   <p className="about-text-home-title">מי אנחנו</p>
   <p>מתמחה בייזום וניהול של פרויקטי נדל"ן. במוקד העשייה שלה שני ערכים מרכזיים – פוטנציאל השבחה גבוה וראיית הלקוח במרכז. השילוב של שני הגורמים מביא ללקוחותינו את אותן עסקאות הנמצאות ב"שפיץ" של ענף הנדל"ן. על מנת להגיע ליעדים אלו החברה, ראשיה ועובדיה מחויבים לערכים נוספים של מצוינות, אמינות, מסוגלות ויצירתיות.</p>
   </div>
-  <div className="img-footer">
-  <img className='footer-img-right' src={Pic9}></img>
-  <img className='footer-img-left' src={Pic9}></img>
-  <img className='footer-img-left' src={Pic9}></img>
+
+  <div className="img-footer-home">
+  <img src={ImgFooter}></img>
+  <img src={ImgFooter}></img>
+  <img src={ImgFooter}></img>
+  <img src={ImgFooter}></img>
   </div>
   </div> 
   
@@ -181,11 +184,10 @@ rend=()=>{
     <Route path='/Form' component={Form} />
     <Route path='/Renter' component={Renter} />
     <Route path='/Route' component={Route} />
-
     <Route path='/Details' component={Details}></Route>
     <Route path='/RedirectTo' component={RedirectTo} />
   </switch>
-    // </div>
+    </div>
     //   </div>
 
     )

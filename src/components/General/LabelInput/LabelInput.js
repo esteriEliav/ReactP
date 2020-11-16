@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Select from "react-dropdown-select";
-import { mapStateToProps } from '../Login/Login'
+import { mapStateToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
+import './LabelInput.css'
 //field,content,change
 
 //קומפוננטה להצגת תווית ואינפוט מתאים
@@ -26,6 +27,8 @@ export class LabelInput extends Component {
        
         return (
             <span>
+<label dir='rtl'>{this.props.field.name}</label>
+                <div className="radio-button-container">
 
                 {type === 'radio' ?
                     this.props.field.radioOptions.map((rad, ind) =>{ return  <React.Fragment key={ind}><input type='radio' name={this.props.field.name} id={rad.id} value={rad.id} required={this.props.field.required}
@@ -45,7 +48,8 @@ export class LabelInput extends Component {
                                     value={content} onChange={(e) => { this.props.change(e, this.props.field.field) }} dir='rtl' />
 
                 }
-                <label dir='rtl'>{this.props.field.name}</label>
+                
+                </div>
             </span>
         )
     }

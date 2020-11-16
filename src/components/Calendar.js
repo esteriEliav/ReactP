@@ -8,6 +8,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import Axios from './Axios';
 import Tasks from './Individual/Task/Tasks';
 import { CommonFunctions, GetFunction, postFunction, Search } from './General/CommonFunctions';
+import './Calendar.css'
 
 
 
@@ -70,7 +71,7 @@ class Calendar extends React.Component {
   };
 
   render() {
-    return (<div>
+    return (<div className="calendar-container">
       {(this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2) && <Redirect to='/n' />}
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
