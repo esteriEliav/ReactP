@@ -60,6 +60,7 @@ class Calendar extends React.Component {
   }
 
   handleDateClick = (arg) => {
+    
     //alert('working');
     this.setState({
       showAddTask: <Tasks type='form' formType='Add' formName='הוסף' object={{ DateForHandling: arg.date }}

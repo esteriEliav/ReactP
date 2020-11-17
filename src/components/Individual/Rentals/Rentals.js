@@ -258,7 +258,14 @@ export class Rentals extends Component {
                     formName='הוסף'
                     isOpen={this.state.showForm}
                     closeModal={this.closeFormModal}
-                    object={{}} />
+                    object={{}} user={this.props.user}
+                    setRenters={this.props.setRenters}
+               setDocuments={this.props.setDocuments} 
+               rentersList={this.props.rentersList}
+               documents={this.props.documents}
+               propertiesList={this.props.propertiesList}
+               rentalsList={this.props.rentalsList}
+                 />
         })
     }}
     >הוסף שוכר</button>
@@ -319,7 +326,7 @@ export class Rentals extends Component {
                     <Properties type='form' formType='Update' formName='עריכה' index={0} object={property}
                         isOpen={this.state.showForm} closeModal={this.closeFormModal} />
             })
-        }}>ערוך-פרטי-נכס</button>)
+        }}>ערוך פרטי נכס</button>)
 
             
         
@@ -332,10 +339,17 @@ export class Rentals extends Component {
             this.setState({
                 showDetails: true, showSomthing:
                     <Renter type='details' object={userObject !== null ? userObject : {}}
-                        isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
+                        isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} 
+                        user={this.props.user}
+                        setRenters={this.props.setRenters}
+                        setDocuments={this.props.setDocuments} 
+                        rentersList={this.props.rentersList}
+                        documents={this.props.documents}
+                        propertiesList={this.props.propertiesList}
+                        rentalsList={this.props.rentalsList}/>
             })
         }}>
-            {userObject && renterName}</Link>
+            {renterName}</Link>
         }
          
          if(object.EnteryDate)

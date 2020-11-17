@@ -16,6 +16,7 @@ import './Task.css';
 import RedirectTo from "../../RedirectTo";
 import PropertyOwner,{DocName} from '../PropertyOwner';
 import fileDownload from 'js-file-download'
+import { Renter } from '../Renter/Renter'
 
 /*
 create table Tasks--משימות
@@ -40,14 +41,14 @@ export class Tasks extends Component {
 
         fieldsArray: [
         { field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] , required: true}, { field: 'Description', name: 'תיאור', type: 'texterea', required: true },
-        { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
+        { field: 'ClassificationID', name: 'סיווג', type: 'radio', radioOptions: [] }, { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date', required: true },
         { field: 'IsHandled', name: 'טופל?', type: 'checkbox' }],
         
         ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.tasksList,
         // [{ TaskID: 1, TaskTypeId: 4, Description: 'אאא', ClassificationID: 2, DateForHandling: '1/02/2018', IsHandled: false },
         // { TaskID: 2, TaskTypeId: 2, Description: 'sא', ClassificationID: 1, DateForHandling: '2/08/2018', IsHandled: true }],//
 
-        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'ClassificationID', name: 'סווג', type: 'radio', radioOptions: [] },
+        fieldsToSearch: [{ field: 'TaskTypeId', name: 'סוג', type: 'radio', radioOptions: [] }, { field: 'ClassificationID', name: 'סיווג', type: 'radio', radioOptions: [] },
         { field: 'DateForHandling', name: 'תאריך לטיפול', type: 'date' }],
 
         isAutho: false,
@@ -359,7 +360,31 @@ export class Tasks extends Component {
         tempobject.IsHandled='X'
         //postFunction('User/GetUserDocuments', { id: object.TaskID, type: 6 }).then(res => this.setState({ docks: res }))
         const docks=this.props.documents.filter(i=>i.type===6 && i.DocUser===object.TaskID)
-       
+       if(object.TaskTypeId===1)
+       {
+        
+        const rental=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
+         if(rental)
+         {
+        const renter=this.props.rentersList.find(i=>i.UserID===rental.UserID && i.status===true) 
+        if(renter)
+        {
+            let renterName=renter.FirstName!==null?renter.FirstName:''
+            renterName+=renter.LastName!==null?' '+renter.LastName:''
+           LinksPerObject.push(<button type='button' index='end' onClick={()=>{
+            this.setState({showSomthing:
+           <Renter type='details' object={renter} closeModal={this.closeDetailsModal}
+           user={this.props.user}
+           setRenters={this.props.setRenters}
+           setDocuments={this.props.setDocuments} 
+           rentersList={this.props.rentersList}
+           documents={this.props.documents}
+           propertiesList={this.props.propertiesList}rentalsList={this.props.rentalsList}/>})}}>
+               
+         מדווח:  {renterName} </button>)
+           }
+        }
+       }
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
          tempobject.doc = docks.map((dock, index) => <button className="button-file4" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)

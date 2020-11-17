@@ -110,25 +110,25 @@ rend=()=>{
 
     <div className="NavBar-links" >
       {/* כל ארבעת השורות הללו לא צריך להתייחס בעיצוב כי זה רק בשביל שתוכלי לראות*/}
-     
       <Link hidden={this.props.user.UserID === null} onClick={() => { this.props.setUser(new UserObject());this.setHome(false)}}>{this.props.user.UserName} התנתק </Link>
+<p>יציאה</p>
        <Link onClick={()=>this.setState({login:<Login closeModal={this.closeLogin} setHome={this.setHome}/>})} hidden={this.props.user.UserID !== null}
        > <button >כניסה</button></Link>
       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
        to={{ pathname: '/PropertyOwner' }} onClick={() => {this.setHome(true)}}><button >משכירים</button></Link>
+       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+       to={{ pathname: '/Renter' }} onClick={() => {this.setHome(true)}}> <button >שוכרים</button></Link>
       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
        to={{ pathname: '/Properties' }} onClick={() => {this.setHome(true)}}> <button>נכסים</button></Link>
       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/Renter' }} onClick={() => {this.setHome(true)}}> <button >שוכרים</button></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
        to="/Calendar" onClick={() => {this.setHome(true)}}><button>יומן</button></Link>
+       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+       to={{ pathname: '/Rentals' }} onClick={() => {this.setHome(true)}}><button >השכרות</button></Link>
       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
        to="/Tasks" onClick={() => {this.setHome(true)}}> <button >משימות</button ></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/Rentals' }} onClick={() => {this.setHome(true)}}><button >השכרות</button></Link>
       <Link to="" hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
        onClick={() => {this.setHome(false)}}><button >דף הבית</button></Link>
-      
+
 </div>
 <div className="task-container">{this.rend()}</div>
 <div >
@@ -142,24 +142,24 @@ rend=()=>{
   <AutoplaySlider
                   play={true}
                   cancelOnInteraction={false} // should stop playing on user interaction
-     interval={3000}> 
+     interval={4000}> 
     <div data-src={Pic6} />
     <div data-src={Pic7} />
     <div data-src={Logo} />
     </AutoplaySlider>
-<div className="text-container" hidden={this.props.user.RoleID===1 || this.props.user.RoleID===2}> 
-    <p className="title">ARGAMAN EXPRESS</p>
-    {/* <p>חברת ארגמן אקספרס בע"מ הינה חברה פרטית בתחום הנדל"ן אשר נוסדה בשנת 2008 
-במהלך שנות פעילותה, צברה החברה ניסיון רב בתחום שיווק נכסים להשקעה , מגורים ומסחרי , ניהול נכסים של משקיעים מהארץ ומחו"ל , שיפוצים ואחזקת מבנים הן להשקעה והן למגורים ,ייעוץ משכנתאות ופתרונות אשראי לפרטיים ועסקים.
-עם השנים צברנו הידע, הכלים וכמובן ניסיון, ובמהלכם רשמנו הישגים מרשימים והפכנו לשם דבר בתחומנו
-עם מחויבות להגשת פתרונות מלאים- אנו זוכים ע״י לקוחותינו למוניטין מוכח כחברה אמינה וערכית. לקוחות אלו בוחרים בנו פעם אחר פעם כשותפים, ואף ממליצים לאחרים.</p>
-    {/* <p>הוא ממש מושלם ומעניין שווה לכם לבוא לבקר פה...</p> */}
-
+<div  hidden={this.props.user.RoleID===1 || this.props.user.RoleID===2}> 
+{/* className="text-container" */}
+    <p className="title">ARGAMAN EXPRESS GROUP</p>
+    {/* <p>
     {/* <img className='nav-bar-logo' src={Pic6}></img> */}
   </div>
   <div className="about-text-home"> 
   <p className="about-text-home-title">מי אנחנו</p>
-  <p>מתמחה בייזום וניהול של פרויקטי נדל"ן. במוקד העשייה שלה שני ערכים מרכזיים – פוטנציאל השבחה גבוה וראיית הלקוח במרכז. השילוב של שני הגורמים מביא ללקוחותינו את אותן עסקאות הנמצאות ב"שפיץ" של ענף הנדל"ן. על מנת להגיע ליעדים אלו החברה, ראשיה ועובדיה מחויבים לערכים נוספים של מצוינות, אמינות, מסוגלות ויצירתיות.</p>
+  <p>חברת ארגמן אקספרס בע"מ הינה חברה פרטית בתחום הנדל"ן אשר נוסדה בשנת 2008.
+במהלך שנות פעילותה צברה החברה ניסיון רב בתחום שיווק נכסים להשקעה , מגורים ומסחרי , ניהול נכסים של משקיעים מהארץ ומחו"ל , שיפוצים ואחזקת מבנים הן להשקעה והן למגורים ,ייעוץ משכנתאות ופתרונות אשראי לפרטיים ועסקים.
+עם השנים צברנו הידע, הכלים וכמובן ניסיון, ובמהלכם רשמנו הישגים מרשימים והפכנו לשם דבר בתחומנו
+.עם מחויבות להגשת פתרונות מלאים- אנו זוכים ע״י לקוחותינו למוניטין מוכח כחברה אמינה וערכית. לקוחות אלו בוחרים בנו פעם אחר פעם כשותפים, ואף ממליצים לאחרים</p>
+
   </div>
 
   <div className="img-footer-home">

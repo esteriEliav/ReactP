@@ -68,9 +68,17 @@ export class PropertiesForRenter extends Component {
     }
 
     setForTable = () => {
+        let LinksForTable=[]
+        //  const rental=this.props.rentalsList.find(i=>i.UserID===this.props.user.UserID && i.status===true)
+        //         if(rental)
+        //         LinksForTable.push( [<button type='button' onClick={()=>{
+               
+        //         const reports=this.props.tasksList.filter(i=>i.TaskTypeID===1 && i.PropertyID===rental.PropertyID)
+        //         this.setState({showSomthing:<Tasks objects={reports}/>})}
+        //     }></button>])
         return {
-            LinksForTable: [],
-
+            
+            LinksForTable
         }
 
     }
