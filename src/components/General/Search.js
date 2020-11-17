@@ -4,7 +4,8 @@ import LabelInput from './LabelInput/LabelInput'
 //import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
 import Popup from 'reactjs-popup';
 import { mapStateToProps } from '../Login/Login'
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import '../../components/Individual/Task/Task.css'
 
 export class Search extends Component {
 
@@ -37,7 +38,7 @@ export class Search extends Component {
 
         return (
             <div>
-                <form onSubmit={this.submitHandler}>
+                <form className="Form-container" onSubmit={this.submitHandler}>
                     {this.props.fieldsArray.map((field, index) =>
                         <span key={index}>
                             <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} />

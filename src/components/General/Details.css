@@ -61,3 +61,7 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #58460f; 
   }
+  .more-details button{
+    width: fit-content;
+    padding: 0 11px;
+}

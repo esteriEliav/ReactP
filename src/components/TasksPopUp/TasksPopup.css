@@ -30,7 +30,7 @@
     color: white;
     border: navajowhite;
     width: 6rem;
-    height: 34px;
+    height: fit-content;
     margin-top: 4px;
     margin-right: 79px;
   }

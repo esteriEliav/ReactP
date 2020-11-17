@@ -22,7 +22,7 @@ form input{
 /* .container-rentals */
  form span{
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 /* .container-rentals  */
 form span input{
@@ -31,6 +31,8 @@ form span input{
 /* .container-rentals */
  form span label{
     margin-bottom: 0 !important;
+    color:#9f8946;
+    font-weight: bold;
 }
 /* .container-rentals */
  form button{

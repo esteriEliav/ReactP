@@ -30,6 +30,7 @@
     margin-right: 20px;
     margin-left: 10px;
     line-height: 30px;
+    width: 268px;
  }
  .form-edit span label{
     margin-left: 9px;
@@ -93,5 +94,16 @@
   }
 
   .margin-top-div{
-   margin-top: 20rem;
+   margin-top: 30rem;
  }
+em{
+   color: red;
+   font-weight:bold;
+}
+.span-container{
+   display: flex;
+   justify-self: center;
+   align-items: center;
+   flex-direction: column;
+   margin:8px 0;
+}

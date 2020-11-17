@@ -104,11 +104,16 @@ if(e)
                 items.push(<span key={i}>{links[i]}<p /> {links[i].props.showForm}</span>)
                 i += 1
             }
+            return items
+        }
+        const fieldsToAdd=(index)=>{
+            let items = []
+
             let fieldsToAdd = this.state.fieldsToAdd[j]
             while (j < this.state.fieldsToAdd.length && fieldsToAdd.index === index) {
                 fieldsToAdd = this.state.fieldsToAdd[j]
-                items.push(<span>
-                    <p />
+                items.push(<span className="span-container">
+                    <br />
                     <LabelInput key={j} field={fieldsToAdd} content={this.state.Object[fieldsToAdd.field]} change={this.change} />
                 </span>)
                 j += 1
@@ -176,19 +181,24 @@ if(e)
                      onSubmit={submitHandler}>
                         <p> <em>{this.state.generalEror}</em><br /></p>
                         {this.state.fieldsArray.map((field, index) =>
+                        <>
                             <span className="edit-span" key={index}>
                                 <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} focusHandler={focusHandler} />
                                 {this.state.erors[field.field] && <><br /><em>{this.state.erors[field.field]}</em></>}
-                                {func(index)}
                                 
+                             {func(index)}
                             </span>
+                           { fieldsToAdd(index)}
+                           </>
 
                         )}
-                       <div className="container-footer-edit"> {func('end')}
-                      
+                         
+                       <div className="container-footer-edit"> {func('end')}</div>
+                       <div className="container-footer-edit"> { fieldsToAdd('end')}</div>
+
                         {/* באטן של סבמיט */}
                         <button className="submit-edit" type='submit' name={this.props.name} >{this.props.name}</button>
-                        </div>
+                        
                     </form>
                     </div>
                 </Popup>

@@ -490,7 +490,7 @@ export class Properties extends Component {
                        setDocuments={this.props.setDocuments}
                        setTasks={this.props.setTasks}/>
                 })
-            }}>ערוך-השכרה</button>)
+            }}>ערוך השכרה</button>)
         }
         //אחרת, אם לא מושכרת
         else {
@@ -522,7 +522,7 @@ export class Properties extends Component {
                        setDocuments={this.props.setDocuments}
                        setTasks={this.props.setTasks}/>
                 })
-            }}>הוסף-השכרה</button>)
+            }}>הוסף השכרה</button>)
         }
         //אםהנכס מחולק לכמה נכסים
         if (object.IsDivided) {

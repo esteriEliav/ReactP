@@ -34,9 +34,12 @@ import Pic1 from './../../pic1.png';
 import Pic9 from './../../pic9.png';
 
 import AwesomeSlider from 'react-awesome-slider';
+
+import withAutoplay from 'react-awesome-slider/dist/autoplay';
 import 'react-awesome-slider/dist/styles.css';
 
 
+const AutoplaySlider = withAutoplay(AwesomeSlider);
 
 
 export class Home extends Component {
@@ -136,18 +139,21 @@ rend=()=>{
   </div>
   </div>
   <div className="body-home-container" hidden={this.state.home}>
-  <AwesomeSlider>
+  <AutoplaySlider
+                  play={true}
+                  cancelOnInteraction={false} // should stop playing on user interaction
+     interval={3000}> 
     <div data-src={Pic6} />
     <div data-src={Pic7} />
     <div data-src={Logo} />
-  </AwesomeSlider>
+    </AutoplaySlider>
 <div className="text-container" hidden={this.props.user.RoleID===1 || this.props.user.RoleID===2}> 
-    <p className="title">MY PROJECT</p>
-    <p>זה האתר שלנו</p>
-    <p>הוא ממש מושלם ומעניין שווה לכם לבוא לבקר פה...</p>
-    <p>אני לא באמת יודעת מה לכתוב פה אבל צריך לכתוב משהו בקטנה על האתר</p>
-    <p>אז פשוט תסגננו משהו ותכתבו במקום מה שכתבתי עכשיו</p>
-    {/* <button className="btn-login">כניסה</button>  */}
+    <p className="title">ARGAMAN EXPRESS</p>
+    {/* <p>חברת ארגמן אקספרס בע"מ הינה חברה פרטית בתחום הנדל"ן אשר נוסדה בשנת 2008 
+במהלך שנות פעילותה, צברה החברה ניסיון רב בתחום שיווק נכסים להשקעה , מגורים ומסחרי , ניהול נכסים של משקיעים מהארץ ומחו"ל , שיפוצים ואחזקת מבנים הן להשקעה והן למגורים ,ייעוץ משכנתאות ופתרונות אשראי לפרטיים ועסקים.
+עם השנים צברנו הידע, הכלים וכמובן ניסיון, ובמהלכם רשמנו הישגים מרשימים והפכנו לשם דבר בתחומנו
+עם מחויבות להגשת פתרונות מלאים- אנו זוכים ע״י לקוחותינו למוניטין מוכח כחברה אמינה וערכית. לקוחות אלו בוחרים בנו פעם אחר פעם כשותפים, ואף ממליצים לאחרים.</p>
+    {/* <p>הוא ממש מושלם ומעניין שווה לכם לבוא לבקר פה...</p> */}
 
     {/* <img className='nav-bar-logo' src={Pic6}></img> */}
   </div>
