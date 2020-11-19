@@ -411,7 +411,7 @@ export class Rentals extends Component {
        
        if (docks && docks[0]) {
         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempObject.doc = docks.map((dock, index) => <button className="button-file1" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+        tempObject.doc = docks.map((dock, index) => <button className="button-file1" type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow,

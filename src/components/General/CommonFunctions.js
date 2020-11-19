@@ -97,17 +97,18 @@ export const CommonFunctions = async (type, object, path) => {
             alert('עודכן בהצלחה')
                 ;
         x = res.data;
-    },
-        () => {
-            if (type == 'Add')
+    }
+    ).catch(()=>{
+              if (type == 'Add')
                 alert('תקלה... לא נוסף')
             else if (type == 'Delete')
                 alert('תקלה... לא נמחק')
             else
                 alert('תקלה... לא עודכן')
             console.log('תקלה בשליחת הבקשה')
-            x = null;
-        })
+            x = null;   
+           
+        });
         ;
     return x
 }
@@ -127,7 +128,9 @@ export const Search = async (object, path) => {
             console.log(path,res.data)
             x = res.data;
         }
-            , () => {
+    
+            ).catch(()=>{
+                
                 alert('תקלה... החיפוש לא הצליח')
                 x = null
             });
@@ -138,7 +141,11 @@ export const GetFunction = async (path) => {// לפונקציות get
     await Axios.get(path).then(res => {
         console.log(path,res.data)
         x = res.data
-    }, res => { console.log(res); x = null })
+    }).catch(()=>{
+                
+       
+        x = null
+    });
     return x;
 }
 
@@ -148,8 +155,12 @@ export const postFunction = async (path, data) => {//לפונקציות ששול
         console.log(path,res.data)
         x = res.data;
         ;
-    }, () => { x = null })
-        ;
+    }).catch(()=>{
+                
+        alert('תקלה... החיפוש לא הצליח')
+        x = null
+    });
+        
     return x;
 }
 

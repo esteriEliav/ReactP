@@ -387,7 +387,7 @@ export class Tasks extends Component {
        }
         if (docks && docks[0]) {
          fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         tempobject.doc = docks.map((dock, index) => <button className="button-file4" type='button' key={index} onClick={() => { fileDownload(dock.docCoding,DocName(dock.DocName)) }}>{DocName(dock.DocName)}</button>)
+         tempobject.doc = docks.map((dock, index) => <button className="button-file4" type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
          }
         return {
             fieldsToAdd, LinksForEveryRow,
@@ -396,7 +396,7 @@ export class Tasks extends Component {
 
     }
     rend = () => {
-        if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2 && this.props.user.RoleID !== 3) {
+    if (this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2 && this.props.user.RoleID !== 3) {
             return <Redirect to='/a' />
         }
         
