@@ -8,7 +8,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Axios from "../../Axios";
 import Details from '../../General/Details';
 import Form from '../../General/Form';
-import { CommonFunctions, GetFunction, postFunction, Search } from '../../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
 import TaskObject from '../../../Models-Object/TaskObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
@@ -140,7 +140,7 @@ export class Tasks extends Component {
         const path = 'Task/Search';
 
         if (object) {
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             if (objects)
             {
             let name = 'תוצאות חיפוש'

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Popup from 'reactjs-popup';
 import Axios from '../Axios'
 import { Link } from 'react-router-dom';
-import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonFunctions';
 import './TasksPopUp.css';
 import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'

@@ -24,7 +24,7 @@ import Search from './components/General/Search';
 import PopUpForProperties from './components/Individual/PopUpForProperties';
 
 function App() {
-
+  
 
   return (
 

@@ -5,7 +5,7 @@ import Axios from "../../Axios";
 import Details from '../../General/Details';
 import Renter from '../Renter/Renter';
 import Properties from '../Properties/Properties';
-import { CommonFunctions, GetFunction, postFunction, Search } from '../../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
 import RentalObject from '../../../Models-Object/RentalObject';
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
@@ -118,7 +118,7 @@ export class Rentals extends Component {
         const path = 'Rental/Search';
 
         if (object) {
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             if (objects)
             {
             let name = 'תוצאות חיפוש'

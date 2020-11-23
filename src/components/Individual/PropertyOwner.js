@@ -7,7 +7,7 @@ import MPropertyForRenterain1 from './PropertiesForRenter/PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../Axios";
-import { CommonFunction, CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
+import { CommonFunction, CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonFunctions';
 import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
 import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
@@ -60,7 +60,7 @@ export class PropertyOwner extends Component {
 
         if (object) {
                
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             let name = 'תוצאות חיפוש'
             if (objects)
             {

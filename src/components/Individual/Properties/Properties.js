@@ -5,7 +5,7 @@ import Form from '../../General/Form'
 import { Link, Redirect } from 'react-router-dom';
 import Axios from '../../Axios'
 import Details from '../../General/Details';
-import { CommonFunctions, GetFunction, postFunction, Search } from '../../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
 import PropertyObject from '../../../Models-Object/PropertyObject';
 import DocumentObject from '../../../Models-Object/DocumentObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
@@ -165,7 +165,7 @@ export class Properties extends Component {
         const path = 'Property/Search';
 
         if (object) {
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             if (objects)
             {
             let name = 'תוצאות חיפוש'
@@ -251,7 +251,7 @@ export class Properties extends Component {
             const con = window.confirm('למחוק נכס?')
             if (con === false)
                 return;
-            object = { id: object.propertyID }
+            object = { id: object.PropertyID }
         }
         
        const res= await CommonFunctions(type, object, path) 

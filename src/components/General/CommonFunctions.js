@@ -121,14 +121,13 @@ export const CommonFunctions = async (type, object, path) => {
 
 // return x;
 
-export const Search = async (object, path) => {
+export const SearchFor = async (object, path) => {
     let x;
     await Axios.post(path, { ...object })
         .then(res => {
             console.log(path,res.data)
             x = res.data;
-        }
-    
+        }   
             ).catch(()=>{
                 
                 alert('תקלה... החיפוש לא הצליח')

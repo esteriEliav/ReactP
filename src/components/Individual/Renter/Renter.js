@@ -9,7 +9,7 @@ import MPropertyForRenterain1 from '../PropertiesForRenter/PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../../Axios";
-import { CommonFunctions, CommonFunction, GetFunction, postFunction, Search } from '../../General/CommonFunctions';
+import { CommonFunctions, CommonFunction, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
 import RenterObject from '../../../Models-Object/UserObject'
 import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
@@ -86,7 +86,7 @@ export class Renter extends Component {
         const path = 'Renter/Search';
 
         if (object) {
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             if (objects)
             {
             let name = 'תוצאות חיפוש'

@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import interactionPlugin from '@fullcalendar/interaction';
 import Axios from './Axios';
 import Tasks from './Individual/Task/Tasks';
-import { CommonFunctions, GetFunction, postFunction, Search } from './General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from './General/CommonFunctions';
 import './Calendar.css'
 
 

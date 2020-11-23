@@ -111,7 +111,8 @@ rend=()=>{
     <div className="NavBar-links" >
       {/* כל ארבעת השורות הללו לא צריך להתייחס בעיצוב כי זה רק בשביל שתוכלי לראות*/}
       <Link hidden={this.props.user.UserID === null} onClick={() => { this.props.setUser(new UserObject());this.setHome(false)}}>{this.props.user.UserName} התנתק </Link>
-<p>יציאה</p>
+<p> </p>
+<p></p>
        <Link onClick={()=>this.setState({login:<Login closeModal={this.closeLogin} setHome={this.setHome}/>})} hidden={this.props.user.UserID !== null}
        > <button >כניסה</button></Link>
       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}

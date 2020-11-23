@@ -5,7 +5,7 @@ import Properties from './Properties/Properties'
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
 import Details from '../General/Details';
-import { CommonFunctions, GetFunction, postFunction, Search } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonFunctions';
 import SubPropertyObject from '../../Models-Object/SubPropertyObject'
 import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
@@ -96,7 +96,7 @@ export class SubProperties extends Component {
         const path = 'SubProperty/Search';
 
         if (object) {
-            let objects =await Search(object, path)
+            let objects =await SearchFor(object, path)
             if (objects)
             {
             let name = 'תוצאות חיפוש'
