@@ -1,21 +1,21 @@
 
 import React, { Component } from 'react'
-import Table from '../../General/Table'
-import Details from '../../General/Details'
-import Form from '../../General/Form'
+import Table from '../../General/Table/Table'
+import Details from '../../General/Details/Details'
+import Form from '../../General/Form/Form'
 import Properties from '../Properties/Properties'
 import AddCommonLinks from '../../General/AddCommonLinks'
 import MPropertyForRenterain1 from '../PropertiesForRenter/PropertyForRenter';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Axios from "../../Axios";
-import { CommonFunctions, CommonFunction, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
+import { CommonFunctions, CommonFunction, GetFunction, postFunction, SearchFor } from '../../General/CommonAxiosFunctions';
 import RenterObject from '../../../Models-Object/UserObject'
-import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
+import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import './Renter.css'
 import RedirectTo from "../../RedirectTo";
-import PropertyOwner,{DocName} from '../PropertyOwner';
+import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../General/CommonFunctions'
 import fileDownload from 'js-file-download'
 
 
@@ -50,7 +50,7 @@ export class Renter extends Component {
         showSomthing: null,
         docks: [],
         objects: [],
-        red:null
+        red: null
 
     }
     closeDetailsModal = () => {
@@ -70,8 +70,7 @@ export class Renter extends Component {
         //     generalEror = 'SMS חובה להכניס אימייל או '
         //     isErr = true
         // }
-        if((object.FirstName===undefined || object.FirstName==='' ) && (object.LastName===undefined || object.LastName==='' ))
-        {
+        if ((object.FirstName === undefined || object.FirstName === '') && (object.LastName === undefined || object.LastName === '')) {
             generalEror = 'חובה להכניס שם או שם משפחה'
             isErr = true
         }
@@ -82,21 +81,20 @@ export class Renter extends Component {
         return { isErr: isErr, generalEror: generalEror, erors: erors }
 
     }
-    submitSearch =async (object) => {
+    submitSearch = async (object) => {
         const path = 'Renter/Search';
 
         if (object) {
-            let objects =await SearchFor(object, path)
-            if (objects)
-            {
-            let name = 'תוצאות חיפוש'
-            if (objects.length === 0) {
-                name = 'לא נמצאו תוצאות'
+            let objects = await SearchFor(object, path)
+            if (objects) {
+                let name = 'תוצאות חיפוש'
+                if (objects.length === 0) {
+                    name = 'לא נמצאו תוצאות'
+                }
+                this.setState({ ObjectsArray: [] })
+                const objArray = [...objects]
+                this.setState({ ObjectsArray: objArray, name, fieldsToSearch: null })
             }
-            this.setState({ObjectsArray:[]})
-            const objArray=[...objects]
-            this.setState({ ObjectsArray: objArray, name,fieldsToSearch:null })
-        }
         }
     }
     submit = async (type, object) => {
@@ -128,7 +126,7 @@ export class Renter extends Component {
                 Dock = object.add;
             }
             let newObj = new RenterObject(UserID, FirstName, LastName, SMS, Email, Phone, 3, UserName, Password, Dock, docName);
-            
+
             object = newObj
 
         }
@@ -138,14 +136,14 @@ export class Renter extends Component {
                 return;
             object = { id: object.UserID }
         }
-        const res= await CommonFunctions(type, object, path)
+        const res = await CommonFunctions(type, object, path)
         let list = await GetFunction('Renter/GetAllRenters')
-                this.props.setRenters(list !== null ? list : [])
-               
-                list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : []) 
-                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Renter'}}/>})
-           return res
+        this.props.setRenters(list !== null ? list : [])
+
+        list = await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : [])
+        this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/Renter' }} /> })
+        return res
         // if (res && res !== null) {
         //     this.closeFormModal();
         // }
@@ -154,11 +152,13 @@ export class Renter extends Component {
     setForTable = () => {
         let LinksForTable = []
         if (this.state.name !== 'שוכרים')
-            LinksForTable = [<button type='button' onClick={() => { 
-                this.setState({ ObjectsArray: this.props.rentersList, name: 'שוכרים',
-                fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
-                { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'text' }],
-                 }) }}>חזרה לשוכרים</button>]
+            LinksForTable = [<button type='button' onClick={() => {
+                this.setState({
+                    ObjectsArray: this.props.rentersList, name: 'שוכרים',
+                    fieldsToSearch: [{ field: 'FirstName', name: 'שם פרטי', type: 'text' }, { field: 'LastName', name: 'שם משפחה', type: 'text' },
+                    { field: 'SMS', name: 'SMS', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'text' }],
+                })
+            }}>חזרה לשוכרים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -170,12 +170,12 @@ export class Renter extends Component {
                             validate={this.validate} />
                 })
             }} >הוספת שוכר </button>,
-            <button type='button'  onClick={async() => {
+            <button type='button' onClick={async () => {
                 const con = window.confirm('לשלוח?')
                 if (con === true) {
                     let res;
-                   res=await GetFunction('User/SendAllRenter')
-                
+                    res = await GetFunction('User/SendAllRenter')
+
                     if (res)
                         alert("נשלח")
                     else
@@ -190,43 +190,35 @@ export class Renter extends Component {
 
     }
     setForForm = object => {
-        const fieldsToAdd = [{ field: 'document', name: 'מסמכים', type: 'file', index: 'end' }]
+        const fieldsToAdd = [...AddDocField]
         let LinksPerObject = []
-        const docks=this.props.documents.filter(i=>i.type===4 && i.DocUser===object.UserID)
+        const docks = this.props.documents.filter(i => i.type === 4 && i.DocUser === object.UserID)
         if (docks && docks[0]) {
- 
-            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
-            <button index='end' type='button' key={index} onClick={async() => {
-                 const b=window.confirm('למחוק מסמך?')
-                if(b)
-                {
-                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
-              let  list=await GetFunction('User/GetAllDocuments')
-        this.props.setDocuments(list !== null ? list : []) 
-                }
- }}> מחיקת מסמך {DocName(dock.DocName)}</button>)}</div>)
-         }
+
+            LinksPerObject.push(<div index='end'>{DocDeleteButton(docks, this.props.setDocuments)}</div>)
+
+        }
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
 
-      //  postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID }).then(res => this.setState({ properties: res }))
-      const rentals=this.props.rentalsList.filter(i=>i.UserID===object.UserID)
-      let properties=[]
-      rentals.map(item=>{properties.push(...this.props.propertiesList.filter(i=>i.PropertyID===item.PropertyID)) })
-     
+        //  postFunction('Renter/getPropertiesbyRenterID', { id: object.OwnerID }).then(res => this.setState({ properties: res }))
+        const rentals = this.props.rentalsList.filter(i => i.UserID === object.UserID)
+        let properties = []
+        rentals.map(item => { properties.push(...this.props.propertiesList.filter(i => i.PropertyID === item.PropertyID)) })
+
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let fieldsToAdd = [];
         let LinksForEveryRow = [<Link
             to={{ pathname: '/Properties', objects: properties }}>דירות ששוכר</Link>]
         //postFunction('User/GetUserDocuments', { id: object.UserID, type: 4 }).then(res => this.setState({ docks: res }))
-        const docks=this.props.documents.filter(i=>i.type===4 && i.DocUser===object.UserID)
-       
+        const docks = this.props.documents.filter(i => i.type === 4 && i.DocUser === object.UserID)
+
         if (docks && docks[0]) {
-         fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-         object.doc = docks.map((dock, index) => <button className="button-file2" type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
-         }
+            fieldsToAdd = [{ ...DocField }]
+            object.doc = DocButtons(docks)
+        }
         return {
             fieldsToAdd, LinksForEveryRow, object,
             ButtonsForEveryRow, LinksPerObject
@@ -272,7 +264,7 @@ export class Renter extends Component {
             <div>
                 {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
                     this.rend()
-                    : <Redirect to='/a' />}
+                    : <Redirect to='/' />}
 
             </div>
 
@@ -280,7 +272,7 @@ export class Renter extends Component {
     }
 }
 
-export default connect (mapStateToProps,mapDispatchToProps)(Renter);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Renter));
 // export const rentersList = [{ UserID: 1, FirstName: 'aaa', LastName: 'asd', Phone: '000', Email: 'acd' },
 // { UserID: 2, FirstName: 'aaa', LastName: 'aaz', Phone: '000', Email: 'acd' },
 // { UserID: 3, FirstName: 'aaa', LastName: 'ard', Phone: '000', Email: 'acd' }]

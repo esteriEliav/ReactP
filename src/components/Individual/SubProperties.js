@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
-import Table from "../General/Table";
-import Form from '../General/Form'
+import Table from "../General/Table/Table";
+import Form from '../General/Form/Form'
 import Properties from './Properties/Properties'
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
 import Axios from "../Axios";
-import Details from '../General/Details';
-import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonFunctions';
+import Details from '../General/Details/Details';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonAxiosFunctions';
 import SubPropertyObject from '../../Models-Object/SubPropertyObject'
-import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
+import { mapStateToProps, mapDispatchToProps } from '../Login/Login'
 import { connect } from 'react-redux'
 import Rentals from './Rentals/Rentals';
 //import { propertiesList } from './Properties';
 import RedirectTo from "../RedirectTo";
-import PropertyOwner,{DocName} from './PropertyOwner';
+import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../General/CommonFunctions'
 import fileDownload from 'js-file-download'
 
 /*
@@ -30,39 +30,39 @@ IsRented bit not null constraint DF_SubProperties_IsRented default 0
 
 export class SubProperties extends Component {
 
-    tname=this.props.location && this.props.location.PropertyID
+    tname = this.props.location && this.props.location.PropertyID
     state = {
-        name:' תת נכסים לנכס מספר '+this.tname,
+        name: ' תת נכסים לנכס מספר ' + this.tname,
         fieldsArray: [{ field: 'PropertyID', name: 'נכס', type: 'select', selectOptions: [] },
         { field: 'num', name: 'מספר', type: 'text', required: true }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' },
         { field: 'IsRented', name: 'מושכר?', type: 'checkbox' }],
-        ObjectsArray:this.props.location && this.props.location.objects,
-           // [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
-        
-        
-           // fieldsToSearch: [],//[{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
+        ObjectsArray: this.props.location && this.props.location.objects,
+        // [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }],//
+
+
+        // fieldsToSearch: [],//[{ field: 'PropertyID', name: 'קוד נכס', type: 'text' },
         // { field: 'num', name: 'מספר', type: 'text' }, { field: 'Size', name: 'שטח', type: 'text' }, { field: 'RoomsNum', name: 'מספר חדרים', type: 'text' }],
         //isAutho: true,//false
-      //  showForm: false,
+        //  showForm: false,
         //showDetails: this.props.type == 'details' ? true : false,
         showSomthing: null,
         docks: [],
-        red:null
+        red: null
         //propertyObject: {},
         //rental: {}
 
     }
     componentDidMount = async () => {
 
-      //  const cities = this.props.cities
-        let propertiesOptions = this.props.propertiesList.filter(item =>item.IsDivided);
-        propertiesOptions=propertiesOptions.filter(i=>i.status===true).map(item=> {
-           // const street = await postFunction('Property/GetStreetByID', item.CityID);
-           const city=this.props.cities.find(i=>i.CityId===item.CityID)
-           const street=this.props.streets.find(i=>i.StreetID===item.StreetID && i.CityId===item.CityID)
-           
+        //  const cities = this.props.cities
+        let propertiesOptions = this.props.propertiesList.filter(item => item.IsDivided);
+        propertiesOptions = propertiesOptions.filter(i => i.status === true).map(item => {
+            // const street = await postFunction('Property/GetStreetByID', item.CityID);
+            const city = this.props.cities.find(i => i.CityId === item.CityID)
+            const street = this.props.streets.find(i => i.StreetID === item.StreetID && i.CityId === item.CityID)
+
             return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
-    })
+        })
         let fieldsArray = [...this.state.fieldsArray];
         fieldsArray[0].selectOptions = propertiesOptions;
         this.setState({ fieldsArray })
@@ -70,11 +70,11 @@ export class SubProperties extends Component {
     }
     closeDetailsModal = () => {
 
-        this.setState({  showSomthing: null })
+        this.setState({ showSomthing: null })
     }
     closeFormModal = () => {
 
-        this.setState({  showSomthing: null })
+        this.setState({ showSomthing: null })
     }
     validate = object => {
         let isErr = false
@@ -92,24 +92,23 @@ export class SubProperties extends Component {
         }
         return { isErr: isErr, generalEror: generalEror, erors: erors }
     }
-    submitSearch =async (object) => {
+    submitSearch = async (object) => {
         const path = 'SubProperty/Search';
 
         if (object) {
-            let objects =await SearchFor(object, path)
-            if (objects)
-            {
-            let name = 'תוצאות חיפוש'
-            if (objects.length === 0) {
-                name = 'לא נמצאו תוצאות'
+            let objects = await SearchFor(object, path)
+            if (objects) {
+                let name = 'תוצאות חיפוש'
+                if (objects.length === 0) {
+                    name = 'לא נמצאו תוצאות'
+                }
+                this.setState({ ObjectsArray: [] })
+                const objArray = [...objects]
+                this.setState({ ObjectsArray: objArray, name })
             }
-            this.setState({ObjectsArray:[]})
-            const objArray=[...objects]
-            this.setState({ ObjectsArray: objArray, name })
-        }
         }
     }
-    submit =async (type, object) => {
+    submit = async (type, object) => {
         let path = 'SubProperty/' + type + 'SubProperty'
         if (type === 'Add' || type === 'Update') {
             let newObj = SubPropertyObject()
@@ -138,13 +137,13 @@ export class SubProperties extends Component {
                 return;
             object = { id: object.SubPropertyID }
         }
-        const res= await CommonFunctions(type, object, path)
-        let  list = await GetFunction('SubProperty/GetAllSubProperties')
-                this.props.setSubProperties(list !== null ? list : [])
-               
-                list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : []) 
-                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/SubProperties'}}/>})
+        const res = await CommonFunctions(type, object, path)
+        let list = await GetFunction('SubProperty/GetAllSubProperties')
+        this.props.setSubProperties(list !== null ? list : [])
+
+        list = await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : [])
+        this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/SubProperties' }} /> })
 
         return res
         // if (res && res !==  null) {
@@ -157,33 +156,29 @@ export class SubProperties extends Component {
     setForTable = () => {
         // let LinksForTable = []
         // if (this.state.name !== 'תת נכסים')
-          let  LinksForTable = [<button type='button' onClick={() => { 
-                this.setState({ showSomthing:
-                    <Form closeModal={this.closeFormModal} 
-                    fieldsArray={this.state.fieldsArray} Object={{PropertyID:this.props.location.PropertyID}} submit={this.submit} type='Add' name=' הוסף'
-                    setForForm={this.setForForm}
-                validate={this.validate}/> })}}>הוספת תת נכס לנכס אב</button>]
+        let LinksForTable = [<button type='button' onClick={() => {
+            this.setState({
+                showSomthing:
+                    <Form closeModal={this.closeFormModal}
+                        fieldsArray={this.state.fieldsArray} Object={{ PropertyID: this.props.location.PropertyID }} submit={this.submit} type='Add' name=' הוסף'
+                        setForForm={this.setForForm}
+                        validate={this.validate} />
+            })
+        }}>הוספת תת נכס לנכס אב</button>]
         return {
             LinksForTable
 
         }
     }
     setForForm = object => {
-        let fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
+        let fieldsToAdd = [{ ...AddDocField }]
         let LinksPerObject = []
-        const docks=this.props.documents.filter(i=>i.type===5 && i.DocUser===object.SubPropertyID)
+        const docks = this.props.documents.filter(i => i.type === 5 && i.DocUser === object.SubPropertyID)
         if (docks && docks[0]) {
- 
-            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
-            <button index='end' type='button' key={index} onClick={async() => {
-                 const b=window.confirm('למחוק מסמך?')
-                if(b)
-                {
-                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
-              let  list=await GetFunction('User/GetAllDocuments')
-        this.props.setDocuments(list !== null ? list : []) 
-                }
-            }}> מחיקת מסמך {DocName(dock.DocName)}</button>)}</div>)         }
+
+            LinksPerObject.push(<div index='end'>{DocDeleteButton(docks, this.props.setDocuments)}</div>)
+
+        }
         return { fieldsToAdd, LinksPerObject }
     }
     set = (object) => {
@@ -192,9 +187,9 @@ export class SubProperties extends Component {
         let ButtonsForEveryRow = []
         let LinksPerObject = []
         let fieldsToAdd = []
-        let tempobject = {...object};
+        let tempobject = { ...object };
         //postFunction('Propety/GetPropertyByID', { id: object.PropertyID }).then(res => this.setState({ propertyObject: res }))
-        const propertyObject=this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
+        const propertyObject = this.props.propertiesList.find(i => i.PropertyID === object.PropertyID)
         tempobject.PropertyID = <Link onClick={() => {
             this.setState({
                 showDetails: true, showSomthing:
@@ -213,8 +208,8 @@ export class SubProperties extends Component {
 
 
         if (object.IsRented) {
-           // postFunction('Property/GetRentalBySubPropertyID', { id: object.SubPropertyID }).then(res => this.setState({ rental: res }))
-           const rental=this.props.rentalsList.find(i=>i.SubPropertyID===object.SubPropertyID)
+            // postFunction('Property/GetRentalBySubPropertyID', { id: object.SubPropertyID }).then(res => this.setState({ rental: res }))
+            const rental = this.props.rentalsList.find(i => i.SubPropertyID === object.SubPropertyID)
             tempobject.IsRented = <Link onClick={() => {
                 this.setState({
                     showDetails: true, showSomthing:
@@ -237,12 +232,12 @@ export class SubProperties extends Component {
             }} >שנה השכרה</button>)
 
         }
-       // postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 }).then(res => this.setState({ docks: res }))
-       const docks=this.props.documents.filter(i=>i.type===5 && i.DocUser===object.SubPropertyID)
-       
-       if (docks && docks[0]) {
-        fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        tempobject.doc = docks.map((dock, index) => <button className="button-file3" type='button' key={index} onClick={() => {window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
+        // postFunction('User/GetUserDocuments', { id: object.SubPropertyID, type: 5 }).then(res => this.setState({ docks: res }))
+        const docks = this.props.documents.filter(i => i.type === 5 && i.DocUser === object.SubPropertyID)
+
+        if (docks && docks[0]) {
+            fieldsToAdd = [{ ...DocField }]
+            tempobject.doc = DocButtons(docks)
         }
         return {
             fieldsToAdd, LinksForEveryRow: LinksForEveryRow,
@@ -277,7 +272,7 @@ export class SubProperties extends Component {
             return <div><Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
-                validate={this.validate} erors={this.state.erors} submit={this.submit} 
+                validate={this.validate} erors={this.state.erors} submit={this.submit}
                 submitSearch={this.submitSearch}
             />{this.state.showSomthing}{this.state.red}</div>
 
@@ -295,6 +290,6 @@ export class SubProperties extends Component {
 
 }
 
-export default connect (mapStateToProps,mapDispatchToProps)(SubProperties);
+export default connect(mapStateToProps, mapDispatchToProps)(SubProperties);
 //export const SubPropertiesList = [{ SubPropertyID: 1, PropertyID: 2, num: 2, Size: 150, RoomsNum: 2, IsRented: false }]
 //GetFunction('SubProperty/GetAllSubProperties');

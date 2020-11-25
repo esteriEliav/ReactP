@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 //import { CommonFunctions, GetFunction, postFunction } from './CommonFunctions';
 import Popup from 'reactjs-popup';
-import { mapStateToProps } from '../Login/Login'
+import { mapStateToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-import Form from './Form';
 import './Details.css'
 
 /*
@@ -67,7 +66,7 @@ export class Details extends Component {
                             return <div className="more-details" key={index}>
 
                                 {this.props.Object[item.field] && <div><label dir='rtl'>{item.name}</label>:
-      
+
                   <label dir='rtl'>{this.props.Object[item.field]}</label></div>}
                                 <span>
                                     {func(index).map(item => <div>{item}</div>)}

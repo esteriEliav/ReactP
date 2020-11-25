@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Popup from 'reactjs-popup';
-import LabelInput from '../General/LabelInput/LabelInput';
+import LabelInput from '../../General/LabelInput/LabelInput';
 import './PopUpForProperties.css'
 
 
@@ -9,11 +9,11 @@ export class PopUpForProperties extends Component {
         object: {}
     }
     change = (e, field) => {
-         let obj = { ...this.state.obj };
-        if(!e.target && e[0])
-        obj[field] = e[0].id ;
-       else
-        obj[field] = e.target.value
+        let obj = { ...this.state.obj };
+        if (!e.target && e[0])
+            obj[field] = e[0].id;
+        else
+            obj[field] = e.target.value
         this.setState({ object: obj })
     }
     render() {

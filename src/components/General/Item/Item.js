@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
-import Form from '../Form';
+import Form from '../Form/Form';
 import { mapStateToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-import Details from "../Details";
+import Details from "../Details/Details";
 import './Item.css';
 // import MoreDetails from './';
 // import Edit from './';
@@ -59,19 +59,19 @@ export class Item extends Component {
     render() {
         return (
             <React.Fragment>
-                <tr>{this.props.fieldsArray.map((item, index) => {if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
+                <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
                     {(this.props.user.RoleID == 1 || this.props.user.RoleID == 2) &&
                         <div className="icon-container">
                             <td><button onClick={() => { this.setState({ details: true }) }} >
-                            &#10011;
+                                &#10011;
                              </button>{this.showdet()}</td>
 
-                            <td><button onClick={() => { this.setState({ form: true }) }} > 
-                            &#128394;
+                            <td><button onClick={() => { this.setState({ form: true }) }} >
+                                &#128394;
                             </button>{this.showForm("Update", 'ערוך')} </td>
 
                             <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>
-                            {/* &#10008; */}
+                                {/* &#10008; */}
                             &#128465;
                             </button></td>
                         </div>

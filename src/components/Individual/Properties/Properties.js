@@ -1,23 +1,25 @@
 import React, { Component } from 'react'
-import Table from '../../General/Table'
-import Form from '../../General/Form'
+import Table from '../../General/Table/Table'
+import Form from '../../General/Form/Form'
 
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import Axios from '../../Axios'
-import Details from '../../General/Details';
-import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonFunctions';
+import Details from '../../General/Details/Details';
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonAxiosFunctions';
 import PropertyObject from '../../../Models-Object/PropertyObject';
 import DocumentObject from '../../../Models-Object/DocumentObject'
-import { mapStateToProps,mapDispatchToProps } from '../../Login/Login'
+import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import property from '../../../Models-Object/PropertyObject';
 import SubProperties from '../SubProperties';
 import { Rentals } from '../Rentals/Rentals';
-import PopUpForProperties from '../PopUpForProperties';
+import PopUpForProperties from '../PopUpForProperty/PopUpForProperties';
 import subProperty from '../../../Models-Object/SubPropertyObject';
+import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../General/CommonFunctions'
+
 import './Properties.css';
 import RedirectTo from "../../RedirectTo";
-import PropertyOwner,{DocName} from '../PropertyOwner';
+import PropertyOwner from '../PropertyOwner/PropertyOwner';
 import fileDownload from 'js-file-download'
 
 
@@ -43,21 +45,49 @@ IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם 
 */
 //קומפוננטת נכסים
 export class Properties extends Component {
-    componentWillMount =  () => {
-        const owners = this.props.ownersList.filter(i=>i.status===true).map(item => { return { id: item.OwnerID, name:item.OwnerFirstName!==null && item.OwnerFirstName + ' ' +item.OwnerFirstName!==null && item.OwnerFirstName } })
+    componentWillMount = () => {
+
+        const owners = this.props.ownersList.filter(i => i.status === true).map(item => {
+            let name = item.OwnerFirstName !== null ? item.OwnerFirstName : '';
+            name += item.OwnerLastName !== null ? ' ' + item.OwnerLastName : ''
+            return { id: item.OwnerID, name: name }
+        })
         const res = this.props.cities;
         const cities = res !== null ?
             res.map(item => { return { id: item.CityId, name: item.CityName } }) : [];
         let fieldsArray = [...this.state.fieldsArray];
         fieldsArray[1].selectOptions = owners;
         fieldsArray[2].selectOptions = cities;
-        let exclusivityPersons=this.props.exclusivityPeople
-        
-            exclusivityPersons=exclusivityPersons!==null?
-            exclusivityPersons.map(item=>{return {id:item.ExclusivityID,name:item.ExclusivityName}}):[]
-        
-        this.setState({ fieldsArray, cities,exclusivityPersons });
-        
+        let exclusivityPersons = this.props.exclusivityPeople
+
+        exclusivityPersons = exclusivityPersons !== null ?
+            exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) : []
+
+        this.setState({ fieldsArray, cities, exclusivityPersons });
+
+
+    }
+    componentDidUpdate = (prev, next) => {
+        debugger
+        if (prev.cities !== next.cities || prev.owners !== next.owners || prev.exclusivityPersons !== next.exclusivityPersons) {
+            const owners = this.props.ownersList.filter(i => i.status === true).map(item => {
+                let name = item.OwnerFirstName !== null ? item.OwnerFirstName : '';
+                name += item.OwnerLastName !== null ? ' ' + item.OwnerLastName : ''
+                return { id: item.OwnerID, name: name }
+            })
+            const res = this.props.cities;
+            const cities = res !== null ?
+                res.map(item => { return { id: item.CityId, name: item.CityName } }) : [];
+            let fieldsArray = [...this.state.fieldsArray];
+            fieldsArray[1].selectOptions = owners;
+            fieldsArray[2].selectOptions = cities;
+            let exclusivityPersons = this.props.exclusivityPeople
+
+            exclusivityPersons = exclusivityPersons !== null ?
+                exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) : []
+
+            this.setState({ fieldsArray, cities, exclusivityPersons });
+        }
 
     }
     state = {
@@ -71,7 +101,7 @@ export class Properties extends Component {
         ],
 
         fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
-        { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }],
+        { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'radio', radioOptions: [{ id: 'true', name: 'מושכר' }, { id: 'false', name: 'לא מושכר' }] }],
 
         ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.propertiesList,
         // [{ PropertyID: 1, CityName: 'Haifa', StreetName: 'Pinsker', Number: 30, Floor: 2, IsDivided: false, IsRented: true, IsExclusivity: true },
@@ -88,7 +118,7 @@ export class Properties extends Component {
         rentalObject: null,
         streets: [],
         exclusivityPersons: [],
-        red:null
+        red: null
     }
     //סוגרת חלונית מסוג דיטיילס
     closeDetailsModal = () => {
@@ -102,8 +132,8 @@ export class Properties extends Component {
     }
     closeExtentionModal = () => {
 
-        this.setState({  showExtention: null })
-        
+        this.setState({ showExtention: null })
+
     }
     //בדיקת תקינות אוביקט מסוג נכס
     validate = object => {
@@ -133,50 +163,46 @@ export class Properties extends Component {
     }
     submitForExtentions = async (type, object) => {
         let path = 'Property/' + type;
-        
+
         const res = await CommonFunctions('Add', object, path);
-        
+
         if (res) {
             this.closeExtentionModal()
         }
         let list
-        if(type.contains('City')) 
-        {  
-                list = await GetFunction('Property/GetAllCities')
-                this.props.setCities(list !== null ? list : [])
+        if (type.contains('City')) {
+            list = await GetFunction('Property/GetAllCities')
+            this.props.setCities(list !== null ? list : [])
         }
-                else if(type.contains('Street'))
-                {
-                list=await GetFunction('Property/GetAllStreets')
-                this.props.setStreets(list !== null ? list : [])
-                 }
-                else
-                {
-                    list=await GetFunction('Property/GetAllExclusivityPoeple')
-              this.props.setExclusivityPeople(list !== null ? list : [])
-                
-                }
-                
-   this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Properties'}}/>})
+        else if (type.contains('Street')) {
+            list = await GetFunction('Property/GetAllStreets')
+            this.props.setStreets(list !== null ? list : [])
+        }
+        else {
+            list = await GetFunction('Property/GetAllExclusivityPoeple')
+            this.props.setExclusivityPeople(list !== null ? list : [])
 
-            }
+        }
+
+        this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/Properties' }} /> })
+
+    }
     //סבמיט לחיפוש
-    submitSearch =async (object) => {
+    submitSearch = async (object) => {
         const path = 'Property/Search';
 
         if (object) {
-            let objects =await SearchFor(object, path)
-            if (objects)
-            {
-            let name = 'תוצאות חיפוש'
-            if (objects.length === 0) {
-                name = 'לא נמצאו תוצאות'
+            let objects = await SearchFor(object, path)
+            if (objects) {
+                let name = 'תוצאות חיפוש'
+                if (objects.length === 0) {
+                    name = 'לא נמצאו תוצאות'
+                }
+                this.setState({ ObjectsArray: [] })
+                const objArray = [...objects]
+                this.setState({ ObjectsArray: objArray, name, fieldsToSearch: null })
+
             }
-            this.setState({ObjectsArray:[]})
-            const objArray=[...objects]
-            this.setState({ ObjectsArray: objArray, name,fieldsToSearch:null })
-            
-        }
         }
     }
     //סבמיט לפורם (הוספה,עדכון ומחיקה)
@@ -184,41 +210,36 @@ export class Properties extends Component {
 
         let path = 'Property/' + type + 'Property';
         if (type === 'Add' || type === 'Update') {
-            
+
             let newObj = PropertyObject();
             debugger
-            const proper=this.props.propertiesList.find(i=>i.PropertyID===object.PropertyID)
-            if(proper)
-            {
-                if(proper.IsRented!==object.IsRented)
-                {
-                    if(object.IsRented===false)
-                    {
-                     const rental=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
-                     if(rental)
-                     {
-                  const b=window.confirm('להסיר השכרה?')
-                  if(b)  
-                 await postFunction('Rental/DeleteRental',{id:rental.RentalID});
-               
-                     }
+            const proper = this.props.propertiesList.find(i => i.PropertyID === object.PropertyID)
+            if (proper) {
+                if (proper.IsRented !== object.IsRented) {
+                    if (object.IsRented === false) {
+                        const rental = this.props.rentalsList.find(i => i.PropertyID === object.PropertyID && i.status === true)
+                        if (rental) {
+                            const b = window.confirm('להסיר השכרה?')
+                            if (b)
+                                await postFunction('Rental/DeleteRental', { id: rental.RentalID });
+
+                        }
                     }
-                     else if(object.IsRented===true)
-                     {
-                        object.IsRented=false
+                    else if (object.IsRented === true) {
+                        object.IsRented = false
                         alert("לא ניתן להפוך את הנכס למושכר, יש להוסיף השכרה לנכס")
-                     }
+                    }
                 }
 
-                
+
             }
             if (type === 'Add')
                 newObj.PropertyID = 1
             else
                 newObj.PropertyID = object.PropertyID;
-               
-           // const proper=await postFunction('Property/GetPropertyByID',{id:object.PropertyID});
-           
+
+            // const proper=await postFunction('Property/GetPropertyByID',{id:object.PropertyID});
+
             newObj.CityID = object.CityID
             newObj.StreetID = object.StreetID
             newObj.OwnerID = object.OwnerID
@@ -253,15 +274,15 @@ export class Properties extends Component {
                 return;
             object = { id: object.PropertyID }
         }
-        
-       const res= await CommonFunctions(type, object, path) 
-      let list = await GetFunction('Property/GetAllProperties')
-       this.props.setProperties(list !== null ? list : [])
-      
-       list=await GetFunction('User/GetAllDocuments')
-       this.props.setDocuments(list !== null ? list : []) 
-       this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/Properties'}}/>})
-       return res
+
+        const res = await CommonFunctions(type, object, path)
+        let list = await GetFunction('Property/GetAllProperties')
+        this.props.setProperties(list !== null ? list : [])
+
+        list = await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : [])
+        this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/Properties' }} /> })
+        return res
         //אם מה שחזר מהשרת אינו נל, סימו שהבקשה הצליחה וניתן ל סגור את החלונית
         // if (res && res !== null) {
         //     this.closeFormModal();
@@ -276,10 +297,12 @@ export class Properties extends Component {
         //באטן לחזרה לנכסים (כשנמצאים בחיפוש)
         if (this.state.name !== 'נכסים')
             LinksForTable = [<button type='button' onClick={() => {
-                 this.setState({ ObjectsArray: this.props.propertiesList, name: 'נכסים'
-                ,  fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
-                { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'checkbox' }]
-        }) }}>חזרה לנכסים</button>]
+                this.setState({
+                    ObjectsArray: this.props.propertiesList, name: 'נכסים'
+                    , fieldsToSearch: [{ field: 'CityName', name: 'עיר', type: 'text' }, { field: 'StreetName', name: 'רחוב', type: 'text' },
+                    { field: 'Number', name: 'מספר', type: 'text' }, { field: 'Floor', name: 'קומה', type: 'number' }, { field: 'IsRented', name: 'מושכר', type: 'radio', radioOptions: [{ id: 'true', name: 'מושכר' }, { id: 'false', name: 'לא מושכר' }] }]
+                })
+            }}>חזרה לנכסים</button>]
         else {
             //באטן להוספת נכס
             LinksForTable = [<button type='button' onClick={() => {
@@ -323,13 +346,14 @@ export class Properties extends Component {
         //    }))
         // const selectOptions = this.state.streets !== null ?
         //     this.state.streets.map() : []
-        
-        const streets=this.props.streets.filter(i => i.CityId === object.CityID)
+
+        const streets = this.props.streets.filter(i => i.CityId === object.CityID)
         this.setState({
-                    fieldsArray:
-                        [...this.state.fieldsArray, this.state.fieldsArray[3].selectOptions = streets !== null ?
-                        streets.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []]})
-                        
+            fieldsArray:
+                [...this.state.fieldsArray, this.state.fieldsArray[3].selectOptions = streets !== null ?
+                    streets.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []]
+        })
+
         //שדה של רחוב
         let fieldsToAdd = []
         //באטן להוספת עיר
@@ -354,8 +378,8 @@ export class Properties extends Component {
         }}
         >הוסף רחוב</button>
         let LinksPerObject = [this.linkToAddPropertyOwner, linkToAddCity, linkToAddStreet]
-        if(object.IsRented!=undefined)
-        fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox',index:8 }) 
+        if (object.IsRented != undefined)
+            fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox', index: 8 })
         //אם הדירה בלעדית
         if (object.IsExclusivity) {
             //GetFunction('Property/GetAllexclusivityPersons').then(res => this.setState({ exclusivityPersons: res }))
@@ -363,8 +387,8 @@ export class Properties extends Component {
             //     this.state.exclusivityPersons.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } }) :
             //     [];
             //שדה של אחראי בלעדיות של הדירה
-            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12,required:true })
-            
+            fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12, required: true })
+
             //באטן להוספת אחראי בלעדיות
             LinksPerObject.push(
                 <button index={12} type='button' onClick={() => {
@@ -378,22 +402,15 @@ export class Properties extends Component {
                 >הוסף אחראי בלעדיות</button>)
 
         }
-        const docks=this.props.documents.filter(i=>i.type===1 && i.DocUser===object.PropertyID)
+        const docks = this.props.documents.filter(i => i.type === 1 && i.DocUser === object.PropertyID)
         if (docks && docks[0]) {
- 
-            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
-            <button index='end' type='button' key={index} onClick={async() => {
-                 const b=window.confirm('למחוק מסמך?')
-                if(b)
-                {
-                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
-                 let  list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : [])
-                 }
- }}> מחיקת מסמך {DocName(dock.DocName)}</button>)}</div>)
-         }
+
+            LinksPerObject.push(<div index='end'>{DocDeleteButton(docks, this.props.setDocuments)}</div>)
+
+
+        }
         //הוספת שדה של הוספת מסמך
-        fieldsToAdd.push({ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' })
+        fieldsToAdd.push({ ...AddDocField })
 
 
 
@@ -405,24 +422,22 @@ export class Properties extends Component {
     }
     //פונקציה שמוסיפה ומשנה דברים שקשורים לתצוגת אוביקט (גם באוביקט עצמו וגם באטנים ושדות שקשורים אליו)
     set = (object) => {    //הפונקציה ממפה את כל השדות של האוביקט והופכת איידי לשם ואת המפתחות זרים לקישורים
-        
+
         let LinksPerObject = []
         let ButtonsForEveryRow = []
         let tempobject = { ...object };
         let LinksForEveryRow = []
         let fieldsToAdd = []
-        if(parseInt(object.StreetID))
-        {
-        const street=this.props.streets.find(i => i.CityId === object.CityID && i.StreetID==object.StreetID)
-       
-        tempobject.StreetID=street.StreetName
+        if (parseInt(object.StreetID)) {
+            const street = this.props.streets.find(i => i.CityId === object.CityID && i.StreetID == object.StreetID)
+
+            tempobject.StreetID = street.StreetName
         }
-    if(parseInt(object.CityID))
-    {
-        const city=this.props.cities.find(i => i.CityId === object.CityID)
-        tempobject.CityID = city.CityName
-    }
-        
+        if (parseInt(object.CityID)) {
+            const city = this.props.cities.find(i => i.CityId === object.CityID)
+            tempobject.CityID = city.CityName
+        }
+
         // const selectOptions = this.props.streets !== null ?
         //     this.state.streets.map(item => { return { id: item.StreetID, name: item.StreetName } }) : []
         // //הוספת שדה רחוב
@@ -430,19 +445,19 @@ export class Properties extends Component {
         // object.StreetID = selectOptions.find(i => i.StreetID === object.StreetID).StreetName;
 
 
-        fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox',index:8 }) 
-        const rentalObject=this.props.rentalsList.find(i=>i.PropertyID===object.PropertyID && i.status===true)
+        fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox', index: 8 })
+        const rentalObject = this.props.rentalsList.find(i => i.PropertyID === object.PropertyID && i.status === true)
 
         //אם הדירה מושכרת
         if (object.IsRented && rentalObject) {
 
-            
+
             // יהיה קישור באוביקט עצמו לפרטי ההשכרה
             tempobject.IsRented = <Link onClick={() => {
                 this.setState({ showDetails: true })
                 this.setState({
                     showsomthing: <Rentals
-                    
+
                         isOpen={this.state.showDetails}
                         closeModal={this.closeDetailsModal}
                         object={rentalObject}
@@ -456,11 +471,11 @@ export class Properties extends Component {
                         rentalsList={this.props.rentalsList}
                         cities={this.props.cities}
                         streets={this.props.streets}
-                       setRentals={this.props.setRentals}
-                       setProperties={this.props.setProperties}
-                       setDocuments={this.props.setDocuments}
-                       setTasks={this.props.setTasks}
-               
+                        setRentals={this.props.setRentals}
+                        setProperties={this.props.setProperties}
+                        setDocuments={this.props.setDocuments}
+                        setTasks={this.props.setTasks}
+
                         type='details'
                     />
                 })
@@ -476,7 +491,7 @@ export class Properties extends Component {
                         isOpen={this.state.showForm}
                         closeModal={this.closeFormModal}
                         object={rentalObject}
-                        user={this.props.user} 
+                        user={this.props.user}
                         documents={this.props.documents}
                         paymentTypes={this.props.paymentTypes}
                         rentersList={this.props.rentersList}
@@ -486,9 +501,9 @@ export class Properties extends Component {
                         cities={this.props.cities}
                         streets={this.props.streets}
                         setRentals={this.props.setRentals}
-                       setProperties={this.props.setProperties}
-                       setDocuments={this.props.setDocuments}
-                       setTasks={this.props.setTasks}/>
+                        setProperties={this.props.setProperties}
+                        setDocuments={this.props.setDocuments}
+                        setTasks={this.props.setTasks} />
                 })
             }}>ערוך השכרה</button>)
         }
@@ -516,22 +531,22 @@ export class Properties extends Component {
                         user={this.props.user}
                         cities={this.props.cities}
                         streets={this.props.streets}
-                        object={{ PropertyID: object.PropertyID }} 
+                        object={{ PropertyID: object.PropertyID }}
                         setRentals={this.props.setRentals}
-                       setProperties={this.props.setProperties}
-                       setDocuments={this.props.setDocuments}
-                       setTasks={this.props.setTasks}/>
+                        setProperties={this.props.setProperties}
+                        setDocuments={this.props.setDocuments}
+                        setTasks={this.props.setTasks} />
                 })
             }}>הוסף השכרה</button>)
         }
         //אםהנכס מחולק לכמה נכסים
         if (object.IsDivided) {
-           
+
             // postFunction('SubProperty/GetSubPropertiesOfParentProperty', { id: object.PropertyID }).then(res => this.setState({ spobjects: res }))
-           const spobjects=this.props.SubPropertiesList.filter(i=>i.SubPropertiesID===object.SubPropertiesID)
+            const spobjects = this.props.SubPropertiesList.filter(i => i.SubPropertiesID === object.SubPropertiesID)
             //לינק לטבלה המציגה את כל הנכסים המחולקים שלו
             tempobject.IsDivided = <Link
-                to={{ pathname: '/SubProperties', objects: spobjects, PropertyID:object.PropertyID}}>V</Link>//במקום הוי אמורים לשים אייקון שמסמל כן
+                to={{ pathname: '/SubProperties', objects: spobjects, PropertyID: object.PropertyID }}>V</Link>//במקום הוי אמורים לשים אייקון שמסמל כן
             //באטן להוספת תת נכס
             LinksPerObject.push(<button type='button' index={9} onClick={() => {
                 this.setState({ showForm: true })
@@ -551,24 +566,24 @@ export class Properties extends Component {
         //postFunction('Property/GetRentalByPropertyID', { id: object.propertyID }).then(res => this.setState({ rentalObject: res }))
         //אם הדירה בלעדית
         if (object.IsExclusivity) {
-            object.IsExclusivity='V'
+            object.IsExclusivity = 'V'
             //שדה של אחראי בלעדיות של הדירה
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12 })
-            
-            if(object.ExclusivityID)
-            tempobject.ExclusivityID = this.state.exclusivityPersons.find(i => i.id === object.ExclusivityID).name
+
+            if (object.ExclusivityID)
+                tempobject.ExclusivityID = this.state.exclusivityPersons.find(i => i.id === object.ExclusivityID).name
         }
         else
-        object.IsExclusivity='X'
+            object.IsExclusivity = 'X'
 
 
         //בשדה משכיר ,באטן לפרטי משכיר
         //postFunction('PropertyOwner/GetOwnerByID', { id: object.OwnerID }).then(res => this.setState({ ownerobject: res }))
-       // this.setState({ ownerobject: this.state.fieldsArray[1].selectOptions.find(i => i.id === object.OwnerID) })
-       
-       const ownerobject=this.props.ownersList.find(i=>i.OwnerID===object.OwnerID)
-       let ownerName=ownerobject.OwnerFirstName!==null ? ownerobject.OwnerFirstName:'' ;
-       ownerName+=ownerobject.OwnerLastName?  ' ' + ownerobject.OwnerLastName:''
+        // this.setState({ ownerobject: this.state.fieldsArray[1].selectOptions.find(i => i.id === object.OwnerID) })
+
+        const ownerobject = this.props.ownersList.find(i => i.OwnerID === object.OwnerID)
+        let ownerName = ownerobject.OwnerFirstName !== null ? ownerobject.OwnerFirstName : '';
+        ownerName += ownerobject.OwnerLastName ? ' ' + ownerobject.OwnerLastName : ''
         tempobject.OwnerID = (<Link onClick={() => {
             this.setState({
                 showDetails: true,
@@ -582,17 +597,17 @@ export class Properties extends Component {
                 />
             })
         }}>{ownerobject && ownerName} </Link>)
-       
-        
 
-       // postFunction('User/GetUserDocuments', { id: object.PropertyID, type: 1 }).then(res => this.setState({ docks: res }))
-            //באטנים שיציגו את כל המסמכים הקשורים לדירה
-            const docks=this.props.documents.filter(i=>i.type===1 && i.DocUser===object.PropertyID)
-       
-            if (docks && docks[0]) {
-             fieldsToAdd .push({ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } )
-             tempobject.doc = docks.map((dock, index) => <button type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
-             }
+
+
+        // postFunction('User/GetUserDocuments', { id: object.PropertyID, type: 1 }).then(res => this.setState({ docks: res }))
+        //באטנים שיציגו את כל המסמכים הקשורים לדירה
+        const docks = this.props.documents.filter(i => i.type === 1 && i.DocUser === object.PropertyID)
+
+        if (docks && docks[0]) {
+            fieldsToAdd.push({ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' })
+            tempobject.doc = DocButtons(docks)
+        }
         //מחזירה אוביקט:
         //fieldsToAdd- שדות נוספים הקשורים לאוביקט
         //LinksForEveryRow:לינקים שיש להוסיף בהצגת האוביקט (בקומפוננטת דיטיילס)
@@ -609,7 +624,7 @@ export class Properties extends Component {
     }
     //פונקציה הבוחרת מה לרנדר  בהתאם לטייפ שנשלח אליה
     rend = () => {
-        
+
         // מציג פרטים של אוביקט מסוים מסוג נכס 
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
@@ -640,7 +655,7 @@ export class Properties extends Component {
         //אם לא נשלח טייפ תוצג הטבלה של כל הנכסים
         else {
 
-             let fieldsArray = [...this.state.fieldsArray]
+            let fieldsArray = [...this.state.fieldsArray]
             // fieldsArray.splice(0, 1)
             return <div><Table name={this.state.name} fieldsArray={fieldsArray}
                 objectsArray={this.state.ObjectsArray}
@@ -652,17 +667,17 @@ export class Properties extends Component {
         }
     }
     render() {
-        
+
         return (
 
             <div>
                 {this.props.user.RoleID === 1 || this.props.user.RoleID === 2 ?
                     this.rend()
-                    : <Redirect to='/a' />}
+                    : <Redirect to='/' />}
             </div>
         )
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Properties)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Properties))
 

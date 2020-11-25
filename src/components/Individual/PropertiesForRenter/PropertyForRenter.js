@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import Table from '../../General/Table';
-import { Link, Redirect } from 'react-router-dom';
+import Table from '../../General/Table/Table';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import Axios from "../../Axios";
-import { CommonFunctions } from '../../General/CommonFunctions';
+import { CommonFunctions } from '../../General/CommonAxiosFunctions';
 import TaskObject from '../../../Models-Object/TaskObject';
-import { mapStateToProps ,mapDispatchToProps} from '../../Login/Login'
+import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import Tasks from '../Task/Tasks';
 import RedirectTo from "../../RedirectTo";
@@ -21,10 +21,10 @@ export class PropertiesForRenter extends Component {
         showSomthing: null,
         showForm: false
     }
-    
+
     closeFormModal = () => {
 
-        this.setState({  showSomthing: null })
+        this.setState({ showSomthing: null })
     }
     authorization = () => {
         if (this.props.user.RoleID === 3) {
@@ -35,7 +35,7 @@ export class PropertiesForRenter extends Component {
     submit = async (type, object) => {
         let path = 'Task/AddTask'
         let newObj = TaskObject()
-        
+
         newObj.TaskTypeID = 1
         newObj.Description = object.Description
         newObj.PropertyID = object.PropertyID
@@ -68,16 +68,16 @@ export class PropertiesForRenter extends Component {
     }
 
     setForTable = () => {
-        let LinksForTable=[]
+        let LinksForTable = []
         //  const rental=this.props.rentalsList.find(i=>i.UserID===this.props.user.UserID && i.status===true)
         //         if(rental)
         //         LinksForTable.push( [<button type='button' onClick={()=>{
-               
+
         //         const reports=this.props.tasksList.filter(i=>i.TaskTypeID===1 && i.PropertyID===rental.PropertyID)
         //         this.setState({showSomthing:<Tasks objects={reports}/>})}
         //     }></button>])
         return {
-            
+
             LinksForTable
         }
 
@@ -88,22 +88,22 @@ export class PropertiesForRenter extends Component {
         return { fieldsToAdd, LinksPerObject }
     }
     set = object => {
-        let tempobject={...object}
-         debugger
-        
-        const street=this.props.streets.find(i => i.CityId === object.CityID && i.StreetID==object.StreetID)
-        tempobject.StreetID=street.StreetName
-        const city=this.props.cities.find(i => i.CityId === object.CityID)
+        let tempobject = { ...object }
+        debugger
+
+        const street = this.props.streets.find(i => i.CityId === object.CityID && i.StreetID == object.StreetID)
+        tempobject.StreetID = street.StreetName
+        const city = this.props.cities.find(i => i.CityId === object.CityID)
         tempobject.CityID = city.CityName
-       
+
         let ButtonsForEveryRow = [<button type='button' onClick={() => {
             this.setState({ showForm: true })
             this.setState({
                 showSomthing:
-                    <Tasks type='report'  closeModal={this.closeFormModal}
+                    <Tasks type='report' closeModal={this.closeFormModal}
                         object={object}
                         validate={this.validate} submit={this.submit} set={this.set}
-                        setForForm={this.setForForm}/>
+                        setForForm={this.setForForm} />
             })
         }}>דווח על תקלה</button>]
 
@@ -111,12 +111,12 @@ export class PropertiesForRenter extends Component {
 
 
         return {
-            fieldsToAdd: [], LinksForEveryRow: [], object:tempobject, enable: false,
+            fieldsToAdd: [], LinksForEveryRow: [], object: tempobject, enable: false,
             ButtonsForEveryRow, LinksPerObject: []
         }
     }
     render() {
-       
+
         return (
             <div>
                 {this.props.user.RoleID !== 3 && <Redirect to='/a' />}
@@ -130,4 +130,4 @@ export class PropertiesForRenter extends Component {
     }
 }
 
-export default connect (mapStateToProps,mapDispatchToProps)(PropertiesForRenter)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PropertiesForRenter))

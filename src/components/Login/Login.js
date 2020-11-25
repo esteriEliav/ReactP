@@ -1,5 +1,5 @@
 import React, { Component, useReducer } from 'react';
-import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions';
+import { CommonFunctions, GetFunction, postFunction } from '../General/CommonAxiosFunctions';
 import UserDTO from '../../Models-Object/UserObject';
 import { connect } from 'react-redux'
 import { Link, Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
@@ -23,8 +23,8 @@ export class Login extends Component {
         {
             userName: '',
             password: '',
-            redirect:true,
-           
+            redirect: true,
+
 
         }
     // componentDidMount = async () => {
@@ -53,31 +53,30 @@ export class Login extends Component {
 
     onSubmit = async (e) => {
         e.preventDefault();
-        let user = await postFunction('User/Ifhaveuse',{ username:this.state.userName,passemail:this.state.password})
-        if (user ) {
-            
+        let user = await postFunction('User/Ifhaveuse', { username: this.state.userName, passemail: this.state.password })
+        if (user) {
+
             new UserDTO()
-            const userObj = new UserDTO(user.UserID,user.FirstName,user.LastName,user.SMS,user.Email,user.Phone,user.RoleID,user.userName,user.Password)
-            let userName=userObj.FirstName!==null && userObj.FirstName;
-            userName+=userObj.LastName!==null && ' '+userObj.LastName;
+            const userObj = new UserDTO(user.UserID, user.FirstName, user.LastName, user.SMS, user.Email, user.Phone, user.RoleID, user.userName, user.Password)
+            let userName = userObj.FirstName !== null && userObj.FirstName;
+            userName += userObj.LastName !== null && ' ' + userObj.LastName;
             alert(" ברוכים הבאים " + userName);
-           let list = await GetFunction('Property/GetAllCities')
+            let list = await GetFunction('Property/GetAllCities')
             this.props.setCities(list !== null ? list : [])
-            list=await GetFunction('Property/GetAllStreets')
+            list = await GetFunction('Property/GetAllStreets')
             this.props.setStreets(list !== null ? list : [])
-            list= await GetFunction('Task/GetAllClassificationTypes');
+            list = await GetFunction('Task/GetAllClassificationTypes');
             this.props.setClassificationTypes(list !== null ? list : [])
 
-        
+
             debugger
-            if (userObj.RoleID === 3)
-            {
-               list = await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID })
+            if (userObj.RoleID === 3) {
+                list = await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID })
                 this.props.setProperties(list !== null ? list : [])
                 this.props.setHome(true)
             }
             else {
-            
+
                 list = await GetFunction('Property/GetAllProperties')
                 this.props.setProperties(list !== null ? list : [])
                 list = await GetFunction('PropertyOwner/getAllOwners')
@@ -90,21 +89,21 @@ export class Login extends Component {
                 this.props.setSubProperties(list !== null ? list : [])
                 list = await GetFunction('Task/GetAllTasks')
                 this.props.setTasks(list !== null ? list : [])
-                list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : []) 
-               list = await GetFunction('Task/GetAllTaskTypes');
-               this.props.setTaskTypes(list !== null ? list : []) 
-               list=await GetFunction('Rental/GetAllPaymentTypes');
-               this.props.setPaymentTypes(list !== null ? list : []) 
-              list=await GetFunction('Property/GetAllExclusivityPoeple')
-              this.props.setExclusivityPeople(list !== null ? list : [])
+                list = await GetFunction('User/GetAllDocuments')
+                this.props.setDocuments(list !== null ? list : [])
+                list = await GetFunction('Task/GetAllTaskTypes');
+                this.props.setTaskTypes(list !== null ? list : [])
+                list = await GetFunction('Rental/GetAllPaymentTypes');
+                this.props.setPaymentTypes(list !== null ? list : [])
+                list = await GetFunction('Property/GetAllExclusivityPoeple')
+                this.props.setExclusivityPeople(list !== null ? list : [])
                 debugger
-                
+
             }
-            
-            this.setState({ redirect:false})
+
+            this.setState({ redirect: false })
             this.props.closeModal()
-             this.props.setUser(userObj);
+            this.props.setUser(userObj);
         }
         else
             alert("שם משתמש או סיסמה שגויים")
@@ -115,31 +114,31 @@ export class Login extends Component {
     };
 
     render() {
-        
+
         return (
             <Popup className="popup-login" open={this.state.redirect} closeOnDocumentClick={false} modal> <a className="close close-login" onClick={this.props.closeModal}>
-            &times;
+                &times;
   </a>
-           
-            <form onSubmit={this.onSubmit} className="login-form">
-            <div><img className="img-login" src={picLogin}></img> </div>
-            <div className="login-text">
-                <label className="login-item" htmlFor="user-name">שם משתמש</label>
-                <input className="login-item input-field" type="text" name="user-name" value={this.state.userName} id="name" placeholder="שם משתמש" onChange={this.handleChange('userName')} />
-                <label className="login-item" htmlFor="password">סיסמה </label>
-                <input className="login-item input-field" type="password" name="password" value={this.state.password} id="password" placeholder="סיסמה" onChange={this.handleChange('password')} />
-                <div className="login-item btn-enter">
-                    <input className="login-button" type="submit" value="כניסה" />
-                </div>
-                <div className="login-item btn-forget">
-                    {/* הקישור יפנה לדף של שחזור סיסמה */}
-                    {/* <a href="@">שכחת סיסמה?</a> */}
-                    {/*<a href="@">שכחת סיסמה?</a>*/}
-                   שכחת סיסמה?<Link to="/signup" onClick={()=>this.props.closeModal()} >לחץ כאן</Link>
-                   
-                </div>
-                </div></form> 
-</Popup>
+
+                <form onSubmit={this.onSubmit} className="login-form">
+                    <div><img className="img-login" src={picLogin}></img> </div>
+                    <div className="login-text">
+                        <label className="login-item" htmlFor="user-name">שם משתמש</label>
+                        <input className="login-item input-field" type="text" name="user-name" value={this.state.userName} id="name" placeholder="שם משתמש" onChange={this.handleChange('userName')} />
+                        <label className="login-item" htmlFor="password">סיסמה </label>
+                        <input className="login-item input-field" type="password" name="password" value={this.state.password} id="password" placeholder="סיסמה" onChange={this.handleChange('password')} />
+                        <div className="login-item btn-enter">
+                            <input className="login-button" type="submit" value="כניסה" />
+                        </div>
+                        <div className="login-item btn-forget">
+                            {/* הקישור יפנה לדף של שחזור סיסמה */}
+                            {/* <a href="@">שכחת סיסמה?</a> */}
+                            {/*<a href="@">שכחת סיסמה?</a>*/}
+                   שכחת סיסמה?<Link to="/signup" onClick={() => this.props.closeModal()} >לחץ כאן</Link>
+
+                        </div>
+                    </div></form>
+            </Popup>
 
 
         )
@@ -168,11 +167,11 @@ export const mapDispatchToProps = dispatch => {
         setDocuments: (documents) => dispatch({ type: 'SET_DOCUMENTS', documents }),
         setTaskTypes: (taskTypes) => dispatch({ type: 'SET_TASKTYPES', taskTypes }),
         setClassificationTypes: (classificationTypes) => dispatch({ type: 'SET_CLASSIFICATIONTYPES', classificationTypes }),
-        setPaymentTypes: (paymentTypes) => dispatch({ type:'SET_PAYMENTTYPES', paymentTypes }),
-        setExclusivityPeople: (exclusivityPeople) => dispatch({ type:'SET_EXCLUSIVITYPEOPLE', exclusivityPeople }),
+        setPaymentTypes: (paymentTypes) => dispatch({ type: 'SET_PAYMENTTYPES', paymentTypes }),
+        setExclusivityPeople: (exclusivityPeople) => dispatch({ type: 'SET_EXCLUSIVITYPEOPLE', exclusivityPeople }),
 
 
-        
+
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

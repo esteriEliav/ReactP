@@ -10,95 +10,95 @@ const initialState = {
     rentersList: [],
     SubPropertiesList: [],
     tasksList: [],
-    
+
     cities: [],
     streets: [],
     documents: [],
-   taskTypes:[],
-   classificationTypes:[],
-    paymentTypes:[],
-    exclusivityPeople:[]
+    taskTypes: [],
+    classificationTypes: [],
+    paymentTypes: [],
+    exclusivityPeople: []
 
 
 };
 
-const reducer = (state= initialState, action) => {
+const reducer = (state = initialState, action) => {
     if (action.type === 'SET_USER')
         return {
             ...state,
-            user: action.userObj
+            user: { ...action.userObj }
         }
     if (action.type === 'SET_PROPERTIES')
         return {
             ...state,
-            propertiesList: action.propertiesList
+            propertiesList: [...action.propertiesList]
         }
     if (action.type === 'SET_OWNERS')
         return {
             ...state,
-            ownersList: action.ownersList
+            ownersList: [...action.ownersList]
         }
     if (action.type === 'SET_RENTALS')
         return {
             ...state,
-            rentalsList: action.rentalsList
+            rentalsList: [...action.rentalsList]
         }
     if (action.type === 'SET_RENTERS')
         return {
             ...state,
-            rentersList: action.rentersList
+            rentersList: [...action.rentersList]
         }
     if (action.type === 'SET_SUBPROPERTIES')
         return {
             ...state,
-            SubPropertiesList: action.SubPropertiesList
+            SubPropertiesList: [...action.SubPropertiesList]
         }
     if (action.type === 'SET_TASKS')
         return {
             ...state,
-            tasksList: action.tasksList
+            tasksList: [...action.tasksList]
         }
     if (action.type === 'SET_CITIES')
         return {
             ...state,
-            cities: action.cities
+            cities: [...action.cities]
         }
-        if (action.type === 'SET_STREETS')
+    if (action.type === 'SET_STREETS')
         return {
             ...state,
-            streets: action.streets
+            streets: [...action.streets]
         }
-        if (action.type === 'SET_DOCUMENTS')
+    if (action.type === 'SET_DOCUMENTS')
         return {
             ...state,
-            documents: action.documents
+            documents: [...action.documents]
         }
-        if (action.type === 'SET_TASKTYPES')
+    if (action.type === 'SET_TASKTYPES')
         return {
             ...state,
-            taskTypes: action.taskTypes
+            taskTypes: [...action.taskTypes]
         }
-        if (action.type === 'SET_CLASSIFICATIONTYPES')
-        
-        return {
-            ...state,
-           classificationTypes : action.classificationTypes
-        }
-        if (action.type === 'SET_PAYMENTTYPES')
-        
-        return {
-            ...state,
-           paymentTypes : action.paymentTypes
-        }
-        if (action.type === 'SET_EXCLUSIVITYPEOPLE')
-        
-        return {
-            ...state,
-            exclusivityPeople : action.exclusivityPeople
-        }
-        
+    if (action.type === 'SET_CLASSIFICATIONTYPES')
 
-        
+        return {
+            ...state,
+            classificationTypes: [...action.classificationTypes]
+        }
+    if (action.type === 'SET_PAYMENTTYPES')
+
+        return {
+            ...state,
+            paymentTypes: [...action.paymentTypes]
+        }
+    if (action.type === 'SET_EXCLUSIVITYPEOPLE')
+
+        return {
+            ...state,
+            exclusivityPeople: [...action.exclusivityPeople]
+        }
+
+
+
     return state
 };
 

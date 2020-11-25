@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Login from '../Login/Login'
-import Calendar from '../Calendar'
+import Calendar from '../Calander/Calendar'
 import EventDetails from '../EventDetails'
 import Sign_up from '../Sign_up'
-import Form from '../General/Form'
-import Details from '../General/Details'
+import Form from '../General/Form/Form'
+import Details from '../General/Details/Details'
 import Properties from "../Individual/Properties/Properties";
-import PropertyOwner from "../Individual/PropertyOwner";
+import PropertyOwner from "../Individual/PropertyOwner/PropertyOwner";
 import PropertyForRenter from "../Individual/PropertiesForRenter/PropertyForRenter";
 import Rentals from "../Individual/Rentals/Rentals";
 import Tasks from "../Individual/Task/Tasks";
@@ -24,6 +24,8 @@ import Select from "react-dropdown-select";
 
 import './Home.css';
 import Logo from './../../logo-nav-bar.jpg';
+import Logo1 from './../../logo-nav-bar1.jpg';
+
 import Pic7 from './../../../src/pic7.jpg';
 import ImgFooter from '../../../src/footer.jpg'
 //import Pic2 from './../../pic2.jpg';
@@ -45,16 +47,16 @@ const AutoplaySlider = withAutoplay(AwesomeSlider);
 export class Home extends Component {
   state = {
     showt: false,
-    home:false,
-    login:null
+    home: false,
+    login: null
   }
-  
+
   closeModel = () => {
     this.setState({ showt: false })
 
   }
-  closeLogin=()=>{
-    this.setState({login:null})
+  closeLogin = () => {
+    this.setState({ login: null })
   }
   // authorization = () => {
   //   if (this.props.user.RoleID === 1 || this.props.user.RoleID === 2) {
@@ -62,140 +64,138 @@ export class Home extends Component {
   //   }
   //   return <Redirect to='/a' />
   // }
-setHome=(bool)=>{
-  this.setState({home:bool})
-}
-rend=()=>{
-  
-  if(this.props.user.RoleID===1 || this.props.user.RoleID===2)
-  {
-    //this.state.showt &&
-    if(this.state.home===false)
-    return  <TasksPopUp setHome={this.setHome} />
-
+  setHome = (bool) => {
+    this.setState({ home: bool })
   }
-  else if(this.props.user.RoleID===3)
-  {
-    if(this.state.home===false)
-     this.setState({home:true})
-      return <Redirect to= '/PropertyForRenter' />
+  rend = () => {
+
+    if (this.props.user.RoleID === 1 || this.props.user.RoleID === 2) {
+      //this.state.showt &&
+      if (this.state.home === false)
+        return <TasksPopUp setHome={this.setHome} />
+
     }
-}
+    else if (this.props.user.RoleID === 3) {
+      if (this.state.home === false)
+        this.setState({ home: true })
+      return <Redirect to='/PropertyForRenter' />
+    }
+  }
   render() {
-    
+
     var cron = require('node-cron');
     const i = () => {
       cron.schedule('* */30 * * * * ', () => {
         this.setState({ showt: true })
 
       });
-      
+
     }
 
-     
+
 
     return (
 
       <div>
-   <meta charset="utf-8"></meta>
-  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"></link>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <div className="NavBar">
-  
-    
-      {/* <button onClick={() => { this.props.setUser(use2);}}>משתמש מזכירה</button>
+        <meta charset="utf-8"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"></link>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <div className="NavBar">
+
+
+          {/* <button onClick={() => { this.props.setUser(use2);}}>משתמש מזכירה</button>
      <button > בבבבללבלבלבללהללהלהלהלהלהלהלהלה להלהלהלהלהלהלהלהלהלהלהלהל</button> */}
 
-    <div className="NavBar-links" >
-      {/* כל ארבעת השורות הללו לא צריך להתייחס בעיצוב כי זה רק בשביל שתוכלי לראות*/}
-      <Link hidden={this.props.user.UserID === null} onClick={() => { this.props.setUser(new UserObject());this.setHome(false)}}>{this.props.user.UserName} התנתק </Link>
-<p> </p>
-<p></p>
-       <Link onClick={()=>this.setState({login:<Login closeModal={this.closeLogin} setHome={this.setHome}/>})} hidden={this.props.user.UserID !== null}
-       > <button >כניסה</button></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/PropertyOwner' }} onClick={() => {this.setHome(true)}}><button >משכירים</button></Link>
-       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/Renter' }} onClick={() => {this.setHome(true)}}> <button >שוכרים</button></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/Properties' }} onClick={() => {this.setHome(true)}}> <button>נכסים</button></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to="/Calendar" onClick={() => {this.setHome(true)}}><button>יומן</button></Link>
-       <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to={{ pathname: '/Rentals' }} onClick={() => {this.setHome(true)}}><button >השכרות</button></Link>
-      <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       to="/Tasks" onClick={() => {this.setHome(true)}}> <button >משימות</button ></Link>
-      <Link to="" hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
-       onClick={() => {this.setHome(false)}}><button >דף הבית</button></Link>
+          <div className="NavBar-links" >
+            {/* כל ארבעת השורות הללו לא צריך להתייחס בעיצוב כי זה רק בשביל שתוכלי לראות*/}
+            <Link hidden={this.props.user.UserID === null} onClick={() => { this.props.setUser(new UserObject()); this.setHome(false) }}>{this.props.user.UserName} התנתק </Link>
+            <p> </p>
+            <p></p>
+            <Link onClick={() => this.setState({ login: <Login closeModal={this.closeLogin} setHome={this.setHome} /> })} hidden={this.props.user.UserID !== null}
+            > <button >כניסה</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to={{ pathname: '/PropertyOwner' }} onClick={() => { this.setHome(true) }}><button >משכירים</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to={{ pathname: '/Renter' }} onClick={() => { this.setHome(true) }}> <button >שוכרים</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to={{ pathname: '/Properties' }} onClick={() => { this.setHome(true) }}> <button>נכסים</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to="/Calendar" onClick={() => { this.setHome(true) }}><button>יומן</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to={{ pathname: '/Rentals' }} onClick={() => { this.setHome(true) }}><button >השכרות</button></Link>
+            <Link hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              to="/Tasks" onClick={() => { this.setHome(true) }}> <button >משימות</button ></Link>
+            <Link to="" hidden={this.props.user.RoleID !== 1 && this.props.user.RoleID !== 2}
+              onClick={() => { this.setHome(false) }}><button >דף הבית</button></Link>
 
-</div>
-<div className="task-container">{this.rend()}</div>
-<div >
-  
-  <div>
-    <img className='nav-bar-logo' src={Logo}></img>
-  </div>
-  </div>
-  </div>
-  <div className="body-home-container" hidden={this.state.home}>
-  <AutoplaySlider
-                  play={true}
-                  cancelOnInteraction={false} // should stop playing on user interaction
-     interval={4000}> 
-    <div data-src={Pic6} />
-    <div data-src={Pic7} />
-    <div data-src={Logo} />
-    </AutoplaySlider>
-<div  hidden={this.props.user.RoleID===1 || this.props.user.RoleID===2}> 
-{/* className="text-container" */}
-    <p className="title">ARGAMAN EXPRESS GROUP</p>
-    {/* <p>
+          </div>
+          <div className="task-container">{this.rend()}</div>
+          <div >
+
+            <div>
+              <img className='nav-bar-logo' src={Logo}></img>
+            </div>
+          </div>
+        </div>
+        <div className="body-home-container" hidden={this.state.home}>
+          <AutoplaySlider
+            play={true}
+            cancelOnInteraction={false} // should stop playing on user interaction
+            interval={4000}>
+            <div data-src={Pic6} />
+            <div data-src={Pic7} />
+            <div data-src={Logo1} />
+          </AutoplaySlider>
+          <div hidden={this.props.user.RoleID === 1 || this.props.user.RoleID === 2}>
+            {/* className="text-container" */}
+            <p className="title">ARGAMAN EXPRESS GROUP</p>
+            {/* <p>
     {/* <img className='nav-bar-logo' src={Pic6}></img> */}
-  </div>
-  <div className="about-text-home"> 
-  <p className="about-text-home-title">מי אנחנו</p>
-  <p>חברת ארגמן אקספרס בע"מ הינה חברה פרטית בתחום הנדל"ן אשר נוסדה בשנת 2008.
-במהלך שנות פעילותה צברה החברה ניסיון רב בתחום שיווק נכסים להשקעה , מגורים ומסחרי , ניהול נכסים של משקיעים מהארץ ומחו"ל , שיפוצים ואחזקת מבנים הן להשקעה והן למגורים ,ייעוץ משכנתאות ופתרונות אשראי לפרטיים ועסקים.
-עם השנים צברנו הידע, הכלים וכמובן ניסיון, ובמהלכם רשמנו הישגים מרשימים והפכנו לשם דבר בתחומנו
+          </div>
+          <div className="about-text-home">
+            <p className="about-text-home-title">מי אנחנו</p>
+            <p>חברת ארגמן אקספרס בע"מ הינה חברה פרטית בתחום הנדל"ן אשר נוסדה בשנת 2008.
+            במהלך שנות פעילותה צברה החברה ניסיון רב בתחום שיווק נכסים להשקעה , מגורים ומסחרי , ניהול נכסים של משקיעים מהארץ ומחו"ל , שיפוצים ואחזקת מבנים הן להשקעה והן למגורים ,ייעוץ משכנתאות ופתרונות אשראי לפרטיים ועסקים.
+            עם השנים צברנו הידע, הכלים וכמובן ניסיון, ובמהלכם רשמנו הישגים מרשימים והפכנו לשם דבר בתחומנו
 .עם מחויבות להגשת פתרונות מלאים- אנו זוכים ע״י לקוחותינו למוניטין מוכח כחברה אמינה וערכית. לקוחות אלו בוחרים בנו פעם אחר פעם כשותפים, ואף ממליצים לאחרים</p>
 
-  </div>
+          </div>
 
-  <div className="img-footer-home">
-  <img src={ImgFooter}></img>
-  <img src={ImgFooter}></img>
-  <img src={ImgFooter}></img>
-  <img src={ImgFooter}></img>
-  </div>
-  </div> 
-  
-    {i()}
-     {this.state.login}
-     
-       
+          <div className="img-footer-home">
+            <img src={ImgFooter}></img>
+            <img src={ImgFooter}></img>
+            <img src={ImgFooter}></img>
+            <img src={ImgFooter}></img>
+          </div>
+        </div>
 
-<switch>
-    <Route path="/Home" component={Home} />
-    <Route path="/signup" component={Sign_up} />
-    <Route path="/Calendar" component={Calendar} />
-    <Route path='/EventDetails/:id' exact strict component={EventDetails} />
-    <Route path="/Login" component={Login} />
-    <Route path='/Properties' component={Properties} />
-    <Route path='/PropertyOwner' component={PropertyOwner} />
-    <Route name="propertyForRenter" path='/PropertyForRenter' component={PropertyForRenter} />
-    <Route path='/Rentals' component={Rentals} />
-    <Route path='/Tasks' component={Tasks} />
-    <Route path='/SubProperties' component={SubProperties} />
-    <Route path='/Form' component={Form} />
-    <Route path='/Renter' component={Renter} />
-    <Route path='/Route' component={Route} />
-    <Route path='/Details' component={Details}></Route>
-    <Route path='/RedirectTo' component={RedirectTo} />
-  </switch>
-    </div>
-    //   </div>
+        {i()}
+        {this.state.login}
+
+
+
+        <switch>
+          <Route path="/Home" component={Home} />
+          <Route path="/signup" component={Sign_up} />
+          <Route path="/Calendar" component={Calendar} />
+          <Route path='/EventDetails/:id' exact strict component={EventDetails} />
+          <Route path="/Login" component={Login} />
+          <Route path='/Properties' component={Properties} />
+          <Route path='/PropertyOwner' component={PropertyOwner} />
+          <Route name="propertyForRenter" path='/PropertyForRenter' component={PropertyForRenter} />
+          <Route path='/Rentals' component={Rentals} />
+          <Route path='/Tasks' component={Tasks} />
+          <Route path='/SubProperties' component={SubProperties} />
+          <Route path='/Form' component={Form} />
+          <Route path='/Renter' component={Renter} />
+          <Route path='/Route' component={Route} />
+          <Route path='/Details' component={Details}></Route>
+          <Route path='/RedirectTo' component={RedirectTo} />
+        </switch>
+      </div>
+      //   </div>
 
     )
   }

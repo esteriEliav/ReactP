@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
-import Table from '../General/Table'
-import Details from '../General/Details'
-import Form from '../General/Form'
-import AddCommonLinks from '../General/AddCommonLinks'
-import MPropertyForRenterain1 from './PropertiesForRenter/PropertyForRenter';
+import Table from '../../General/Table/Table'
+import Details from '../../General/Details/Details'
+import Form from '../../General/Form/Form'
+// import AddCommonLinks from '../../General/AddCommonLinks'
+// import MPropertyForRenterain1 from '../PropertiesForRenter/PropertyForRenter';
 import { Link, Redirect } from 'react-router-dom';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Axios from "../Axios";
-import { CommonFunction, CommonFunctions, GetFunction, postFunction, SearchFor } from '../General/CommonFunctions';
-import PropertyOwnerObject from '../../Models-Object/PropertyOwnerObject';
-import { mapStateToProps,mapDispatchToProps } from '../Login/Login'
+import { CommonFunctions, GetFunction, postFunction, SearchFor } from '../../General/CommonAxiosFunctions';
+import PropertyOwnerObject from '../../../Models-Object/PropertyOwnerObject';
+import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-import { Properties } from './Properties/Properties'
-import RedirectTo from "../RedirectTo";
-import fileDownload from 'js-file-download';
+// import { Properties } from '../Properties/Properties'
+// import RedirectTo from "../../RedirectTo";
+// import fileDownload from 'js-file-download';
+import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../General/CommonFunctions'
 import './PropertyOwner.css'
 
 
@@ -31,16 +30,16 @@ export class PropertyOwner extends Component {
         { field: 'Phone', name: 'טלפון', type: 'tel', pattern: /\b\d{3}[-]?\d{3}[-]?\d{4}|\d{2}[-]?\d{3}[-]?\d{4}|\d{1}[-]?\d{3}[-]?\d{6}|\d{1}[-]?\d{3}[-]?\d{2}[-]?\d{2}[-]?\d{2}|\*{1}?\d{2,5}\b/g },
         { field: 'Email', name: 'אימייל', type: 'email' }],
         ObjectsArray: this.props.location && this.props.location.objects ? this.props.location.objects : this.props.ownersList,
-       fieldsToSearch:[{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
-       { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
-       { field: 'Phone', name: 'טלפון', type: 'text',},
-       { field: 'Email', name: 'אימייל', type: 'text' }],
+        fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
+        { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
+        { field: 'Phone', name: 'טלפון', type: 'text', },
+        { field: 'Email', name: 'אימייל', type: 'text' }],
         showForm: false,
         showDetails: false,
         showSomthing: null,
         docks: null,
         properties: null,
-        red:null
+        red: null
 
         // fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
         // { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' }, { field: 'Phone', name: 'טלפון', type: 'tel' }, { field: 'Email', name: 'אימייל', type: 'email' }],
@@ -51,25 +50,24 @@ export class PropertyOwner extends Component {
     }
     closeFormModal = () => {
 
-        this.setState({  showSomthing: null })
-        
+        this.setState({ showSomthing: null })
+
     }
-    submitSearch =async (object) => {
-     
+    submitSearch = async (object) => {
+
         const path = 'PropertyOwner/Search';
 
         if (object) {
-               
-            let objects =await SearchFor(object, path)
+
+            let objects = await SearchFor(object, path)
             let name = 'תוצאות חיפוש'
-            if (objects)
-            {
-            if (objects.length ===0 ) {
-                name = 'לא נמצאו תוצאות'    
-            }
-            this.setState({ObjectsArray:[]})
-            const objArray=[...objects]
-            this.setState({ ObjectsArray: objArray, name:name,fieldsToSearch:null })
+            if (objects) {
+                if (objects.length === 0) {
+                    name = 'לא נמצאו תוצאות'
+                }
+                this.setState({ ObjectsArray: [] })
+                const objArray = [...objects]
+                this.setState({ ObjectsArray: objArray, name: name, fieldsToSearch: null })
             }
         }
     }
@@ -95,7 +93,7 @@ export class PropertyOwner extends Component {
                 Dock = object.add;
 
             }
-           
+
             object = new PropertyOwnerObject(OwnerID, OwnerFirstName, OwnerLastName, Phone, Email, Dock, docName)
 
 
@@ -107,13 +105,13 @@ export class PropertyOwner extends Component {
                 return;
             object = { id: object.OwnerID }
         }
-        const res= await CommonFunctions(type, object, path)
-     let list = await GetFunction('PropertyOwner/getAllOwners')
-                this.props.setOwners(list !== null ? list : [])
-                
-                list=await GetFunction('User/GetAllDocuments')
-                this.props.setDocuments(list !== null ? list : []) 
-                this.setState({red:<Redirect to={{pathname:'/RedirectTo',redirect:'/PropertyOwner'}}/>})
+        const res = await CommonFunctions(type, object, path)
+        let list = await GetFunction('PropertyOwner/getAllOwners')
+        this.props.setOwners(list !== null ? list : [])
+
+        list = await GetFunction('User/GetAllDocuments')
+        this.props.setDocuments(list !== null ? list : [])
+        this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/PropertyOwner' }} /> })
         return res
         // if (res!==null) {
         //     this.closeFormModal();
@@ -127,8 +125,7 @@ export class PropertyOwner extends Component {
         let erors = []
         this.state.fieldsArray.map(field => { erors[field.field] = "" })
         let generalEror = ''
-        if((object.OwnerFirstName===undefined || object.OwnerFirstName==='' ) && (object.OwnerLastName===undefined || object.OwnerLastName==='' ))
-        {
+        if ((object.OwnerFirstName === undefined || object.OwnerFirstName === '') && (object.OwnerLastName === undefined || object.OwnerLastName === '')) {
             generalEror = 'חובה להכניס שם או שם משפחה'
             isErr = true
         }
@@ -144,12 +141,15 @@ export class PropertyOwner extends Component {
         let LinksForTable = []
 
         if (this.state.name !== 'משכירים')
-            LinksForTable = [<button type='button' type='button' onClick={() => { 
-                this.setState({ ObjectsArray: this.props.ownersList, name: 'משכירים' ,
-                fieldsToSearch:[{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
-                { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
-                { field: 'Phone', name: 'טלפון', type: 'text',},
-                { field: 'Email', name: 'אימייל', type: 'text' }],}) }}>חזרה למשכירים</button>]
+            LinksForTable = [<button type='button' type='button' onClick={() => {
+                this.setState({
+                    ObjectsArray: this.props.ownersList, name: 'משכירים',
+                    fieldsToSearch: [{ field: 'OwnerFirstName', name: 'שם פרטי', type: 'text' },
+                    { field: 'OwnerLastName', name: 'שם משפחה', type: 'text' },
+                    { field: 'Phone', name: 'טלפון', type: 'text', },
+                    { field: 'Email', name: 'אימייל', type: 'text' }],
+                })
+            }}>חזרה למשכירים</button>]
         else
             LinksForTable = [<button type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -166,50 +166,53 @@ export class PropertyOwner extends Component {
         }
     }
     setForForm = object => {
-        const fieldsToAdd = [{ field: 'document', name: 'הוסף מסמך', type: 'file', index: 'end' }]
+        const fieldsToAdd = [{ ...AddDocField }]
         const LinksPerObject = []
-        const docks=this.props.documents.filter(i=>i.type===2 && i.DocUser===object.OwnerID)
+        const docks = this.props.documents.filter(i => i.type === 2 && i.DocUser === object.OwnerID)
         if (docks && docks[0]) {
- 
-            LinksPerObject.push (<div index='end'>{docks.map((dock, index) => 
-            <button index='end' type='button' key={index} onClick={async() => {
-                 const b=window.confirm('למחוק מסמך?')
-                if(b)
-                {
-                await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
-              let  list=await GetFunction('User/GetAllDocuments')
-        this.props.setDocuments(list !== null ? list : []) 
-                }
- }}> מחיקת מסמך {DocName(dock.DocName)}</button>)}</div>)
-         }
+
+            LinksPerObject.push(<div index='end'>
+                {DocDeleteButton(docks, this.props.setDocuments)}
+                {/* {docks.map((dock, index) => 
+//             <button index='end' type='button' key={index} onClick={async() => {
+//                  const b=window.confirm('למחוק מסמך?')
+//                 if(b)
+//                 {
+//                 await CommonFunctions('Delete',dock,'User/DeleteUserDocument') 
+//               let  list=await GetFunction('User/GetAllDocuments')
+//         this.props.setDocuments(list !== null ? list : []) 
+//                 }
+//  }}> מחיקת מסמך {DocName(dock.DocName)}</button>)} */}
+            </div>)
+        }
         return { fieldsToAdd, LinksPerObject }
     }
-    set =(object) => {
+    set = (object) => {
 
         //let properties = null
         let fieldsToAdd = []
         let ButtonsForEveryRow = []
         let LinksPerObject = []
-        
-       //postFunction('PropertyOwner/', { id: object.OwnerID}).then(res =>{ this.setState({ properties: res })})
-       const properties=this.props.propertiesList.filter(i=>i.OwnerID
-        ===object.OwnerID)
-     //this.setState({properties: await postFunction('PropertyOwner/', { id: object.OwnerID})})
-       // let res = this.state.properties
+
+        //postFunction('PropertyOwner/', { id: object.OwnerID}).then(res =>{ this.setState({ properties: res })})
+        const properties = this.props.propertiesList.filter(i => i.OwnerID
+            === object.OwnerID)
+        //this.setState({properties: await postFunction('PropertyOwner/', { id: object.OwnerID})})
+        // let res = this.state.properties
         // res = res !== null ? res : [];
-        let LinksForEveryRow = [<Link 
+        let LinksForEveryRow = [<Link
             to={{
-                pathname: '/Properties', objects: properties!== null ?properties  : []
-               
+                pathname: '/Properties', objects: properties !== null ? properties : []
+
             }} >דירות</Link>]
-            
+
         //postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 }).then(res => {this.setState({ docks: res });})    
-       //this.setState({docks: await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })})
-       const docks=this.props.documents.filter(i=>i.type===2 && i.DocUser===object.OwnerID)
-       
-       if (docks && docks[0]) {
-        fieldsToAdd = [{ field: 'doc', name: 'מסמכים', type: 'file', index: 'end' } ] 
-        object.doc = docks.map((dock, index) => <button className="button-file" type='button' key={index} onClick={() => { window.open(dock.DocCoding)}}>{DocName(dock.DocName)}</button>)
+        //this.setState({docks: await postFunction('User/GetUserDocuments', { id: object.OwnerID, type: 2 })})
+        const docks = this.props.documents.filter(i => i.type === 2 && i.DocUser === object.OwnerID)
+        if (docks && docks[0]) {
+            fieldsToAdd = [{ ...DocField }]
+            object.doc = DocButtons(docks)
+            // docks.map((dock, index) => <button className="button-file" type='button' key={index} onClick={() => { window.open(dock.DocCoding)}}>{DocName(dock.DocName)}</button>)
         }
         return {
             fieldsToAdd, LinksForEveryRow, object,
@@ -264,11 +267,10 @@ export class PropertyOwner extends Component {
     }
 }
 
-export default connect (mapStateToProps,mapDispatchToProps)(PropertyOwner);
-export const DocName=(docName)=>
-{
-    let name=docName.substring(docName.lastIndexOf('\\')+1)
-     return name.substring(0,name.lastIndexOf('.'));
+export default connect(mapStateToProps, mapDispatchToProps)(PropertyOwner);
+export const DocName = (docName) => {
+    let name = docName.substring(docName.lastIndexOf('\\') + 1)
+    return name.substring(0, name.lastIndexOf('.'));
 }
 //export const ownersList =
     //GetFunction('PropertyOwner/getAllOwners')

@@ -21,10 +21,17 @@ export class Search extends Component {
     }
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
         let tempObject = { ...this.state.Object };
-        console.log('e.target.checked', e.target.checked)
-        tempObject[field] = e.target.type === 'checkbox' ? e.target.checked : 
-        e.target.type === 'radio'?parseInt(e.target.value): e.target.value;
-        
+        if (e.target.type === 'checkbox')
+            tempObject[field] = e.target.checked
+        else if (e.target.type === 'radio') {
+            if (parseInt(e.target.value))
+                tempObject[field] = parseInt(e.target.value)
+            else
+                tempObject[field] = e.target.value;
+        }
+        else
+            tempObject[field] = e.target.value;
+
         this.setState({ Object: tempObject });
     }
     submitHandler = (e) => {
