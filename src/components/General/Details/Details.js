@@ -62,7 +62,7 @@ export class Details extends Component {
                     <a className="close" onClick={this.props.closeModal}>&times;</a>
                     <div className="div-container-popup">
                         {this.props.fieldsArray.map((item, index) => {
-                            debugger
+
                             return <div className="more-details" key={index}>
 
                                 {this.props.Object[item.field] && <div><label dir='rtl'>{item.name}</label>:

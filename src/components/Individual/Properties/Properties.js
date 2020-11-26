@@ -279,9 +279,9 @@ export class Properties extends PureComponent {
         const res = await CommonFunctions(type, object, path)
         let list = await GetFunction('Property/GetAllProperties')
         this.props.setProperties(list !== null ? list : [])
-
         list = await GetFunction('User/GetAllDocuments')
         this.props.setDocuments(list !== null ? list : [])
+        //this.props.history.push({ pathname: '/RedirectTo', redirect: '/Properties' })
         this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/Properties' }} /> })
         return res
         //אם מה שחזר מהשרת אינו נל, סימו שהבקשה הצליחה וניתן ל סגור את החלונית
@@ -290,7 +290,9 @@ export class Properties extends PureComponent {
         // }
 
     }
-
+    componentDidUpdate() {
+        debugger
+    }
 
     //פונקציה להוספת דברים הקשורים לקומפוננטת טייבל
     setForTable = () => {
@@ -403,6 +405,7 @@ export class Properties extends PureComponent {
                 >הוסף אחראי בלעדיות</button>)
 
         }
+
         const docks = this.props.documents.filter(i => i.type === 1 && i.DocUser === object.PropertyID)
         if (docks && docks[0]) {
 
@@ -448,7 +451,7 @@ export class Properties extends PureComponent {
 
         fieldsToAdd.push({ field: 'IsRented', name: 'מושכר', type: 'checkbox', index: 8 })
         const rentalObject = this.props.rentalsList.find(i => i.PropertyID === object.PropertyID && i.status === true)
-
+        debugger
         //אם הדירה מושכרת
         if (object.IsRented && rentalObject) {
 
@@ -482,6 +485,7 @@ export class Properties extends PureComponent {
                 })
             }}//במקום הוי אמורים לשים אייקון שמסמל כן
             >V</Link>
+
             //באטן לעריכת ההשכרה
             LinksPerObject.push(<button index={7} type='button' onClick={() => {
                 this.setState({ showForm: true })
@@ -506,6 +510,7 @@ export class Properties extends PureComponent {
                         setDocuments={this.props.setDocuments}
                         setTasks={this.props.setTasks} />
                 })
+                this.forceUpdate()
             }}>ערוך השכרה</button>)
         }
         //אחרת, אם לא מושכרת
@@ -567,7 +572,7 @@ export class Properties extends PureComponent {
         //postFunction('Property/GetRentalByPropertyID', { id: object.propertyID }).then(res => this.setState({ rentalObject: res }))
         //אם הדירה בלעדית
         if (object.IsExclusivity) {
-            object.IsExclusivity = 'V'
+            tempobject.IsExclusivity = 'V'
             //שדה של אחראי בלעדיות של הדירה
             fieldsToAdd.push({ field: 'ExclusivityID', name: 'אחראי בלעדיות', type: 'select', selectOptions: this.state.exclusivityPersons, index: 12 })
 
@@ -575,7 +580,11 @@ export class Properties extends PureComponent {
                 tempobject.ExclusivityID = this.state.exclusivityPersons.find(i => i.id === object.ExclusivityID).name
         }
         else
-            object.IsExclusivity = 'X'
+            tempobject.IsExclusivity = 'X'
+        if (object.IsWarranty)
+            tempobject.IsWarranty = 'V'
+        else
+            tempobject.IsWarranty = 'X'
 
 
         //בשדה משכיר ,באטן לפרטי משכיר
@@ -625,11 +634,11 @@ export class Properties extends PureComponent {
     }
     //פונקציה הבוחרת מה לרנדר  בהתאם לטייפ שנשלח אליה
     rend = () => {
-
+        let whatToRender = []
         // מציג פרטים של אוביקט מסוים מסוג נכס 
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
-            return <Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+            whatToRender.push(<Details closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={some.object}
                 fieldsArray={this.state.fieldsArray}
                 LinksPerObject={some.LinksPerObject}
@@ -637,38 +646,39 @@ export class Properties extends PureComponent {
                 ButtonsForEveryRow={some.ButtonsForEveryRow}
                 fieldsToAdd={some.fieldsToAdd}
 
-            />
+            />)
 
         }
         //מציג הוספה או עריכה של אוביקט מסיג נכס
         else if (this.props.type === 'form') {
             let fieldsArray = [...this.state.fieldsArray];
             fieldsArray.splice(0, 1)
-            return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
+            whatToRender.push(<Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
                 name={this.props.formName}
                 type={this.props.formType}
                 fieldsArray={fieldsArray}
                 submit={this.submit} setForForm={this.setForForm}
                 validate={this.validate}
-            />
+            />)
         }
         //אם לא נשלח טייפ תוצג הטבלה של כל הנכסים
         else {
-
             let fieldsArray = [...this.state.fieldsArray]
             // fieldsArray.splice(0, 1)
-            return <div><Table name={this.state.name} fieldsArray={fieldsArray}
+            whatToRender.push(<div><Table name={this.state.name} fieldsArray={fieldsArray}
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable} setForForm={this.setForForm}
                 set={this.set} delObject={this.submit}
                 validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
                 fieldsToSearch={this.state.fieldsToSearch}
-            />{this.state.showsomthing}{this.state.showExtention}{this.state.red}</div>
+            /></div>, this.state.showsomthing, this.state.showExtention, this.state.red)
         }
+        debugger
+        return whatToRender
     }
     render() {
-
+        debugger
         return (
 
             <div>

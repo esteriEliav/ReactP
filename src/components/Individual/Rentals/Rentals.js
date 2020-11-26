@@ -223,6 +223,7 @@ export class Rentals extends Component {
         this.props.setDocuments(list !== null ? list : [])
         list = await GetFunction('Task/GetAllTasks')
         this.props.setTasks(list !== null ? list : [])
+        // this.props.history.push({ pathname: '/RedirectTo', redirect: '/Rentals' })
         this.setState({ red: <Redirect to={{ pathname: '/RedirectTo', redirect: '/Rentals' }} /> })
         return res
         // if (res && res !== null) {

@@ -64,7 +64,7 @@ export class Tasks extends Component {
         propertyObject: {},
         spobject: {},
         red: null,
-        type: this.props.type,
+        type: this.props.location.type ? this.props.location.type : this.props.type,
         prevName: null,
         prevObjects: []
 
@@ -485,14 +485,28 @@ export class Tasks extends Component {
                 {this.state.name}
                 <br /><br /><br />
                 <button onClick={() => {
+                    this.props.history.push(this.props.match.url + '/faults');
                     this.setState({ type: 'table', name: 'תקלות', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 1) }); this.forceUpdate()
                 }}>תקלות</button>
-                <button onClick={() => { this.setState({ type: 'table', name: 'חוזים', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 2) }) }}>חוזים</button>
-                <button onClick={() => { this.setState({ type: 'table', name: 'פגישות', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 4) }) }}>פגישות</button>
-                <button onClick={() => { this.setState({ type: 'table', name: 'רכבים', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 5) }) }}>רכבים</button>
-                <button onClick={() => { this.setState({ type: 'table', name: 'כל המשימות', ObjectsArray: this.props.tasksList.filter(i => i.status == true) }) }}>כל המשימות</button>
+                <button onClick={() => {
+                    this.props.history.push(this.props.match.url + '/renwes');
+                    this.setState({ type: 'table', name: 'חוזים', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 2) })
+                }}>חוזים</button>
+                <button onClick={() => {
+                    this.props.history.push(this.props.match.url + '/meetings');
+                    this.setState({ type: 'table', name: 'פגישות', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 4) })
+                }}>פגישות</button>
+                <button onClick={() => {
+                    this.props.history.push(this.props.match.url + '/cars');
+                    this.setState({ type: 'table', name: 'רכבים', ObjectsArray: this.props.tasksList.filter(i => i.status == true && i.TaskTypeId === 5) })
+                }}>רכבים</button>
+                <button onClick={() => {
+                    this.props.history.push(this.props.match.url + '/allTasks');
+                    this.setState({ type: 'table', name: 'כל המשימות', ObjectsArray: this.props.tasksList.filter(i => i.status == true) })
+                }}>כל המשימות</button>
                 <button onClick={
                     async () => {
+                        this.props.history.push(this.props.match.url + '/archivesTasks');
                         const archivesTasks = await GetFunction('Task/GetAllarchivesTasks')
                         if (archivesTasks)
                             archivesTasks.map(i => i.status = undefined)

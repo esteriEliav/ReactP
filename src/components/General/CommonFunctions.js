@@ -8,7 +8,8 @@ export const DocName = (docName) => {
 }
 export const DocButtons = (docks) => {
 
-    return docks.map((dock, index) => <button className="button-file" type='button' key={index} onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
+    return docks.map((dock, index) => <button className="button-file" type='button' key={index}
+        onClick={() => { window.open(dock.DocCoding) }}>{DocName(dock.DocName)}</button>)
 
 }
 export const DocDeleteButton = (docks, setDocuments) => {
