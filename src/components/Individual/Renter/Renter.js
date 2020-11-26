@@ -190,7 +190,7 @@ export class Renter extends Component {
 
     }
     setForForm = object => {
-        const fieldsToAdd = [...AddDocField]
+        const fieldsToAdd = { ...AddDocField }
         let LinksPerObject = []
         const docks = this.props.documents.filter(i => i.type === 4 && i.DocUser === object.UserID)
         if (docks && docks[0]) {

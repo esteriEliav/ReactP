@@ -89,7 +89,31 @@ export class Rentals extends Component {
         this.setState({ fieldsArray: fieldsArray1, PaymentTypeOptions })
 
     }
+    componentDidUpdate = (prevProps, PrevState) => {
+        if (JSON.stringify(prevProps.rentersList) !== JSON.stringify(this.props.rentersList) || JSON.stringify(prevProps.propertiesList) !== JSON.stringify(this.props.propertiesList)) {
+            let renters = this.props.rentersList.filter(i => i.status === true)
+            renters = renters.map(item => { return { id: item.UserID, name: item.FirstName + ' ' + item.LastName } })
+            //const cities = this.props.cities
 
+            let city;
+            let street;
+            let propertiesOptions = this.props.propertiesList.filter(i => i.status === true)
+                .map(item => {
+                    //const street = await postFunction('Property/GetStreetByID', item.CityID);
+                    city = this.props.cities.find(i => i.CityId === item.CityID)
+                    street = this.props.streets.find(i => i.CityId === item.CityID && i.StreetID === item.StreetID)
+
+                    return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
+                })
+
+            let fieldsArray1 = [...this.state.fieldsArray];
+            fieldsArray1[0].selectOptions = propertiesOptions;
+            fieldsArray1[1].selectOptions = renters;
+
+            this.setState({ fieldsArray: fieldsArray1 })
+
+        }
+    }
     closeDetailsModal = () => {
 
         this.setState({ showDetails: false, showSomthing: null })

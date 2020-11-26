@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Table from '../../General/Table/Table'
 import Form from '../../General/Form/Form'
 
@@ -44,7 +44,7 @@ ExclusivityID int,
 IsWarranty bit not null constraint DF_Properties_IsWarranty default 0,-- האם באחריות 
 */
 //קומפוננטת נכסים
-export class Properties extends Component {
+export class Properties extends PureComponent {
     componentWillMount = () => {
 
         const owners = this.props.ownersList.filter(i => i.status === true).map(item => {
@@ -67,9 +67,10 @@ export class Properties extends Component {
 
 
     }
-    componentDidUpdate = (prev, next) => {
-        debugger
-        if (prev.cities !== next.cities || prev.owners !== next.owners || prev.exclusivityPersons !== next.exclusivityPersons) {
+    componentDidUpdate = (prevProps, prev) => {
+
+
+        if (JSON.stringify(prev.cities) != JSON.stringify(this.state.cities) || JSON.stringify(prevProps.ownersList) != JSON.stringify(this.props.ownersList) || JSON.stringify(prev.exclusivityPersons) != JSON.stringify(this.state.exclusivityPersons)) {
             const owners = this.props.ownersList.filter(i => i.status === true).map(item => {
                 let name = item.OwnerFirstName !== null ? item.OwnerFirstName : '';
                 name += item.OwnerLastName !== null ? ' ' + item.OwnerLastName : ''

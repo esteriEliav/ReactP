@@ -99,6 +99,29 @@ export class Tasks extends Component {
         this.setState({ fieldsArray, fieldsToSearch, ClassificationOptions, TaskTypeOptions, propertiesOptions })
 
     }
+    componentDidUpdate = (prevProps, PrevState) => {
+        if (JSON.stringify(prevProps.taskTypes) !== JSON.stringify(this.props.taskTypes)) {
+            const y = this.props.taskTypes;
+            const TaskTypeOptions = y !== null ?
+                y.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } }) : []
+
+            let city;
+            let street;
+            const propertiesOptions = this.props.propertiesList.filter(i => i.status === true).map(item => {
+                //const street = await postFunction('Property/GetStreetByID', item.CityID);
+                city = this.props.cities.find(i => i.CityId === item.CityID)
+                street = this.props.streets.find(i => i.CityId === item.CityID && i.StreetID === item.StreetID)
+
+                return { id: item.PropertyID, name: item.PropertyID + ':' + street.StreetName + ' ' + item.Number + ' ,' + city.CityName }
+            })
+            let fieldsArray = [...this.state.fieldsArray];
+
+
+            fieldsArray[0].radioOptions = [...TaskTypeOptions];
+            this.setState({ fieldsArray, TaskTypeOptions, propertiesOptions })
+
+        }
+    }
     closeDetailsModal = () => {
 
         this.setState({ showDetails: false, showSomthing: null })
