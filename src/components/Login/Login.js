@@ -1,4 +1,4 @@
-import React, { Component, useReducer } from 'react';
+import React, { Component, useReducer, PureComponent } from 'react';
 import { CommonFunctions, GetFunction, postFunction } from '../General/CommonAxiosFunctions';
 import UserDTO from '../../Models-Object/UserObject';
 import { connect } from 'react-redux'
@@ -6,17 +6,11 @@ import { Link, Redirect, Route, BrowserRouter, Switch } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import picLogin from '../../../src/pic-login.png';
 
-
-import Axios from "../Axios"
-//import Router from './Router';
-import userDTO from '../../Models-Object/UserObject';
-//const use1 = new userDto(1, 'aa', 'bb', null, null, null, 3);
-//const use2 = new userDto(1, 'aa', 'bb', null, null, null, 1);
 import './Login.css'
 
 
 
-export class Login extends Component {
+export class Login extends PureComponent {
     use1 = new UserDTO(1, 'aa', 'bb', null, null, null, 3);
     use2 = new UserDTO(1, 'aa', 'bb', null, null, null, 1);
     state =
@@ -27,30 +21,6 @@ export class Login extends Component {
 
 
         }
-    // componentDidMount = async () => {
-    //     debugger;
-    //    let list = await GetFunction('PropertyOwner/getAllOwners')
-    //     this.props.setOwners(list !== null ? list : [])
-    //      list = await GetFunction('Property/GetAllProperties')
-    //     this.props.setProperties(list !== null ? list : [])
-    //     list = await GetFunction('Rental/GetAllRentals')
-    //     this.props.setRentals(list !== null ? list : [])
-    //     list = await GetFunction('Renter/GetAllRenters')
-    //     this.props.setRenters(list !== null ? list : [])
-    //     list = await GetFunction('SubProperty/GetAllSubProperties')
-    //     this.props.setSubProperties(list !== null ? list : [])
-    //     list = await GetFunction('Task/GetAllTasks')
-    //     this.props.setTasks(list !== null ? list : [])
-    //     list = await GetFunction('Property/GetAllCities')
-    //     this.props.setCities(list !== null ? list : [])
-    //     list=await GetFunction('Property/GetAllStreets')
-    //     this.props.setStreets(list !== null ? list : [])
-    //     list=await GetFunction('User/GetAllDocuments')
-    //      this.props.setDocuments(list !== null ? list : [])
-    //     debugger;
-
-    // }
-
     onSubmit = async (e) => {
         e.preventDefault();
         let user = await postFunction('User/Ifhaveuse', { username: this.state.userName, passemail: this.state.password })
@@ -67,9 +37,9 @@ export class Login extends Component {
             this.props.setStreets(list !== null ? list : [])
             list = await GetFunction('Task/GetAllClassificationTypes');
             this.props.setClassificationTypes(list !== null ? list : [])
+            list = await GetFunction('Task/GetAllTasks')
+            this.props.setTasks(list !== null ? list : [])
 
-
-            debugger
             if (userObj.RoleID === 3) {
                 list = await postFunction('Renter/getPropertiesbyRenterID', { id: userObj.UserID })
                 this.props.setProperties(list !== null ? list : [])
@@ -87,8 +57,7 @@ export class Login extends Component {
                 this.props.setRenters(list !== null ? list : [])
                 list = await GetFunction('SubProperty/GetAllSubProperties')
                 this.props.setSubProperties(list !== null ? list : [])
-                list = await GetFunction('Task/GetAllTasks')
-                this.props.setTasks(list !== null ? list : [])
+
                 list = await GetFunction('User/GetAllDocuments')
                 this.props.setDocuments(list !== null ? list : [])
                 list = await GetFunction('Task/GetAllTaskTypes');
@@ -144,9 +113,6 @@ export class Login extends Component {
         )
     }
 }
-
-
-
 export const mapStateToProps = state => {
     return {
         ...state
@@ -169,9 +135,6 @@ export const mapDispatchToProps = dispatch => {
         setClassificationTypes: (classificationTypes) => dispatch({ type: 'SET_CLASSIFICATIONTYPES', classificationTypes }),
         setPaymentTypes: (paymentTypes) => dispatch({ type: 'SET_PAYMENTTYPES', paymentTypes }),
         setExclusivityPeople: (exclusivityPeople) => dispatch({ type: 'SET_EXCLUSIVITYPEOPLE', exclusivityPeople }),
-
-
-
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

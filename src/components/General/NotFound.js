@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 
-export class NotFound extends Component {
+export class NotFound extends PureComponent {
     render() {
         return (
             <div>

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Table from '../../General/Table/Table'
 import { Link, Redirect, withRouter } from 'react-router-dom';
 import Details from '../../General/Details/Details';
@@ -10,9 +10,10 @@ import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import Form from '../../General/Form/Form'
 import PropertyOwner from '../PropertyOwner/PropertyOwner';
-import SubProperties from '../SubProperties';
+import SubProperties from '../SubProperties/SubProperties';
 import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../General/CommonFunctions'
-
+import { AddProperty, UpdateProperty, PropertyDetails } from '../Properties/PropertyNecActions';
+import { AddOwner, UpdateOwner, OwnerDetails } from '../PropertyOwner/OwnerNecActions';
 import './Rentals.css';
 import RedirectTo from "../../RedirectTo";
 import fileDownload from 'js-file-download'
@@ -31,7 +32,7 @@ ContactRenew bit constraint DF_Rentals_ContactRenew default 0,--האם לחדש 
 */
 
 
-export class Rentals extends Component {
+export class Rentals extends PureComponent {
 
     state = {
         name: 'השכרות',
@@ -115,7 +116,7 @@ export class Rentals extends Component {
         }
     }
     closeDetailsModal = () => {
-
+        debugger
         this.setState({ showDetails: false, showSomthing: null })
     }
     closeFormModal = () => {
@@ -261,15 +262,8 @@ export class Rentals extends Component {
         }
     }
     linkToAddRenter = <button type='button' index={0} onClick={() => {
-        this.setState({ showForm: true })
-        this.setState({
-            showSomthing: <Properties type='form'
-                formType='Add'
-                formName='הוסף'
-                isOpen={this.state.showForm}
-                closeModal={this.closeFormModal}
-                object={{}} />
-        })
+        //this.setState({ showForm: true })
+        this.setState({ showSomthing: <AddProperty object={{}} closeModal={this.closeFormModal} /> })
     }}  >הוסף נכס</button>
     linkToAddProperty = <button type='button' index={1} onClick={() => {
 
@@ -337,20 +331,20 @@ export class Rentals extends Component {
 
         tempObject.PropertyID = <Link onClick={() => {
             this.setState({
-                showDetails: true, showSomthing:
-                    <Properties type='details' object={property !== null ? property : {}}
-                        isOpen={this.state.showDetails} closeModal={this.closeDetailsModal} />
+                showSomthing: <PropertyDetails
+                    object={property !== null ? property : {}}
+                    closeModal={this.closeDetailsModal} />
             })
+
+
+
         }}
-
-
         >{object.PropertyID}</Link>
 
         LinksPerObject.push(<button type='button' index={0} onClick={() => {
             this.setState({
-                showForm: true, showSomthing:
-                    <Properties type='form' formType='Update' formName='עריכה' index={0} object={property}
-                        isOpen={this.state.showForm} closeModal={this.closeFormModal} />
+                showSomthing:
+                    <UpdateProperty object={property} closeModal={this.closeFormModal} />
             })
         }}>ערוך פרטי נכס</button>)
 
@@ -395,7 +389,7 @@ export class Rentals extends Component {
             ownerName += ownerObject.OwnerLastName !== null ? ' ' + ownerObject.OwnerLastName : '';
             LinksPerObject.push(<button type='button' index='end' onClick={() => {
                 this.setState({
-                    showDetails: true, showSomthing: <PropertyOwner object={ownerObject}
+                    showSomthing: <PropertyOwner object={ownerObject}
                         type='details' isOpen={this.state.showDetails} closeModal={this.closeDetailsModal}
                         propertiesList={this.props.propertiesList}
                         documents={this.props.documents} />
@@ -445,7 +439,8 @@ export class Rentals extends Component {
 
     }
     rend = () => {
-        ;
+        debugger
+        console.log('this.props-rentals', this.props)
         if (this.props.type === 'details') {
             const some = this.set(this.props.object)
 
@@ -459,7 +454,7 @@ export class Rentals extends Component {
 
 
         }
-        else if (this.props.type || this.props.type === 'form') {
+        else if (this.props.type === 'form') {
 
             return <Form closeModal={this.props.closeModal} isOpen={this.props.isOpen}
                 Object={this.props.object}
@@ -472,11 +467,20 @@ export class Rentals extends Component {
 
         }
         else
-            return <div><Table name={this.state.name} fieldsArray={this.state.fieldsArray} objectsArray={this.state.ObjectsArray}
-                setForTable={this.setForTable} setForForm={this.setForForm}
-                set={this.set} delObject={this.submit}
-                validate={this.validate} erors={this.state.erors} submit={this.submit} submitSearch={this.submitSearch}
-                fieldsToSearch={this.state.fieldsToSearch} ></Table>{this.state.showSomthing}{this.state.red}</div>
+            return <div>
+                <Table
+                    name={this.state.name}
+                    fieldsArray={this.state.fieldsArray}
+                    objectsArray={this.state.ObjectsArray}
+                    setForTable={this.setForTable}
+                    setForForm={this.setForForm}
+                    set={this.set} delObject={this.submit}
+                    validate={this.validate}
+                    submit={this.submit}
+                    submitSearch={this.submitSearch}
+                    fieldsToSearch={this.state.fieldsToSearch} >
+                </Table>
+                {this.state.showSomthing}{this.state.red}</div>
 
     }
     render() {

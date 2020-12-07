@@ -1,11 +1,10 @@
 
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import { Redirect } from 'react-router-dom';
-export class RedirectTo extends Component {
+export class RedirectTo extends PureComponent {
     render() {
-        debugger
         return (
-           <Redirect to={this.props.location.redirect}/>
+            <Redirect to={{ pathname: this.props.location.redirect, type: this.props.location.type, code: this.props.location.code }} />
         )
     }
 }

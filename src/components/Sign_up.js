@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import Axios from "./Axios";
 import { CommonFunctions, GetFunction, postFunction } from './General/CommonAxiosFunctions';
 import Popup from 'reactjs-popup';
 
-export class Sign_up extends Component {
+export class Sign_up extends PureComponent {
     state =
         {
             username: '',
             passemail: '',
             open: true
-            // phone:''
         }
 
 
@@ -19,7 +18,6 @@ export class Sign_up extends Component {
     onSubmit = async (e) => {
         e.preventDefault();
         //פונקצייה שבודקת האם יש  שם ומייל או ,SMS ושולחת לשם
-        //if(fun())//forgotpassword
         let user = await postFunction('User/forgotpassword', { username: this.state.username, passemail: this.state.passemail })
         if (user) {
             alert(this.state.username + " סיסמא נשלחה אליך !!!!!!!!!!");
@@ -47,8 +45,6 @@ export class Sign_up extends Component {
                     <input className="login-item input-field" type="text" name="username" value={this.state.username} id="username" placeholder="שם משתמש" onChange={this.handleChange('username')} />
                     <label className="login-item" htmlFor="email">אימות אימייל</label>
                     <input className="login-item input-field" type="email" name="passemail" value={this.state.passemail} id="passemail" placeholder="מייל" onChange={this.handleChange('passemail')} />
-                    {/* <label className="login-item" htmlFor="phone">אימות</label>  */}
-                    {/* <input className="login-item input-field" type="phone" name="phone" value={this.state.phone} id="phone" placeholder="פון" onChange={()=>{this.handleChange('phone')}} />                            */}
                     <div className="login-item btn-enter">
                         <input className="login-button" type="submit" value="שליחה" />
                     </div>
@@ -61,12 +57,5 @@ export class Sign_up extends Component {
         )
     }
 }
-function fun() {
-
-    return true;
-    //  return false;
-}
-
-
 export default Sign_up
 

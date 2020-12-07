@@ -10,7 +10,6 @@ const initialState = {
     rentersList: [],
     SubPropertiesList: [],
     tasksList: [],
-
     cities: [],
     streets: [],
     documents: [],
@@ -58,11 +57,15 @@ const reducer = (state = initialState, action) => {
             ...state,
             tasksList: [...action.tasksList]
         }
-    if (action.type === 'SET_CITIES')
+    if (action.type === 'SET_CITIES') {
+        let cities = [...action.cities]
+        if (cities)
+            cities = cities.map(item => { return { id: item.CityId, name: item.CityName } })
         return {
             ...state,
-            cities: [...action.cities]
+            cities: cities
         }
+    }
     if (action.type === 'SET_STREETS')
         return {
             ...state,
@@ -73,30 +76,42 @@ const reducer = (state = initialState, action) => {
             ...state,
             documents: [...action.documents]
         }
-    if (action.type === 'SET_TASKTYPES')
+    if (action.type === 'SET_TASKTYPES') {
+        let taskTypes = [...action.taskTypes]
+        if (taskTypes)
+            taskTypes = taskTypes.map(item => { return { id: item.TaskTypeId, name: item.TaskTypeName } })
         return {
             ...state,
-            taskTypes: [...action.taskTypes]
+            taskTypes: taskTypes
         }
-    if (action.type === 'SET_CLASSIFICATIONTYPES')
-
+    }
+    if (action.type === 'SET_CLASSIFICATIONTYPES') {
+        let classificationTypes = [...action.classificationTypes]
+        if (classificationTypes)
+            classificationTypes = classificationTypes.map(item => { return { id: item.ClassificationID, name: item.ClassificationName } })
         return {
             ...state,
-            classificationTypes: [...action.classificationTypes]
+            classificationTypes: classificationTypes
         }
-    if (action.type === 'SET_PAYMENTTYPES')
-
+    }
+    if (action.type === 'SET_PAYMENTTYPES') {
+        let paymentTypes = [...action.paymentTypes]
+        if (paymentTypes)
+            paymentTypes = paymentTypes.map(item => { return { id: item.PaymentTypeID, name: item.PaymentTypeName } })
         return {
             ...state,
-            paymentTypes: [...action.paymentTypes]
+            paymentTypes: paymentTypes
         }
-    if (action.type === 'SET_EXCLUSIVITYPEOPLE')
-
+    }
+    if (action.type === 'SET_EXCLUSIVITYPEOPLE') {
+        let exclusivityPeople = [...action.exclusivityPeople]
+        if (exclusivityPeople)
+            exclusivityPeople = exclusivityPeople.map(item => { return { id: item.ExclusivityID, name: item.ExclusivityName } })
         return {
             ...state,
-            exclusivityPeople: [...action.exclusivityPeople]
+            exclusivityPeople: exclusivityPeople
         }
-
+    }
 
 
     return state

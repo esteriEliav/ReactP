@@ -5,9 +5,9 @@ const property = () => {
         PropertyID: null,
         OwnerID: null,
         CityID: null,
-        
+
         StreetID: null,
-        
+
         Number: null,
         Size: null,//--גודל דירה
         Floor: null,
@@ -22,7 +22,8 @@ const property = () => {
         ApartmentNum: null,
         Dock: null,
         DocName: null,
-        status: true
+        status: true,
+        IsInsured: false
     }
 }
 export default property;

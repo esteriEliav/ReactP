@@ -1,23 +1,21 @@
-import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import React, { Component, PureComponent } from 'react'
 import LabelInput from './LabelInput/LabelInput'
-//import { CommonFunctions, GetFunction, postFunction } from '../General/CommonFunctions'
-import Popup from 'reactjs-popup';
+import { SearchFor } from './CommonAxiosFunctions'
 import { mapStateToProps } from '../Login/Login'
 import { connect } from 'react-redux';
 import '../../components/Individual/Task/Task.css'
 
-export class Search extends Component {
+export class Search extends PureComponent {
 
     state = {//לכל קומפוננטה יש אוביקט, שדות שצריך להוסיף לו בהתאם לאוביקט, שגיאות אם הוקשמשהו לא חוקי, ושדה המציין אם הקומפוננטה סיימה את פעולתה וניתן לחזור להצגת האוביקטים
         Object: { ...this.props.Object },
         isRedirect: false,
     }
-    componentDidMount = () => {
-        // let tempObject = {}
-        // this.props.fieldsArray.map(field => { tempObject[field.field] = "" });
-        // this.setState({ Object: tempObject });
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.statusSearch == false && this.props.statusSearch === true) {
 
+            this.setState({ Object: {} })
+        }
     }
     change = (e, field) => {//כשמשתנה שדה יש לעדכן זאת
         let tempObject = { ...this.state.Object };
@@ -34,11 +32,14 @@ export class Search extends Component {
 
         this.setState({ Object: tempObject });
     }
-    submitHandler = (e) => {
+    submitHandler = async (e) => {
         e.preventDefault();
-        this.props.submit(this.state.Object)
+        if (this.state.Object) {
+            const path = this.props.path + '/Search';
+            let objects = await SearchFor(this.state.Object, path)
+            this.props.submit(objects)
 
-        // this.setState({ isRedirect: this.props.submit(this.state.Object) })
+        }
     }
 
     render() {
@@ -50,12 +51,10 @@ export class Search extends Component {
                         <span key={index}>
                             <LabelInput field={field} content={this.state.Object[field.field]} change={this.change} />
                         </span>
-
                     )}
                     {/* באטן של סבמיט */}
-                    <button type={this.props.type} name={this.props.name} >{this.props.name}</button>
+                    <button type={this.props.type}>חיפוש</button>
                 </form>
-                {/* {this.state.isRedirect} */}
             </div>
         )
     }

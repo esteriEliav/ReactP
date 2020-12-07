@@ -1,82 +1,76 @@
-import React, { Component } from 'react'
-import { Link } from 'react-router-dom';
-import Form from '../Form/Form';
-import { mapStateToProps } from '../../Login/Login'
+import React, { Component, PureComponent } from 'react'
+import PropTypes, { object } from 'prop-types';
+import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
-import Details from "../Details/Details";
 import './Item.css';
-// import MoreDetails from './';
-// import Edit from './';
-// import Delete from './'
+import * as Action from '../Action'
 
 
 
 //קומפוננטה להצגת שורה בטבלה
-export class Item extends Component {
+export class Item extends PureComponent {
     gen = this.props.set(this.props.Object);
     state = {
-        LinksForEveryRow: this.gen.LinksForEveryRow,
+        LinksForDetails: this.gen.LinksForDetails,
         ButtonsForEveryRow: this.gen.ButtonsForEveryRow,
         fieldsToAdd: this.gen.fieldsToAdd,
         LinksPerObject: this.gen.LinksPerObject,
         Object: this.gen.object,
-        // isToomatch: false,
-        details: false,
-        form: false
+        details: null,
+        form: null
 
     }
-
-    closeDetailsModal = () => {
-
-        this.setState({ details: false })
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.set !== this.props.set || prevProps.Object !== this.props.Object) {
+            const gen = this.props.set(this.props.Object);
+            this.setState({
+                LinksForDetails: gen.LinksForDetails,
+                ButtonsForEveryRow: gen.ButtonsForEveryRow,
+                fieldsToAdd: gen.fieldsToAdd,
+                LinksPerObject: gen.LinksPerObject,
+                Object: gen.object,
+            })
+        }
     }
     closeFormModal = () => {
-
-        this.setState({ form: false })
+        this.setState({ form: null })
     }
-    // componentWillMount = () => {//בעבורכל אוביקט יש לעדכן אותו ואת כל השדות והקישורים הקשורים אליו
-    //     //אם יש מידי הרבה שדות , לא נציג את כולם ונוסיף קישור לפרטים מלאים
-    //     if (this.props.fieldsArray.length > 5 || this.props.fieldsArray.length + this.state.LinksForEveryRow.length + this.state.ButtonsForEveryRow.length + this.state.fieldsToAdd.length > 8)
-    //         this.setState({ isToomatch: true })
-    // }
-
-    showdet = () => {
-        return this.state.details && <Details closeModal={this.closeDetailsModal} isOpen={this.state.details}
-            fieldsArray={this.props.fieldsArray} Object={this.state.Object}
-            LinksForEveryRow={this.state.LinksForEveryRow} ButtonsForEveryRow={this.state.ButtonsForEveryRow}
-            fieldsToAdd={this.state.fieldsToAdd} LinksPerObject={this.state.LinksPerObject}
-            submit={this.props.submit} setForForm={this.props.setForForm}
-        />
-    }
-    showForm = (type, name) => {
-        return this.state.form && <Form closeModal={this.closeFormModal} isOpen={this.state.form}
-            fieldsArray={this.props.fieldsArray} Object={this.props.Object}
-            submit={this.props.submit} type={type} formType={type} name={name}
-            setForForm={this.props.setForForm} validate={this.props.validate}
-        />
-
+    closeDetailsModal = () => {
+        this.setState({ details: null })
     }
     render() {
+        debugger
         return (
             <React.Fragment>
                 <tr>{this.props.fieldsArray.map((item, index) => { if (index < 6) return <td key={index}>{this.state.Object[item.field]}</td> })}
-                    {(this.props.user.RoleID == 1 || this.props.user.RoleID == 2) &&
+                    {(this.props.actions && !this.props.restore) ?
                         <div className="icon-container">
-                            <td><button onClick={() => { this.setState({ details: true }) }} >
+                            <td><button onClick={() => {
+                                this.setState({ details: this.props.actions(Action.details, null, null, this.props.Object, this.closeDetailsModal) })
+                            }} >
                                 &#10011;
-                             </button>{this.showdet()}</td>
+                             </button>
+                            </td>
 
-                            <td><button onClick={() => { this.setState({ form: true }) }} >
+                            <td><button onClick={() => {
+                                this.setState({ form: this.props.actions(Action.form, Action.Update, 'ערוך', this.props.Object, this.closeFormModal) })
+                            }} >
                                 &#128394;
-                            </button>{this.showForm("Update", 'ערוך')} </td>
+                            </button>
+                            </td>
 
-                            <td><button onClick={() => { this.props.submit('Delete', this.props.Object) }}>
-                                {/* &#10008; */}
-                            &#128465;
+                            <td><button onClick={() => { this.props.delObject(this.props.Object) }}>
+                                &#128465;
                             </button></td>
                         </div>
-                    }
+                        : this.props.restore ?
+                            <td><button onClick={() => { this.props.restore(this.props.Object) }}>
+                                שחזר
+                    </button></td> : null}
                     {this.state.ButtonsForEveryRow.map((but, index) => <td index={index}> {but}</td>)}
+                    {this.state.details}
+                    {this.state.form}
+
                 </tr>
 
 
@@ -85,4 +79,12 @@ export class Item extends Component {
         )
     }
 }
-export default connect(mapStateToProps)(Item)
+export default connect(mapStateToProps, mapDispatchToProps)(Item)
+Item.propTypes = {
+    set: PropTypes.func,
+    Object: PropTypes.object,
+    fieldsArray: PropTypes.arrayOf(PropTypes.object),
+    closeModal: PropTypes.func,
+    actions: PropTypes.func,
+    delObject: PropTypes.func,
+}

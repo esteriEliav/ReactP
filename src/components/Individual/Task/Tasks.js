@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Table from '../../General/Table/Table'
 import Properties from '../Properties/Properties'
-import SubProperties from '../SubProperties'
+import SubProperties from '../SubProperties/SubProperties'
 import PopUpForProperties from '../PopUpForProperty/PopUpForProperties'
 
 import { Link, Redirect, withRouter } from 'react-router-dom';
@@ -15,6 +15,8 @@ import { connect } from 'react-redux'
 import './Task.css';
 import RedirectTo from "../../RedirectTo";
 import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../General/CommonFunctions'
+import { AddProperty, UpdateProperty, PropertyDetails } from '../Properties/PropertyNecActions';
+
 import fileDownload from 'js-file-download'
 import { Renter } from '../Renter/Renter'
 
@@ -34,7 +36,7 @@ IsHandled bit constraint DF_Tasks_IsHandled default 0, --האם טופל
 HandlingDate datetime,--תאריך טיפול
 HandlingWay nvarchar(max),--אופן טיפול
  */
-export class Tasks extends Component {
+export class Tasks extends PureComponent {
     state = {
 
         name: 'משימות',
@@ -359,10 +361,9 @@ export class Tasks extends Component {
             if (object.TaskTypeId === 1)
                 tempobject.ReportDate = new Date(object.ReportDate).toLocaleDateString();
             tempobject.PropertyID = <Link onClick={() => {
-                this.setState({ showDetails: true })
                 this.setState({
-                    showSomthing: <Properties object={propertyObject} type='details'
-                        closeModal={this.closeDetailsModal} />
+                    showSomthing: <PropertyDetails object={propertyObject} closeModal={this.closeDetailsModal} />
+
                 })
             }}>{object.PropertyID}</Link>
 
@@ -469,7 +470,8 @@ export class Tasks extends Component {
         }
         else if (this.state.type === 'table') {
 
-            return <div><Table name={this.state.name}
+            return <div><Table
+                name={this.state.name}
                 fieldsArray={this.state.fieldsArray}
                 objectsArray={this.state.ObjectsArray}
                 setForTable={this.setForTable}

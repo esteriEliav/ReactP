@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Table from '../../General/Table/Table'
 import Details from '../../General/Details/Details'
 import Form from '../../General/Form/Form'
@@ -16,7 +16,7 @@ import { DocButtons, DocDeleteButton, DocField, AddDocField } from '../../Genera
 import './PropertyOwner.css'
 
 
-export class PropertyOwner extends Component {
+export class PropertyOwner extends PureComponent {
     // obj = []
     // componentDidMount = () => {
 

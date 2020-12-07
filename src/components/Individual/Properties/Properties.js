@@ -11,7 +11,7 @@ import DocumentObject from '../../../Models-Object/DocumentObject'
 import { mapStateToProps, mapDispatchToProps } from '../../Login/Login'
 import { connect } from 'react-redux'
 import property from '../../../Models-Object/PropertyObject';
-import SubProperties from '../SubProperties';
+import SubProperties from '../SubProperties/SubProperties';
 import { Rentals } from '../Rentals/Rentals';
 import PopUpForProperties from '../PopUpForProperty/PopUpForProperties';
 import subProperty from '../../../Models-Object/SubPropertyObject';
@@ -527,21 +527,22 @@ export class Properties extends PureComponent {
                         formName='הוסף השכרה'
                         isOpen={this.state.showForm}
                         closeModal={this.closeFormModal}
-                        paymentTypes={this.props.paymentTypes}
-                        propertiesList={this.props.propertiesList}
-                        SubPropertiesList={this.props.SubPropertiesList}
-                        rentersList={this.props.rentersList}
-                        ownersList={this.props.ownersList}
-                        documents={this.props.documents}
-                        rentalsList={this.props.rentalsList}
-                        user={this.props.user}
-                        cities={this.props.cities}
-                        streets={this.props.streets}
-                        object={{ PropertyID: object.PropertyID }}
-                        setRentals={this.props.setRentals}
-                        setProperties={this.props.setProperties}
-                        setDocuments={this.props.setDocuments}
-                        setTasks={this.props.setTasks} />
+                    // paymentTypes={this.props.paymentTypes}
+                    // propertiesList={this.props.propertiesList}
+                    // SubPropertiesList={this.props.SubPropertiesList}
+                    // rentersList={this.props.rentersList}
+                    // ownersList={this.props.ownersList}
+                    // documents={this.props.documents}
+                    // rentalsList={this.props.rentalsList}
+                    // user={this.props.user}
+                    // cities={this.props.cities}
+                    // streets={this.props.streets}
+                    // object={{ PropertyID: object.PropertyID }}
+                    // setRentals={this.props.setRentals}
+                    // setProperties={this.props.setProperties}
+                    // setDocuments={this.props.setDocuments}
+                    // setTasks={this.props.setTasks} 
+                    />
                 })
             }}>הוסף השכרה</button>)
         }
@@ -674,11 +675,11 @@ export class Properties extends PureComponent {
                 fieldsToSearch={this.state.fieldsToSearch}
             /></div>, this.state.showsomthing, this.state.showExtention, this.state.red)
         }
-        debugger
+
         return whatToRender
     }
     render() {
-        debugger
+        console.log('this.props-properties-less', this.props)
         return (
 
             <div>

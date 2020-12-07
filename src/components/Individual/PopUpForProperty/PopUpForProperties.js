@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Popup from 'reactjs-popup';
 import LabelInput from '../../General/LabelInput/LabelInput';
 import './PopUpForProperties.css'
 
 
-export class PopUpForProperties extends Component {
+export class PopUpForProperties extends PureComponent {
     state = {
         object: {}
     }
@@ -17,6 +17,7 @@ export class PopUpForProperties extends Component {
         this.setState({ object: obj })
     }
     render() {
+        debugger
         return (
             <Popup open={true} closeOnDocumentClick={false}
                 contentStyle={{ backgroundColor: "white" }} >

@@ -1,5 +1,5 @@
 
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Table from '../../General/Table/Table'
 import Details from '../../General/Details/Details'
 import Form from '../../General/Form/Form'
@@ -29,7 +29,7 @@ import fileDownload from 'js-file-download'
 // public string Password { get; set; }
 
 
-export class Renter extends Component {
+export class Renter extends PureComponent {
     state = {
 
         name: 'שוכרים',

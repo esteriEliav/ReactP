@@ -1,26 +1,22 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import Login from '../Login/Login'
-import Calendar from '../Calander/Calendar'
+import Calendar from '../Individual/Calander/Calendar'
 import EventDetails from '../EventDetails'
 import Sign_up from '../Sign_up'
 import Form from '../General/Form/Form'
 import Details from '../General/Details/Details'
-import Properties from "../Individual/Properties/Properties";
-import PropertyOwner from "../Individual/PropertyOwner/PropertyOwner";
+import Property from "../Individual/Properties/Property";
+import Owner from "../Individual/PropertyOwner/Owner";
 import PropertyForRenter from "../Individual/PropertiesForRenter/PropertyForRenter";
-import Rentals from "../Individual/Rentals/Rentals";
-import Tasks from "../Individual/Task/Tasks";
-import SubProperties from "../Individual/SubProperties";
-import ReportForm from "../Individual/ReportForm";
-import Renter from '../Individual/Renter/Renter';
-import { Link, Redirect, Route } from 'react-router-dom';
+import Rental from "../Individual/Rentals/Rental";
+import Task from "../Individual/Task/Task";
+import SubProperties from "../Individual/SubProperties/SubProperties";
+import NRenter from '../Individual/Renter/NRenter';
+import { Link, Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux'
 import UserObject from '../../Models-Object/UserObject'
 import TasksPopUp from "../TasksPopUp/TasksPopUp";
 import RedirectTo from "../RedirectTo";
-import Axios from 'axios';
-import { GetFunction, postFunction } from '../General/CommonFunctions';
-import Select from "react-dropdown-select";
 
 import './Home.css';
 import Logo from './../../logo-nav-bar.jpg';
@@ -28,12 +24,7 @@ import Logo1 from './../../logo-nav-bar1.jpg';
 
 import Pic7 from './../../../src/pic7.jpg';
 import ImgFooter from '../../../src/footer.jpg'
-//import Pic2 from './../../pic2.jpg';
 import Pic6 from './../../../src/building.jpg';
-
-import Pic1 from './../../pic1.png';
-//import Pic6 from './../../pic6.png';
-import Pic9 from './../../pic9.png';
 
 import AwesomeSlider from 'react-awesome-slider';
 
@@ -44,13 +35,14 @@ import 'react-awesome-slider/dist/styles.css';
 const AutoplaySlider = withAutoplay(AwesomeSlider);
 
 
-export class Home extends Component {
+export class Home extends PureComponent {
   state = {
-    showt: false,
     home: false,
     login: null
   }
-
+  componentDidMount = () => {
+    this.props.history.replace('/')
+  }
   closeModel = () => {
     this.setState({ showt: false })
 
@@ -58,19 +50,12 @@ export class Home extends Component {
   closeLogin = () => {
     this.setState({ login: null })
   }
-  // authorization = () => {
-  //   if (this.props.user.RoleID === 1 || this.props.user.RoleID === 2) {
-  //     return null
-  //   }
-  //   return <Redirect to='/a' />
-  // }
   setHome = (bool) => {
     this.setState({ home: bool })
   }
   rend = () => {
 
     if (this.props.user.RoleID === 1 || this.props.user.RoleID === 2) {
-      //this.state.showt &&
       if (this.state.home === false)
         return <TasksPopUp setHome={this.setHome} />
 
@@ -78,22 +63,19 @@ export class Home extends Component {
     else if (this.props.user.RoleID === 3) {
       if (this.state.home === false)
         this.setState({ home: true })
-      return <Redirect to='/PropertyForRenter' />
+      return <Redirect to='/PropertiesForRenter' />
     }
   }
   render() {
 
-    var cron = require('node-cron');
-    const i = () => {
-      cron.schedule('* */30 * * * * ', () => {
-        this.setState({ showt: true })
+    // var cron = require('node-cron');
+    // const i = () => {
+    //   cron.schedule('* */30 * * * * ', () => {
+    //     this.setState({ showt: true })
 
-      });
+    //   });
 
-    }
-
-
-
+    // }
     return (
 
       <div>
@@ -104,13 +86,11 @@ export class Home extends Component {
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <div className="NavBar">
 
-
-          {/* <button onClick={() => { this.props.setUser(use2);}}>משתמש מזכירה</button>
-     <button > בבבבללבלבלבללהללהלהלהלהלהלהלהלה להלהלהלהלהלהלהלהלהלהלהלהל</button> */}
-
           <div className="NavBar-links" >
-            {/* כל ארבעת השורות הללו לא צריך להתייחס בעיצוב כי זה רק בשביל שתוכלי לראות*/}
-            <Link hidden={this.props.user.UserID === null} onClick={() => { this.props.setUser(new UserObject()); this.setHome(false) }}>{this.props.user.UserName} התנתק </Link>
+            <Link hidden={this.props.user.UserID === null} onClick={() => {
+              this.props.history.replace('/')
+              this.props.setUser(new UserObject()); this.setHome(false)
+            }}>{this.props.user.UserName} התנתק </Link>
             <p> </p>
             <p></p>
             <Link onClick={() => this.setState({ login: <Login closeModal={this.closeLogin} setHome={this.setHome} /> })} hidden={this.props.user.UserID !== null}
@@ -171,29 +151,29 @@ export class Home extends Component {
           </div>
         </div>
 
-        {i()}
+
         {this.state.login}
 
 
 
-        <switch>
+        <Switch>
           <Route path="/Home" component={Home} />
           <Route path="/signup" component={Sign_up} />
           <Route path="/Calendar" component={Calendar} />
           <Route path='/EventDetails/:id' exact strict component={EventDetails} />
           <Route path="/Login" component={Login} />
-          <Route path='/Properties' component={Properties} />
-          <Route path='/PropertyOwner' component={PropertyOwner} />
-          <Route name="propertyForRenter" path='/PropertyForRenter' component={PropertyForRenter} />
-          <Route path='/Rentals' component={Rentals} />
-          <Route path='/Tasks' component={Tasks} />
+          <Route path='/Properties' component={Property} />
+          <Route path='/PropertyOwner' component={Owner} />
+          <Route name="propertiesForRenter" path='/PropertiesForRenter' component={PropertyForRenter} />
+          <Route path='/Rentals' component={Rental} />
+          <Route path='/Tasks' component={Task} />
           <Route path='/SubProperties' component={SubProperties} />
           <Route path='/Form' component={Form} />
-          <Route path='/Renter' component={Renter} />
+          <Route path='/Renter' component={NRenter} />
           <Route path='/Route' component={Route} />
           <Route path='/Details' component={Details}></Route>
           <Route path='/RedirectTo' component={RedirectTo} />
-        </switch>
+        </Switch>
       </div>
       //   </div>
 
@@ -214,6 +194,6 @@ const mapDispatchToProps = dispatch => {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Home))
 
 
